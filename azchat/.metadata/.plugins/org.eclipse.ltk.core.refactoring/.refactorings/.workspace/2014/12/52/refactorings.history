@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;azchat-web/.git&apos;" deleteContents="false" description="Delete resource &apos;azchat-web/.git&apos;" element1="/azchat-web/.git" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1419418440342"/>&#x0A;<refactoring comment="Delete resource &apos;azure-chat-for-java&apos;" deleteContents="true" description="Delete resource &apos;azure-chat-for-java&apos;" element1="/azure-chat-for-java" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1419419266688"/>
+</session>

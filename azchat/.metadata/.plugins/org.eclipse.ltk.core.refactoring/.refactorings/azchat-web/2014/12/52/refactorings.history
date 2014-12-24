@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;azchat-web/src/com/microsoftopentechnologies/azchat/web/controller&apos; to &apos;controllers&apos;" description="Rename resource &apos;controller&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/com/microsoftopentechnologies/azchat/web/controller" name="controllers" stamp="1419410520074" updateReferences="true"/>
+</session>
