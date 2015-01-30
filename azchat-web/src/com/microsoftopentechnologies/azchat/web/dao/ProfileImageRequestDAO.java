@@ -12,21 +12,30 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.microsoftopentechnologies.azchat.web.dao;
 
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * This interface defines contract methods for the profile image management.
+ * 
+ * @author Rupesh_Shirude
+ *
+ */
 public interface ProfileImageRequestDAO {
 	/**
-	 * Used to save profile image by given file object with file name over azure storage.
+	 * Used to save profile image by given file object with file name over azure
+	 * storage.
 	 * 
 	 * @param file
 	 * @param fileName
 	 * @return
 	 * @throws Exception
 	 */
-	public String saveProfileImage(MultipartFile file, String fileName) throws Exception;
+	public String saveProfileImage(MultipartFile file, String fileName)
+			throws Exception;
+
 	/**
 	 * Used to get the signature to access the private containers.
 	 * 
@@ -34,5 +43,40 @@ public interface ProfileImageRequestDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public String getSignatureForPrivateAccess()throws Exception;
+	public String getSignatureForPrivateAccess() throws Exception;
+
+	/**
+	 * Used to save profile image by given file object with file name over azure
+	 * storage.
+	 * 
+	 * @param file
+	 * @param fileName
+	 * @return
+	 * @throws Exception
+	 */
+	public String savePhoto(MultipartFile file, String fileName)
+			throws Exception;
+
+	/**
+	 * Used to save profile image by given file object with file name over azure
+	 * storage.
+	 * 
+	 * @param file
+	 * @param fileName
+	 * @return
+	 * @throws Exception
+	 */
+	public String saveTempVideo(MultipartFile file, String fileName)
+			throws Exception;
+
+	/**
+	 * Used to save profile image by given file object with file name over azure
+	 * storage.
+	 * 
+	 * @param file
+	 * @param fileName
+	 * @return
+	 * @throws Exception
+	 */
+	public void deletePhoto(String fileName) throws Exception;
 }

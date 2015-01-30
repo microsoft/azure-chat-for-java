@@ -45,6 +45,8 @@ import com.microsoftopentechnologies.azchat.web.data.beans.UserBean;
 import com.microsoftopentechnologies.azchat.web.data.beans.UserPrefBean;
 
 /**
+ * This service class provides the service method for user login process.
+ * 
  * @author Dnyaneshwar_Pawar
  *
  */
@@ -60,13 +62,13 @@ public class LoginService extends BaseServiceImpl {
 
 	@Autowired
 	private FriendRequestDAOImpl friendRequestDAOImpl;
-	
+
 	@Autowired
 	private ProfileImageRequestDAO profileImageRequestDAO;
-	
+
 	@Autowired
 	private PreferenceMetadataDAO preferenceMetadataDAO;
-	
+
 	@Autowired
 	@Qualifier("contentShareService")
 	private ContentShareService contentShareService;
@@ -139,10 +141,10 @@ public class LoginService extends BaseServiceImpl {
 			}
 			LOGGER.debug("Claim Map : " + claimMap.toString());
 		} catch (Exception e) {
-			LOGGER.error("Exception occured while parsing saml token : "
+			LOGGER.error("Exception occurred while parsing saml token : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured while parsing saml token : "
+					"Exception occurred while parsing saml token : "
 							+ e.getMessage());
 		}
 
@@ -162,29 +164,32 @@ public class LoginService extends BaseServiceImpl {
 				userBean.setEmail(user.getEmailAddress());
 				userBean.setCountryCD(String.valueOf(user.getPhoneCountryCode()));
 				userBean.setPhoneNo(String.valueOf(user.getPhoneNumber()));
-				userBean.setPhotoUrl(user.getPhotoBlobUrl()+"?"+profileImageRequestDAO.getSignatureForPrivateAccess());
-				//Fetch the content for this user
-				userBean=contentShareService.getUserContent(userBean);
-				
+				userBean.setPhotoUrl(user.getPhotoBlobUrl()
+						+ "?"
+						+ AzureChatUtils
+								.getSASUrl(AzureChatConstants.PROFILE_IMAGE_CONTAINER));
+				// Fetch the content for this user
+				userBean = contentShareService.getUserContent(userBean);
+
 				LOGGER.debug("User Details : " + userBean.toString());
 
 			} else {
 				userBean.setNewUser(true);
 				userBean.setUsrPrefList(getUserPreferences());
 			}
-		} catch(AzureChatBusinessException e){
-			LOGGER.error("Exception occured while fetching user details from Azure Storage and SQL."
+		} catch (AzureChatBusinessException e) {
+			LOGGER.error("Exception occurred while fetching user details from Azure Storage and SQL."
 					+ e.getMessage());
 			throw new AzureChatBusinessException(e.getMessage());
-		}catch(AzureChatSystemException e){
-			LOGGER.error("Exception occured while fetching user details from Azure Storage and SQL ."
+		} catch (AzureChatSystemException e) {
+			LOGGER.error("Exception occurred while fetching user details from Azure Storage and SQL ."
 					+ e.getMessage());
 			throw new AzureChatSystemException(e.getMessage());
-		}catch (Exception e) {
-			LOGGER.error("Exception occured while fetching user details from Azure SQL DB."
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while fetching user details from Azure SQL DB."
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured while fetching user details from AZURE SQL DB."
+					"Exception occurred while fetching user details from AZURE SQL DB."
 							+ e.getMessage());
 		}
 
@@ -196,33 +201,38 @@ public class LoginService extends BaseServiceImpl {
 	 * Used to get all user preferences to be selected on register page.
 	 * 
 	 * @return
-	 * @throws AzureChatSystemException 
+	 * @throws AzureChatSystemException
 	 */
-	public List<UserPrefBean> getUserPreferences() throws AzureChatSystemException {
+	public List<UserPrefBean> getUserPreferences()
+			throws AzureChatSystemException {
+		LOGGER.info("[LoginSErvice][getUserPreferences] start");
 		List<UserPrefBean> userList = new ArrayList<UserPrefBean>();
 		try {
-			List<PreferenceMetadataEntity> preferenceMetadataEntities = preferenceMetadataDAO.
-																			getPreferenceMetadataEntities();
-			for(PreferenceMetadataEntity preferenceMetadataEntity : preferenceMetadataEntities){
+			List<PreferenceMetadataEntity> preferenceMetadataEntities = preferenceMetadataDAO
+					.getPreferenceMetadataEntities();
+			for (PreferenceMetadataEntity preferenceMetadataEntity : preferenceMetadataEntities) {
 				userList.add(buildUserPrefBean(preferenceMetadataEntity));
 			}
 		} catch (Exception e) {
-			LOGGER.error("Exception occured while fetching user preference metadata from AZURE SQL DB."
+			LOGGER.error("Exception occurred while fetching user preference metadata from AZURE SQL DB."
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured while fetching user details from AZURE SQL DB."
+					"Exception occurred while fetching user details from AZURE SQL DB."
 							+ e.getMessage());
 		}
+		LOGGER.info("[LoginSErvice][getUserPreferences] end");
 		return userList;
 	}
-	
+
 	/**
-	 * Used to generate UserPrefBean object from PreferenceMetadataEntity object.
+	 * Used to generate UserPrefBean object from PreferenceMetadataEntity
+	 * object.
 	 * 
 	 * @param preferenceMetadataEntity
 	 * @return
 	 */
-	private UserPrefBean buildUserPrefBean(PreferenceMetadataEntity preferenceMetadataEntity){
+	private UserPrefBean buildUserPrefBean(
+			PreferenceMetadataEntity preferenceMetadataEntity) {
 		UserPrefBean userPrefBean = new UserPrefBean();
 		userPrefBean.setPrefDesc(preferenceMetadataEntity.getPreferenceDesc());
 		return userPrefBean;

@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class ErrorListBean implements Serializable {
 	/**
-	 * Genrated serial version id for ErrorListBean
+	 * Generated serial version id for ErrorListBean
 	 */
 	private static final long serialVersionUID = 920290905626105943L;
 	private String excpCode;

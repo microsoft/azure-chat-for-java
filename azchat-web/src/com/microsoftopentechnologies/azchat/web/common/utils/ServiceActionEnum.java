@@ -34,7 +34,11 @@ public enum ServiceActionEnum {
 	GET_PENDING_FRIENDS("getPendingFriendList"),
 	UPDATE_FRIENDREQ_STATUS("updateFrndReqstatus"),
 	CONTENT_SHARE("shareContent"),
-	GET_USER_CONTENT("getUserContent");
+	GET_USER_CONTENT("getUserContent"),
+	UPDATE_MSG_COMMENT("updateMessageComment"),
+	UPDATE_USER_LIKE_STATUS("updateUserLikeStatus"),
+	GET_MSG_COMMENTS("getMsgCommets"),
+	GET_PENDING_FRIEND_COUNT("getPendingFriendRequestCount");
 
 	private String serviceAction;
 

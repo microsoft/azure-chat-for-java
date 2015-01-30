@@ -79,7 +79,7 @@ public class AzureChatStorageUtils {
 		String storageConnectionString = getStorageConnectionString();
 		CloudStorageAccount storageAccount = CloudStorageAccount
 				.parse(storageConnectionString);
-		
+
 		// Create the table client.
 		CloudTableClient tableClient = storageAccount.createCloudTableClient();
 
@@ -111,7 +111,7 @@ public class AzureChatStorageUtils {
 		// Create an operation to add the new customer to the people table.
 		TableOperation tableOperation = TableOperation
 				.insertOrReplace(tableEntity);
-		
+
 		// Submit the operation to the table service.
 		getTableReference(tableName).execute(tableOperation);
 		LOGGER.debug("Entity added to table " + tableName);
@@ -129,6 +129,7 @@ public class AzureChatStorageUtils {
 			String blobName) throws Exception {
 		CloudBlockBlob blob = getCloudBlobContainer(containerName)
 				.getBlockBlobReference(blobName);
+		LOGGER.debug("Got blob reference to blob storage : " + blobName);
 		return blob;
 	}
 
@@ -142,15 +143,16 @@ public class AzureChatStorageUtils {
 	 */
 	public static CloudBlobContainer getCloudBlobContainer(String containerName)
 			throws Exception {
-		
+		LOGGER.info("[AzureStorageUtils][getCloudBlobContainer] start");
 		String storageConnectionString = getStorageConnectionString();
 		CloudStorageAccount storageAccount = CloudStorageAccount
 				.parse(storageConnectionString);
 		CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
 		CloudBlobContainer container = blobClient
 				.getContainerReference(containerName);
+		LOGGER.debug("Got reference to the container :" + containerName);
 		container.createIfNotExists();
-
+		LOGGER.info("[AzureStorageUtils][getCloudBlobContainer] end");
 		return container;
 	}
 
@@ -162,12 +164,14 @@ public class AzureChatStorageUtils {
 	 */
 	public static void assignPublicAccessToContainer(
 			CloudBlobContainer container) throws Exception {
+		LOGGER.info("[AzureChatStorageUtils][assignPublicAccessToContainer] start");
 		BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
 		containerPermissions
 				.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);
 		container.uploadPermissions(containerPermissions);
+		LOGGER.debug("PublicAccess Permissions uploaded Successfully.");
+		LOGGER.info("[AzureChatStorageUtils][assignPublicAccessToContainer] end");
 	}
-
 
 	/**
 	 * This method will assign private access to the blob container.
@@ -176,8 +180,9 @@ public class AzureChatStorageUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String assignPrivateAccess(CloudBlobContainer container)
+	public static String generateSASURL(CloudBlobContainer container)
 			throws Exception {
+		LOGGER.info("[AzureChatStorageUtils][assignPrivateAccess] start");
 		String signature = AzureChatConstants.CONSTANT_EMPTY_STRING;
 		SharedAccessBlobPolicy sharedAccessBlobPolicy = new SharedAccessBlobPolicy();
 		GregorianCalendar calendar = new GregorianCalendar(
@@ -187,68 +192,93 @@ public class AzureChatStorageUtils {
 		calendar.add(Calendar.HOUR, 23);
 		sharedAccessBlobPolicy.setSharedAccessExpiryTime(calendar.getTime());
 		sharedAccessBlobPolicy.setPermissions(EnumSet.of(
-				SharedAccessBlobPermissions.READ,
-				SharedAccessBlobPermissions.WRITE,
-				SharedAccessBlobPermissions.DELETE,
-				SharedAccessBlobPermissions.LIST));
+				SharedAccessBlobPermissions.READ
+//				SharedAccessBlobPermissions.WRITE,
+//				SharedAccessBlobPermissions.DELETE,
+//				SharedAccessBlobPermissions.LIST
+				));
 		BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
-		containerPermissions.setPublicAccess(BlobContainerPublicAccessType.OFF);
+//		containerPermissions.setPublicAccess(BlobContainerPublicAccessType.OFF);
 		container.uploadPermissions(containerPermissions);
+		LOGGER.debug("Private Access Permissions uploaded Successfully.");
 		signature = container.generateSharedAccessSignature(
 				sharedAccessBlobPolicy, null);
+		LOGGER.info("[AzureChatStorageUtils][assignPrivateAccess] end");
 		return signature;
 	}
-	
+
 	/**
 	 * This method is used to create queue with the given name.
+	 * 
 	 * @param queueName
 	 * @throws Exception
 	 */
 	public static void createQueue(String queueName) throws Exception {
 		getQueueReference(queueName).createIfNotExists();
+		LOGGER.debug("Queue Created Successfully.");
 	}
-	
+
 	/**
-	 * This method is used to get queue by given queue name.	
+	 * This method is used to get queue by given queue name.
 	 * 
 	 * @param queueName
 	 * @return
 	 * @throws Exception
 	 */
-	public static CloudQueue getQueueReference(String queueName) throws Exception {
+	public static CloudQueue getQueueReference(String queueName)
+			throws Exception {
+		LOGGER.info("[AzureChatStorageUtils][getQueueReference] start");
+		CloudQueue queue = null;
 		String storageConnectionString = getStorageConnectionString();
-		CloudStorageAccount storageAccount = CloudStorageAccount.parse(storageConnectionString);
+		CloudStorageAccount storageAccount = CloudStorageAccount
+				.parse(storageConnectionString);
 		CloudQueueClient queueClient = storageAccount.createCloudQueueClient();
-		return queueClient.getQueueReference(queueName);
+		queue = queueClient.getQueueReference(queueName);
+		LOGGER.debug("Got reference to the queue : " + queueName);
+		LOGGER.info("[AzureChatStorageUtils][getQueueReference] end");
+		return queue;
 	}
-	
+
 	/**
-	 * This method is used to post the message to queue by queue name, message and it's visible time.
-	 * 	
+	 * This method is used to post the message to queue by queue name, message
+	 * and it's visible time.
+	 * 
 	 * @param queueName
 	 * @param message
 	 * @param invisibleTimeInSeconds
 	 * @throws Exception
 	 */
-	public static void postMessageToQueue(String queueName, String message, int invisibleTimeInSeconds) throws Exception {
+	public static void postMessageToQueue(String queueName, String message,
+			int invisibleTimeInSeconds) throws Exception {
+		LOGGER.info("[AzureChatStorageUtils][postMessageToQueue] start");
 		CloudQueue cloudQueue = getQueueReference(queueName);
 		CloudQueueMessage queueMessage = new CloudQueueMessage(message);
-
-		cloudQueue.addMessage(queueMessage, invisibleTimeInSeconds, 0, null, null); 
+		cloudQueue.addMessage(queueMessage, invisibleTimeInSeconds, 0, null,
+				null);
+		LOGGER.info("Added message to the " + queueName
+				+ " queue with visible time : " + invisibleTimeInSeconds
+				+ " sec.");
+		LOGGER.info("[AzureChatStorageUtils][postMessageToQueue] start");
 	}
-	
+
 	/**
-	 * This method is used to fetch the messages from queue. 
+	 * This method is used to fetch the messages from queue.
 	 * 
 	 * @param queueName
 	 * @return
 	 * @throws Exception
 	 */
-	public static CloudQueueMessage getMessageFromQueue(String queueName) throws Exception {
+	public static CloudQueueMessage getMessageFromQueue(String queueName)
+			throws Exception {
+		LOGGER.info("[AzureChatStorageUtils][getMessageFromQueue] start");
+		CloudQueueMessage queueMsg = null;
 		CloudQueue cloudQueue = getQueueReference(queueName);
-		return cloudQueue.retrieveMessage();
+		queueMsg = cloudQueue.retrieveMessage();
+		LOGGER.debug("Retrieved Queue Message successfully" + queueMsg);
+		LOGGER.info("[AzureChatStorageUtils][getMessageFromQueue] end");
+		return queueMsg;
 	}
-	
+
 	/**
 	 * This method is used to delete the messages from the queue.
 	 * 
@@ -256,11 +286,18 @@ public class AzureChatStorageUtils {
 	 * @param queueMessage
 	 * @throws Exception
 	 */
-	public static void deleteMessageFromQueue(String queueName, CloudQueueMessage queueMessage) throws Exception {
+	public static void deleteMessageFromQueue(String queueName,
+			CloudQueueMessage queueMessage) throws Exception {
+		LOGGER.info("[AzureChatStorageUtils][deleteMessageFromQueue] start");
 		CloudQueue cloudQueue = getQueueReference(queueName);
+		LOGGER.debug("Got Queue Reference Successfully. Queue Name"
+				+ cloudQueue.getName());
 		cloudQueue.deleteMessage(queueMessage);
+		LOGGER.debug("Deleted Queue Message Successfully. Message ID :"
+				+ queueMessage.getId());
+		LOGGER.info("[AzureChatStorageUtils][deleteMessageFromQueue] end");
 	}
-	
+
 	/**
 	 * This method forms storage connection string
 	 */
@@ -274,11 +311,11 @@ public class AzureChatStorageUtils {
 				+ AzureChatUtils.getProperty(AzureChatConstants.ACCOUNT_KEY);
 		String defEndPointProtocol = AzureChatUtils
 				.getProperty(AzureChatConstants.DEF_ENDPOINT_PROTOCOL);
-		
+
 		if (AzureChatUtils.isEmptyOrNull(defEndPointProtocol)) {
 			defEndPointProtocol = AzureChatConstants.DEF_ENDPOINT_PROTOCOL_DEFVAL;
 		}
-		
+
 		return defEndPointProtocol + accName + accKey;
 	}
 }

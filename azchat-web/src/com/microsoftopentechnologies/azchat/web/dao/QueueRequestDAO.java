@@ -15,11 +15,15 @@ limitations under the License.
  */
 package com.microsoftopentechnologies.azchat.web.dao;
 
+import java.util.Set;
+
 import com.microsoft.azure.storage.queue.CloudQueueMessage;
+
 /**
- * This interface used to provide methods for azure queue operations for messages.
+ * This interface used to provide methods for azure queue operations for
+ * messages.
  * 
- * @author
+ * @author Rupesh_Shirude
  */
 public interface QueueRequestDAO {
 	/**
@@ -29,19 +33,42 @@ public interface QueueRequestDAO {
 	 * @param expiryTimeInSeconds
 	 * @throws Exception
 	 */
-	public void postMessage(String message, int expiryTimeInSeconds) throws Exception ;
+	public void postMessage(String message, int expiryTimeInSeconds)
+			throws Exception;
+
 	/**
 	 * This method is used to get the messages from queue.
 	 * 
 	 * @return
 	 * @throws Exception
 	 */
-	public CloudQueueMessage getMessageFromQueue() throws Exception ;
+	public CloudQueueMessage getMessageFromQueue() throws Exception;
+
 	/**
-	 * This method is used to delete the messages from queue. 
+	 * This method is used to delete the messages from queue.
 	 * 
 	 * @param queueMessage
 	 * @throws Exception
 	 */
-	public void deleteMessageFromQueue(CloudQueueMessage queueMessage) throws Exception ;
+	public void deleteMessageFromQueue(CloudQueueMessage queueMessage)
+			throws Exception;
+
+	/**
+	 * This method is used to get all messages from queue.
+	 * 
+	 * @param queueMessage
+	 * @throws Exception
+	 */
+	public Set<String> getAllMessagesFromQueue(String queueName)
+			throws Exception;
+
+	/**
+	 * This method is used to post message to queue.
+	 * 
+	 * @param message
+	 * @param expiryTimeInSeconds
+	 * @throws Exception
+	 */
+	public void postFriendRequestNotification(String message,
+			int expiryTimeInSeconds) throws Exception;
 }

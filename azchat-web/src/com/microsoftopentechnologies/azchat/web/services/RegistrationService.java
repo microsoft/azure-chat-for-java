@@ -28,6 +28,7 @@ import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatBusin
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatException;
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatSystemException;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
+import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
 import com.microsoftopentechnologies.azchat.web.dao.FriendRequestDAO;
 import com.microsoftopentechnologies.azchat.web.dao.PreferenceMetadataDAO;
 import com.microsoftopentechnologies.azchat.web.dao.ProfileImageRequestDAO;
@@ -201,8 +202,10 @@ public class RegistrationService extends BaseServiceImpl {
 			userEntity = buildUserEntity(userBean, userEntity);
 			userDao.updateNewUser(userEntity);
 
-			userBean.setPhotoUrl(uri + "?"
-					+ profileImageRequestDAO.getSignatureForPrivateAccess());
+			userBean.setPhotoUrl(uri
+					+ "?"
+					+ AzureChatUtils
+							.getSASUrl(AzureChatConstants.PROFILE_IMAGE_CONTAINER));
 		} catch (Exception e) {
 			LOGGER.error("Azure storage exception while updating user registration details for user id : "
 					+ userBean.getUserID()
@@ -279,10 +282,10 @@ public class RegistrationService extends BaseServiceImpl {
 				return isNewUser;
 			}
 		} catch (Exception e) {
-			LOGGER.error("Exception occured while fetching user details from AZURE SQL DB."
+			LOGGER.error("Exception occurred while fetching user details from AZURE SQL DB."
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured while fetching user details from AZURE SQL DB."
+					"Exception occurred while fetching user details from AZURE SQL DB."
 							+ e.getMessage());
 		}
 		return isNewUser;
@@ -305,10 +308,20 @@ public class RegistrationService extends BaseServiceImpl {
 		userBean.setEmail(userEntity.getEmailAddress());
 		userBean.setCountryCD(String.valueOf(userEntity.getPhoneCountryCode()));
 		userBean.setPhoneNo(String.valueOf(userEntity.getPhoneNumber()));
-		userBean.setPhotoUrl(userEntity.getPhotoBlobUrl() + "?"
-				+ profileImageRequestDAO.getSignatureForPrivateAccess());
+		userBean.setPhotoUrl(userEntity.getPhotoBlobUrl()
+				+ "?"
+				+ AzureChatUtils
+						.getSASUrl(AzureChatConstants.PROFILE_IMAGE_CONTAINER));
 	}
 
+	/**
+	 * This method populates the userPreferenceEntity details.
+	 * 
+	 * @param preferenceMetadataId
+	 * @param userId
+	 * @param desc
+	 * @return
+	 */
 	private UserPreferenceEntity buildUserPreferenceEntity(
 			Integer preferenceMetadataId, String userId, String desc) {
 		UserPreferenceEntity userPreferenceEntity = new UserPreferenceEntity();

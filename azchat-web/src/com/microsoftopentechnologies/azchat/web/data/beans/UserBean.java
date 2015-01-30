@@ -20,6 +20,9 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * This data bean holds the data for user details,user friend details and user
+ * content share details.
+ * 
  * @author Dnyaneshwar_Pawar
  *
  */
@@ -45,6 +48,7 @@ public class UserBean extends BaseBean {
 	private int pendingFriendReq;
 	private MultipartFile multipartFile;
 	private UserMessageListBean userMessageListBean;
+	private String contentLevel;
 
 	/**
 	 * 
@@ -295,6 +299,21 @@ public class UserBean extends BaseBean {
 	 */
 	public void setUserMessageListBean(UserMessageListBean userMessageListBean) {
 		this.userMessageListBean = userMessageListBean;
+	}
+
+	/**
+	 * @return the contentLevel
+	 */
+	public String getContentLevel() {
+		return contentLevel;
+	}
+
+	/**
+	 * @param contentLevel
+	 *            the contentLevel to set
+	 */
+	public void setContentLevel(String contentLevel) {
+		this.contentLevel = contentLevel;
 	}
 
 }

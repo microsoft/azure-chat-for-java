@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	id="WebApp_ID" version="3.1"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="WebApp_ID" version="3.1" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 	<display-name>azchat-web</display-name>
 	
 	<!-- Spring Dispatcher Servlet -->
@@ -14,14 +12,13 @@
 		<servlet-name>dispatcher</servlet-name>
 		<url-pattern>*.htm</url-pattern>
 	</servlet-mapping>
-	
 	<!-- Azure ACS filter configuration -->
 	<filter>
 		<filter-name>ACSAuthFilter</filter-name>
 		<filter-class>com.microsoftopentechnologies.acs.federation.ACSFederationAuthFilter</filter-class>
 		<init-param>
 			<param-name>PassiveRequestorEndpoint</param-name>
-			<param-value>https://namespace-aztest.accesscontrol.windows.net:443/v2/wsfederation</param-value>
+			<param-value>https://azchatlocal.accesscontrol.windows.net:443/v2/wsfederation</param-value>
 		</init-param>
 		<init-param>
 			<param-name>RelyingPartRealm</param-name>
@@ -29,7 +26,7 @@
 		</init-param>
 		<init-param>
 			<param-name>SecretKey</param-name>
-			<param-value>B1EhvDssdzVFA/2fJBNUMQ==</param-value>
+			<param-value>8pKwOoyarTegDZB9E3Rlbg==</param-value>
 		</init-param>
 		<init-param>
 			<param-name>AllowHTTP</param-name>
@@ -37,17 +34,15 @@
 		</init-param>
 		<init-param>
 			<param-name>AnonymousURLs</param-name>
-			<param-value>/index.htm;/css/;/js/;/login.jsp;images/logo.jpg;images/VM-symbol.png;images/Azure-automation.png;images/Azure-SQL.png</param-value>
+			<param-value>/index.htm;/css/;/js/;/login.jsp;/images/</param-value>
 		</init-param>
 		<init-param>
 			<param-name>excludeURLsEndsWith</param-name>
 			<param-value>azchat-web;azchat-web/</param-value>
 		</init-param>
 	</filter>
-	
 	<filter-mapping>
 		<filter-name>ACSAuthFilter</filter-name>
 		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-	
+	</filter-mapping>	
 </web-app>

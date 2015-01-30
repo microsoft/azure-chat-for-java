@@ -16,13 +16,13 @@
 package com.microsoftopentechnologies.azchat.web.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.UserMessageEntity;
 /**
  * This interface used to add, get messages to/from azure table.
  * 
- * @author Administrator
- *
+ * @author Rupesh_Shirude
  */
 public interface UserMessageEntityDAO {
 	/**
@@ -34,7 +34,7 @@ public interface UserMessageEntityDAO {
 	 */
 	public UserMessageEntity addUserMessageEntity(UserMessageEntity userMessageEntity) throws Exception;
 	/**
-	 * this method used to get user mesage by user id.
+	 * this method used to get user message by user id.
 	 * 
 	 * @param userId
 	 * @return
@@ -51,11 +51,35 @@ public interface UserMessageEntityDAO {
 	 */
 	public UserMessageEntity getUserMessageEntities(String userId, String messageId)throws Exception;
 	/**
-	 * this method used to get user mesage by user id.
+	 * this method used to get user message by user id.
 	 * 
 	 * @param userId
 	 * @return
 	 * @throws Exception
 	 */
 	public List<UserMessageEntity> getUserAndFriendsMessages(String userId)throws Exception;
+	/**
+	 * this method used to get all user message ids.
+	 * 
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 */
+	public Set<String> getAllUserMessageIds()throws Exception;
+	/**
+	 * this method used to get all user message ids.
+	 * 
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 */
+	public void deleteMessageById(String messageId)throws Exception;
+	/**
+	 * this method used to get user message by id.
+	 * 
+	 * @param messageId
+	 * @return
+	 * @throws Exception
+	 */
+	public UserMessageEntity getMessageById(String messageId)throws Exception;
 }

@@ -15,13 +15,17 @@
  */
 package com.microsoftopentechnologies.azchat.web.services;
 
+import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -32,8 +36,12 @@ import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatStorageUtils;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
 import com.microsoftopentechnologies.azchat.web.dao.FriendRequestDAO;
+import com.microsoftopentechnologies.azchat.web.dao.PreferenceMetadataDAO;
 import com.microsoftopentechnologies.azchat.web.dao.ProfileImageRequestDAO;
+import com.microsoftopentechnologies.azchat.web.dao.QueueRequestDAO;
 import com.microsoftopentechnologies.azchat.web.dao.UserDAO;
+import com.microsoftopentechnologies.azchat.web.dao.UserPreferenceDAO;
+import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.PreferenceMetadataEntity;
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserEntity;
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.FriendRequestEntity;
 import com.microsoftopentechnologies.azchat.web.data.beans.BaseBean;
@@ -41,7 +49,9 @@ import com.microsoftopentechnologies.azchat.web.data.beans.FriendRequestBean;
 import com.microsoftopentechnologies.azchat.web.data.beans.UserBean;
 
 /**
- * Service class for managing and tracking Friend Requests.
+ * Service class provides the friend request management functionality.It
+ * supports the search friend,update friend status and add friend functionality
+ * by calling corresponding DAO class methods.
  * 
  * @author Dnyaneshwar_Pawar
  *
@@ -62,17 +72,59 @@ public class FriendRequestService extends BaseServiceImpl {
 	@Autowired
 	private ProfileImageRequestDAO profileImageRequestDAO;
 
+	@Autowired
+	private PreferenceMetadataDAO preferenceMetadataDAO;
+
+	@Autowired
+	private UserPreferenceDAO userPreferenceDAO;
+
+	@Autowired
+	private QueueRequestDAO queueRequestDAO;
+
 	/**
 	 * BeanPostProcessor initialization code to create and get reference to the
-	 * FriendRequest table from azure storage.
+	 * AZURE TABLE from azure storage.
 	 * 
 	 * @throws Exception
 	 */
 	@PostConstruct
 	public void init() throws Exception {
 		LOGGER.info("[FriendRequestService][init] start");
+		LOGGER.debug("Creating Friend Request Table.");
+
+		// CREATE AZURE TABLES
 		AzureChatStorageUtils
 				.createTable(AzureChatConstants.TABLE_NAME_FRIEND_REQ);
+		AzureChatStorageUtils
+				.createTable(AzureChatConstants.TABLE_NAME_MESSAGE_COMMENTS);
+		AzureChatStorageUtils
+				.createTable(AzureChatConstants.TABLE_NAME_MESSAGE_LIKES);
+		AzureChatStorageUtils
+				.createTable(AzureChatConstants.TABLE_NAME_USER_MESSAGE);
+
+		// CREATE AZURE SQL TABLES
+		String connectionString = AzureChatUtils.buildConnectionString();
+		Connection connection = AzureChatUtils.getConnection(connectionString);
+		userDAO.createUserTable(connection);
+		preferenceMetadataDAO.createPreferenceMatedateTable(connection);
+		userPreferenceDAO.createUserPreferenceTable(connection);
+		connection.close();
+		
+		// Used to add preference entries in metadata table, if table is newly created.
+		List<PreferenceMetadataEntity> list = preferenceMetadataDAO.getPreferenceMetadataEntities();
+		if(list!=null && list.size()==0){
+			List<String> listOfPreferences = AzureChatUtils.getPreferences();
+			for(String preference : listOfPreferences){
+				PreferenceMetadataEntity preferenceMetadataEntity = buildPreferenceMetadata(preference);
+				preferenceMetadataDAO.addPreferenceMetadataEntity(preferenceMetadataEntity);
+			}
+		}
+		
+		
+		// CREATE QUEUE
+		AzureChatStorageUtils
+				.createQueue(AzureChatConstants.QUEUE_NAME_EMAIL_NOTIFICATION);
+
 		LOGGER.info("[FriendRequestService][init] end");
 	}
 
@@ -86,23 +138,26 @@ public class FriendRequestService extends BaseServiceImpl {
 	public BaseBean executeService(BaseBean baseBean) throws AzureChatException {
 		LOGGER.info("[FriendRequestService][executeService] start");
 		switch (baseBean.getServiceAction()) {
-			case FIND_FRIENDS:
-				baseBean = searchFriends((UserBean) baseBean);
-				break;
-			case FRIEND_STATUS:
-				baseBean = getFriendStatus((FriendRequestBean) baseBean);
-				break;
-			case ADD_FRIEND:
-				baseBean = addFriend((FriendRequestBean) baseBean);
-				break;
-			case GET_PENDING_FRIENDS:
-				baseBean = getPendingFriends((UserBean) baseBean);
-				break;
-			case UPDATE_FRIENDREQ_STATUS:
-				baseBean = updateFriendReqStatus((FriendRequestBean) baseBean);
-				break;
-			default:
-				break;
+		case FIND_FRIENDS:
+			baseBean = searchFriends((UserBean) baseBean);
+			break;
+		case FRIEND_STATUS:
+			baseBean = getFriendStatus((FriendRequestBean) baseBean);
+			break;
+		case ADD_FRIEND:
+			baseBean = addFriend((FriendRequestBean) baseBean);
+			break;
+		case GET_PENDING_FRIENDS:
+			baseBean = getPendingFriends((UserBean) baseBean);
+			break;
+		case UPDATE_FRIENDREQ_STATUS:
+			baseBean = updateFriendReqStatus((FriendRequestBean) baseBean);
+			break;
+		case GET_PENDING_FRIEND_COUNT:
+			baseBean=getPendingFriendRequestCount((UserBean)baseBean);
+			break;
+		default:
+			break;
 		}
 		LOGGER.info("[FriendRequestService][executeService] end");
 		return baseBean;
@@ -158,6 +213,7 @@ public class FriendRequestService extends BaseServiceImpl {
 				pendingfriendBeanList.add(friendBean);
 			}
 			userBean.setFriendList(pendingfriendBeanList);
+			userBean.setPendingFriendReq(pendingfriendBeanList.size());
 		}
 
 	}
@@ -179,7 +235,10 @@ public class FriendRequestService extends BaseServiceImpl {
 					friendRequestBean.getFriendName(),
 					friendRequestBean.getFriendPhotoUrl(),
 					AzureChatConstants.FRIEND_REQUEST_PENDING_APPROVAL);
-			friendRequestBean.setMsg(AzureChatConstants.SUCCESS_MSG_ADD_FRIEND);
+
+			String jsonString = convertToJSONString(friendRequestBean);
+			queueRequestDAO.postFriendRequestNotification(jsonString, 300);
+			LOGGER.debug("Friend Added Successfully.");
 		} catch (Exception e) {
 			LOGGER.error("Exception occurred while adding friend in insertOrReplaceEntity storage method : "
 					+ e.getMessage());
@@ -258,7 +317,7 @@ public class FriendRequestService extends BaseServiceImpl {
 					.getFriendStatusForUserWithFriend(
 							friendRequestBean.getUserID(),
 							friendRequestBean.getFriendID());
-			
+
 			if (friendRequestEntity != null) {
 				friendRequestBean.setUserID(friendRequestEntity.getUserID());
 				friendRequestBean.setStatus(friendRequestEntity.getStatus());
@@ -266,8 +325,8 @@ public class FriendRequestService extends BaseServiceImpl {
 						.setFriendPhotoUrl(friendRequestEntity
 								.getFriendProfileBlobURL()
 								+ "?"
-								+ profileImageRequestDAO
-										.getSignatureForPrivateAccess());
+								+ AzureChatUtils
+										.getSASUrl(AzureChatConstants.PROFILE_IMAGE_CONTAINER));
 				friendRequestBean.setFriendName(friendRequestEntity
 						.getFriendName());
 				friendRequestBean
@@ -358,4 +417,85 @@ public class FriendRequestService extends BaseServiceImpl {
 		LOGGER.info("[FriendRequestService][getFriendInfo] end");
 		return friendRequestBean;
 	}
+
+	/**
+	 * This method convert the FriendRequestEntity to the corresponding JSON
+	 * representation.
+	 * 
+	 * @param entity
+	 * @return
+	 * @throws AzureChatBusinessException
+	 */
+	private String convertToJSONString(FriendRequestBean entity)
+			throws AzureChatBusinessException {
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put("userID", entity.getUserID());
+			jsonObject.put("friendID", entity.getFriendID());
+			jsonObject.put("friendName", entity.getFriendName());
+			jsonObject.put("status", entity.getStatus());
+			jsonObject.put("friendPhotoUrl", entity.getFriendPhotoUrl());
+		} catch (JSONException e) {
+			LOGGER.error("Exception while converting to JSONObject. "
+					+ e.getMessage());
+			throw new AzureChatBusinessException(
+					"Exception while converting to JSONObject. "
+							+ e.getMessage());
+		}
+		return jsonObject.toString();
+	}
+
+	/**
+	 * This method fetch the pending friend list for the user and calculate the
+	 * count and return.
+	 * 
+	 * @param baseBean
+	 * @return
+	 * @throws AzureChatBusinessException
+	 */
+	private BaseBean getPendingFriendRequestCount(UserBean userBean)
+			throws AzureChatBusinessException {
+		LOGGER.info("[FriendRequestService][getPendingFriendRequestCount] start");
+		try {
+			if (AzureChatUtils.isEmptyOrNull(userBean.getUserID())) {
+				LOGGER.error("User ID is null.Can not fetch Pending friend requests count.");
+				throw new AzureChatBusinessException(
+						"User ID is null.Can not fetch Pending Friend Request count.");
+			}
+			List<FriendRequestEntity> pendingFriendList = friendRequestDAO
+					.getPendingFriendRequestsForUser(userBean.getUserID());
+			if (null != pendingFriendList) {
+				userBean.setPendingFriendReq(pendingFriendList.size());
+				LOGGER.debug("Pending Friend Count Set  : "
+						+ pendingFriendList.size());
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while fetching pending request count for user."
+					+ e.getMessage());
+			throw new AzureChatBusinessException(
+					"Exception occurred while fetching pending request count for user."
+							+ e.getMessage());
+		}
+		LOGGER.info("[FriendRequestService][getPendingFriendRequestCount] end");
+		return userBean;
+	}
+	
+	/**
+	 * This method is used to create preference metadata object .
+	 * 
+	 * @param preference
+	 * @return
+	 */
+	private PreferenceMetadataEntity buildPreferenceMetadata(String preference){
+		PreferenceMetadataEntity entity = new PreferenceMetadataEntity();
+		Date date = new Date();
+		entity.setCreatedBy(date);
+		entity.setDateCreated(date);
+		entity.setDateModified(date);
+		entity.setModifiedBy(date);
+		entity.setPreferenceDesc(preference);
+		return entity;
+	}
+	
 }

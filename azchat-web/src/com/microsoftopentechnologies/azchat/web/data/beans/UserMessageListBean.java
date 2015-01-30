@@ -21,7 +21,9 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * @author Administrator This bean holds the collection of the userMesagebean.
+ * This bean holds the collection of the userMesagebean.
+ * 
+ * @author Dnyaneshwar_Pawar
  *
  */
 public class UserMessageListBean implements Serializable {
@@ -37,9 +39,10 @@ public class UserMessageListBean implements Serializable {
 	private MultipartFile photoVedioFile;
 	private String expiryTime;
 	private Boolean isLike;
-    private String msgID;
-    private String ownerName;
-    private String ownerID;
+	private String msgID;
+	private String ownerName;
+	private String ownerID;
+
 	/**
 	 * @return the msgText
 	 */
@@ -138,7 +141,8 @@ public class UserMessageListBean implements Serializable {
 	}
 
 	/**
-	 * @param isLike the isLike to set
+	 * @param isLike
+	 *            the isLike to set
 	 */
 	public void setIsLike(Boolean isLike) {
 		this.isLike = isLike;
@@ -152,7 +156,8 @@ public class UserMessageListBean implements Serializable {
 	}
 
 	/**
-	 * @param msgID the msgID to set
+	 * @param msgID
+	 *            the msgID to set
 	 */
 	public void setMsgID(String msgID) {
 		this.msgID = msgID;
@@ -166,7 +171,8 @@ public class UserMessageListBean implements Serializable {
 	}
 
 	/**
-	 * @param ownerName the ownerName to set
+	 * @param ownerName
+	 *            the ownerName to set
 	 */
 	public void setOwnerName(String ownerName) {
 		this.ownerName = ownerName;
@@ -180,7 +186,8 @@ public class UserMessageListBean implements Serializable {
 	}
 
 	/**
-	 * @param ownerID the ownerID to set
+	 * @param ownerID
+	 *            the ownerID to set
 	 */
 	public void setOwnerID(String ownerID) {
 		this.ownerID = ownerID;

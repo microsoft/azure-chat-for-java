@@ -35,7 +35,7 @@ import com.microsoftopentechnologies.azchat.web.services.BaseService;
 /**
  * LoginController for azchat.This controller redirect user to the login page
  * and also handle the login flow.On Successful login corresponding service logs
- * the user details.
+ * the user details in azure database.
  * 
  * @author Dnyaneshwar_Pawar
  *
@@ -66,7 +66,8 @@ public class LoginController extends BaseController {
 	/**
 	 * This method process the login information of the user.On Successful
 	 * verification from Azure ACS service user redirected to the Home/Landing
-	 * page of the application.
+	 * page of the application.New or first time users are redirected to the
+	 * Registration page for first time activity.
 	 * 
 	 * @param model
 	 * @param loginBean
@@ -83,35 +84,19 @@ public class LoginController extends BaseController {
 		model.put(AzureChatConstants.USER_BEAN, userBean);
 		if (!userBean.hasErrors()) {
 			if (!userBean.isNewUser()) {
-				LOGGER.debug("New user : "+userBean.isNewUser());
+				LOGGER.debug("New user : " + userBean.isNewUser());
 				return processResults(AzureChatConstants.VIEW_NAME_HOME, model,
 						userBean);
 			} else {
-				LOGGER.debug("New user : "+userBean.isNewUser());
+				LOGGER.debug("New user : " + userBean.isNewUser());
 				return processResults(AzureChatConstants.VIEW_NAME_REG, model,
 						userBean);
 			}
 		}
-		LOGGER.debug("Has errors : "+userBean.hasErrors());
+		LOGGER.debug("Has errors : " + userBean.hasErrors());
 		LOGGER.info("[LoginController][goLogin] end");
 		return processResults(AzureChatConstants.VIEW_NAME_INDEX, model,
 				userBean);
 	}
 
-	/**
-	 * This method invalidates the session and logout user to the index page.
-	 * 
-	 * @param request
-	 * @return
-	 */
-/*	@RequestMapping(name = AzureChatConstants.FROM_PAGE_INDEX, params = "isLogout=true")
-	public String logout(HttpServletRequest request,
-			HttpServletResponse response) {
-		for (Cookie cookie : request.getCookies()) {
-			cookie.setMaxAge(0);
-			response.addCookie(cookie);
-		}
-		request.getSession().invalidate();
-		return AzureChatConstants.VIEW_NAME_INDEX;
-	}*/
 }

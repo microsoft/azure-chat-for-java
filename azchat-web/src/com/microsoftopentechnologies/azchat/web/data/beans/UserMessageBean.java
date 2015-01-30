@@ -16,17 +16,19 @@
 package com.microsoftopentechnologies.azchat.web.data.beans;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * @author Administrator
  * 
- *         This bean represents the data elements required to store the User
- *         Text Messages and Media urls.
+ * This bean represents the data elements required to store the User Text
+ * Messages and Media URL.
+ * 
+ * @author Dnyaneshwar_Pawar
  *
  */
-public class UserMessageBean implements Serializable {
+public class UserMessageBean extends BaseBean implements Serializable {
 
 	/**
 	 * Generated serial version id for UserMessagesBean
@@ -38,10 +40,12 @@ public class UserMessageBean implements Serializable {
 	private MultipartFile photoVedioFile;
 	private String photoUrl;
 	private String msgID;
-	private Boolean isLike;
+	private Boolean isLike = false;
 	private int likeCount;
 	private String ownerName;
 	private String ownerID;
+	private List<MessageCommentBean> msgCommentList;
+	private int commentCount;
 
 	/**
 	 * @return the msgText
@@ -191,6 +195,36 @@ public class UserMessageBean implements Serializable {
 	 */
 	public void setOwnerID(String ownerID) {
 		this.ownerID = ownerID;
+	}
+
+	/**
+	 * @return the msgCommentList
+	 */
+	public List<MessageCommentBean> getMsgCommentList() {
+		return msgCommentList;
+	}
+
+	/**
+	 * @param msgCommentList
+	 *            the msgCommentList to set
+	 */
+	public void setMsgCommentList(List<MessageCommentBean> msgCommentList) {
+		this.msgCommentList = msgCommentList;
+	}
+
+	/**
+	 * @return the commentCount
+	 */
+	public int getCommentCount() {
+		return commentCount;
+	}
+
+	/**
+	 * @param commentCount
+	 *            the commentCount to set
+	 */
+	public void setCommentCount(int commentCount) {
+		this.commentCount = commentCount;
 	}
 
 }

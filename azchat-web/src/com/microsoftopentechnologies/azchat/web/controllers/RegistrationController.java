@@ -49,6 +49,15 @@ public class RegistrationController extends BaseController {
 	@Qualifier("registrationService")
 	private BaseService registrationService;
 
+	/**
+	 * This method handles the user registration request and
+	 * response.Successfull registration of the user redirected to the
+	 * home/landing page.
+	 * 
+	 * @param userBean
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(name = AzureChatConstants.FROM_PAGE_REG, method = RequestMethod.POST)
 	public ModelAndView doRegistration(UserBean userBean, ModelMap model) {
 
@@ -65,14 +74,16 @@ public class RegistrationController extends BaseController {
 	}
 
 	/**
-	 * This ajax call to updatea the user profile in Azure SQL database.
+	 * This method handles the update user profile request and parse the
+	 * response into JSON format..
 	 * 
 	 * @param request
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@RequestMapping(value = AzureChatConstants.FROM_PAGE_UPDATE_USR_PROF, method = RequestMethod.POST)
-	public @ResponseBody UserBean updateUserProfile(MultipartHttpServletRequest request) throws IOException {
+	public @ResponseBody UserBean updateUserProfile(
+			MultipartHttpServletRequest request) throws IOException {
 		UserBean userBean = new UserBean();
 		populateUserBean(userBean, request);
 		userBean.setServiceAction(ServiceActionEnum.UPDATE_USER_PROFILE);
@@ -86,7 +97,8 @@ public class RegistrationController extends BaseController {
 	 * @param userBean
 	 * @param request
 	 */
-	private void populateUserBean(UserBean userBean, MultipartHttpServletRequest request) {
+	private void populateUserBean(UserBean userBean,
+			MultipartHttpServletRequest request) {
 		userBean.setUserID(request.getParameter("logedInUserID"));
 		userBean.setFirstName(request.getParameter("firstName"));
 		userBean.setLastName(request.getParameter("lastName"));

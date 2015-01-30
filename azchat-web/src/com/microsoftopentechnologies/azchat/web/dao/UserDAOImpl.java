@@ -33,9 +33,10 @@ import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserEntity;
 
 /**
- * DAO impl class for User data-store table.
+ * Implementation class for UserDAO. This class provides operations to manage
+ * the user information in azure SQL tables.
  * 
- * @author rupesh_shirude
+ * @author Rupesh_Shirude
  *
  */
 @Service("userDao")
@@ -48,8 +49,13 @@ public class UserDAOImpl implements UserDAO {
 	private String connectionString = null;
 	private String sqlString = null;
 
+	/**
+	 * This method adds the new row to the user table in the azure SQL.
+	 * 
+	 * @return userEntity
+	 */
 	public UserEntity saveNewUser(UserEntity user) throws Exception {
-		LOGGER.info("[UserDAOImpl][saveNewUser]         start ");
+		LOGGER.info("[UserDAOImpl][saveNewUser] start ");
 
 		int userId = 0;
 		connectionString = AzureChatUtils.buildConnectionString();
@@ -64,7 +70,7 @@ public class UserDAOImpl implements UserDAO {
 					+ e.getMessage());
 
 			throw new AzureChatSystemException(
-					"Exception occured loading driver class : "
+					"Exception occurred loading driver class : "
 							+ e.getMessage());
 		} catch (SQLException e) {
 
@@ -75,7 +81,7 @@ public class UserDAOImpl implements UserDAO {
 					+ e.getMessage());
 
 			throw new AzureChatSystemException(
-					"Exception occured connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : " + e.getMessage());
 		}
 		try {
 			sqlString = new String(AzureChatSQLConstants.SAVE_NEW_USER);
@@ -121,12 +127,17 @@ public class UserDAOImpl implements UserDAO {
 		return user;
 	}
 
+	/**
+	 * Used to get the user details from Azure SQL by user id
+	 * 
+	 * @param userId
+	 * @return UserEntity
+	 * @author rupesh_shirude
+	 */
 	@Override
 	public UserEntity getUserDetailsByUserId(Integer userId) throws Exception {
 
 		LOGGER.info("[UserDAOImpl][getUserDetailsByUserId] start ");
-
-		LOGGER.info("[UserDAOImpl][getUserDetailsByUserId]         start ");
 
 		UserEntity user = null;
 		connectionString = AzureChatUtils.buildConnectionString();
@@ -141,7 +152,7 @@ public class UserDAOImpl implements UserDAO {
 					+ e.getMessage());
 
 			throw new AzureChatSystemException(
-					"Exception occured loading azure sql driver class : "
+					"Exception occurred loading azure sql driver class : "
 							+ e.getMessage());
 		} catch (SQLException e) {
 
@@ -152,7 +163,7 @@ public class UserDAOImpl implements UserDAO {
 					+ e.getMessage());
 
 			throw new AzureChatSystemException(
-					"Exception occured connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : " + e.getMessage());
 		}
 		try {
 			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_USERID);
@@ -187,10 +198,17 @@ public class UserDAOImpl implements UserDAO {
 								+ e.getMessage());
 			}
 		}
-		LOGGER.info("[UserDAOImpl][getUserDetailsByUserId]         end ");
+		LOGGER.info("[UserDAOImpl][getUserDetailsByUserId] end ");
 		return user;
 	}
 
+	/**
+	 * Used to get the user details from Azure SQL by name id
+	 * 
+	 * @param nameId
+	 * @return List<UserEntity>
+	 * @author rupesh_shirude
+	 */
 	@Override
 	public List<UserEntity> getUserDetailsByNameID(String nameId)
 			throws Exception {
@@ -203,13 +221,13 @@ public class UserDAOImpl implements UserDAO {
 			LOGGER.info("Exception while getUserDetailsByNameID_loading sql driver class  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured loading driver class : "
+					"Exception occurred loading driver class : "
 							+ e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.info("Exception while getUserDetailsByNameID_getting connection  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : " + e.getMessage());
 		}
 		try {
 			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_NAMEID);
@@ -237,14 +255,23 @@ public class UserDAOImpl implements UserDAO {
 								+ e.getMessage());
 			}
 		}
-		LOGGER.info("[UserDAOImpl][getUserDetailsByNameID]         end ");
+		LOGGER.info("[UserDAOImpl][getUserDetailsByNameID] end ");
 		return userEntities;
 	}
 
+	/**
+	 * This method used to get the user details from Azure SQL by nameId and
+	 * identityProvider
+	 * 
+	 * @param nameId
+	 * @param identityProvider
+	 * @return List<UserEntity>
+	 * @author rupesh_shirude
+	 */
 	@Override
 	public List<UserEntity> getUserDetailsByNameIdAndIdentityProvider(
 			String nameId, String identityProvider) throws AzureChatException {
-		LOGGER.info("[UserDAOImpl][getUserDetailsByNameIdAndIdentityProvider]         start ");
+		LOGGER.info("[UserDAOImpl][getUserDetailsByNameIdAndIdentityProvider] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
 		connectionString = AzureChatUtils.buildConnectionString();
 		try {
@@ -253,13 +280,13 @@ public class UserDAOImpl implements UserDAO {
 			LOGGER.info("Exception while getUserDetailsByNameIdAndIdentityProvider_loading sql driver class  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured loading driver class : "
+					"Exception occurred loading driver class : "
 							+ e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.info("Exception while getUserDetailsByNameIdAndIdentityProvider_getting connection  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : " + e.getMessage());
 		}
 		try {
 			sqlString = new String(
@@ -289,14 +316,21 @@ public class UserDAOImpl implements UserDAO {
 								+ e.getMessage());
 			}
 		}
-		LOGGER.info("[UserDAOImpl][getUserDetailsByNameIdAndIdentityProvider]         end ");
+		LOGGER.info("[UserDAOImpl][getUserDetailsByNameIdAndIdentityProvider] end ");
 		return userEntities;
 	}
 
+	/**
+	 * This method is used to get the user details from Azure SQL by first name
+	 * 
+	 * @param firstName
+	 * @return List<UserEntity>
+	 * @author rupesh_shirude
+	 */
 	@Override
 	public List<UserEntity> getUserDetailsByFirstName(String firstName)
 			throws Exception {
-		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstName]         start ");
+		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstName] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
 		connectionString = AzureChatUtils.buildConnectionString();
 		try {
@@ -305,13 +339,13 @@ public class UserDAOImpl implements UserDAO {
 			LOGGER.info("Exception while getUserDetailsByFirstName_loading sql driver class  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured loading driver class : "
+					"Exception occurred loading driver class : "
 							+ e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.info("Exception while getUserDetailsByFirstName_getting connection  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : " + e.getMessage());
 		}
 		try {
 			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_FIRST_NAME);
@@ -339,14 +373,21 @@ public class UserDAOImpl implements UserDAO {
 								+ e.getMessage());
 			}
 		}
-		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstName]         end ");
+		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstName] end ");
 		return userEntities;
 	}
 
+	/**
+	 * Used to get the user details from Azure SQL by last name
+	 * 
+	 * @param lastName
+	 * @return List<UserEntity>
+	 * @author rupesh_shirude
+	 */
 	@Override
 	public List<UserEntity> getUserDetailsByLastName(String lastName)
 			throws Exception {
-		LOGGER.info("[UserDAOImpl][getUserDetailsByLastName]         start ");
+		LOGGER.info("[UserDAOImpl][getUserDetailsByLastName] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
 		connectionString = AzureChatUtils.buildConnectionString();
 		try {
@@ -355,13 +396,13 @@ public class UserDAOImpl implements UserDAO {
 			LOGGER.info("Exception while getUserDetailsByLastName_loading sql driver class  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured loading driver class : "
+					"Exception occurred loading driver class : "
 							+ e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.info("Exception while getUserDetailsByLastName_getting connection  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : " + e.getMessage());
 		}
 		try {
 			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_LAST_NAME);
@@ -389,14 +430,22 @@ public class UserDAOImpl implements UserDAO {
 								+ e.getMessage());
 			}
 		}
-		LOGGER.info("[UserDAOImpl][getUserDetailsByLastName]         end ");
+		LOGGER.info("[UserDAOImpl][getUserDetailsByLastName] end ");
 		return userEntities;
 	}
 
+	/**
+	 * This method is used to get the user details from Azure SQL by first name
+	 * or last name
+	 * 
+	 * @param name
+	 * @return List<UserEntity>
+	 * @author rupesh_shirude
+	 */
 	@Override
 	public List<UserEntity> getUserDetailsByFirstNameOrLastName(String name)
 			throws Exception {
-		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstNameOrLastName]         start ");
+		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstNameOrLastName] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
 		connectionString = AzureChatUtils.buildConnectionString();
 		try {
@@ -405,13 +454,13 @@ public class UserDAOImpl implements UserDAO {
 			LOGGER.info("Exception while getUserDetailsByFirstNameOrLastName_loading sql driver class  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured loading driver class : "
+					"Exception occurred loading driver class : "
 							+ e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.info("Exception while getUserDetailsByFirstNameOrLastName_getting connection  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : " + e.getMessage());
 		}
 		try {
 			sqlString = new String(
@@ -446,6 +495,7 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	/**
+	 * THis method generates the prepare statement.
 	 * 
 	 * @param preparedStatement
 	 * @param user
@@ -474,6 +524,13 @@ public class UserDAOImpl implements UserDAO {
 		return preparedStatement;
 	}
 
+	/**
+	 * This method populates userEntity from the result set.
+	 * 
+	 * @param resultSet
+	 * @return
+	 * @throws SQLException
+	 */
 	public UserEntity generateUserObject(ResultSet resultSet)
 			throws SQLException {
 		UserEntity user = new UserEntity();
@@ -493,6 +550,9 @@ public class UserDAOImpl implements UserDAO {
 		return user;
 	}
 
+	/**
+	 * This method updates the user details row in the azure SQL table.
+	 */
 	@Override
 	public UserEntity updateNewUser(UserEntity user) throws Exception {
 		LOGGER.info("[UserDAOImpl][updateNewUser]         start ");
@@ -509,7 +569,7 @@ public class UserDAOImpl implements UserDAO {
 			LOGGER.info("Exception while updateNewUser_getting connection  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : " + e.getMessage());
 		}
 		try {
 			sqlString = new String(AzureChatSQLConstants.UPDATE_NEW_USER);
@@ -551,6 +611,11 @@ public class UserDAOImpl implements UserDAO {
 
 	}
 
+	/**
+	 * This method fetch and return he user photo blob URL for input user id.
+	 * 
+	 * @return userId
+	 */
 	@Override
 	public String getUserPhotoBlobURL(Integer userId) throws Exception {
 		String profileImageURL = "";
@@ -561,17 +626,18 @@ public class UserDAOImpl implements UserDAO {
 			LOGGER.info("Exception while updateNewUser_loading sql driver class  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured loading driver class : "
+					"Exception occurred loading driver class : "
 							+ e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.info("Exception while updateNewUser_getting connection  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occured connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : " + e.getMessage());
 		}
-		
+
 		try {
-			sqlString = new String(AzureChatSQLConstants.GET_USER_PROFILE_URL_BY_USERID);
+			sqlString = new String(
+					AzureChatSQLConstants.GET_USER_PROFILE_URL_BY_USERID);
 			preparedStatement = connection.prepareStatement(sqlString);
 			preparedStatement.setInt(1, userId);
 			resultSet = preparedStatement.executeQuery();
@@ -604,5 +670,38 @@ public class UserDAOImpl implements UserDAO {
 			}
 		}
 		return profileImageURL;
+	}
+
+	/**
+	 * This method creates the user table in azure SQL.
+	 */
+	@Override
+	public void createUserTable(Connection connection) throws Exception {
+		try {
+			sqlString = new String(AzureChatSQLConstants.CREATE_USER_TABLE);
+			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement.execute();
+		} catch (SQLException e) {
+
+			LOGGER.info("Exception while createUserTable : " + e.getMessage());
+			throw new AzureChatSystemException("Exception executing sql : "
+					+ e.getMessage());
+		} finally {
+
+			try {
+				preparedStatement.close();
+			} catch (SQLException e) {
+
+				LOGGER.info("Exception while createUserTable_closing DB resources : "
+						+ e.getMessage());
+
+				LOGGER.info("Exception while createUserTable_closing DB resources : "
+						+ e.getMessage());
+
+				throw new AzureChatSystemException(
+						"Exception while closing resources : resultSet & prepareStmt : "
+								+ e.getMessage());
+			}
+		}
 	}
 }

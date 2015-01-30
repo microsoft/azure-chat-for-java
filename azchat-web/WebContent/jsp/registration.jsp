@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page session="false"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -10,8 +11,6 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
-<script 
-	src="${pageContext.request.contextPath}/js/bootstrap3-typeahead.js" type="text/javascript"></script>
 <script src="${pageContext.request.contextPath}/js/bootstrap3-typeahead.min.js"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/registration.js"></script>
@@ -129,7 +128,7 @@
 									<div id="div_countryCD" class="col-md-6">
 										<input value="${userBean.countryCD}" id="input_countryCD" name="country" type="text"
 											placeholder="Country" class="typeahead form-control"
-											autocomplete="off" spellcheck="false" required="true"/>
+											autocomplete="off" spellcheck="false" required/>
 										<form:hidden path="countryCD" id="dupCountryCD"/>						
 									</div>									
 								</div>
@@ -149,7 +148,7 @@
 									<div class="col-md-6">	
 									 	<c:forEach items="${userBean.usrPrefList}" var="userPrefBean" varStatus="status">
 											<form:checkbox path="usrPrefList[${status.index}].isChecked" value="${userPrefBean.isChecked}" id="userPref"/>
-											<label for="userPref" style="color: black;">${userPrefBean.prefDesc}</label>
+											<label for="userPref" style="color: black;font-weight: 100;">${userPrefBean.prefDesc}</label>
 											<form:hidden path="usrPrefList[${status.index}].prefDesc"/>
 									 	</c:forEach>
 								 	</div>

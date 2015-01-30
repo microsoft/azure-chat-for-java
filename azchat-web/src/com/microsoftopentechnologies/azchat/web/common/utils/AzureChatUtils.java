@@ -21,12 +21,15 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,6 +42,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatException;
 import com.microsoftopentechnologies.azchat.web.data.beans.BaseBean;
 import com.microsoftopentechnologies.azchat.web.data.beans.ErrorBean;
@@ -60,6 +64,7 @@ public class AzureChatUtils {
 
 	/**
 	 * Gets XML DOM object from string data
+	 * 
 	 * @param data
 	 * @return
 	 * @throws Exception
@@ -83,7 +88,8 @@ public class AzureChatUtils {
 	}
 
 	/**
-	 * Retrieves nameID assetion from ACS token
+	 * Retrieves nameID assertion from ACS token
+	 * 
 	 * @param xPath
 	 * @param assertionDoc
 	 * @return
@@ -101,6 +107,7 @@ public class AzureChatUtils {
 
 	/**
 	 * Retrieves user attribute details from ACS token.
+	 * 
 	 * @param xPath
 	 * @param assertionDoc
 	 * @return
@@ -119,8 +126,10 @@ public class AzureChatUtils {
 			String attributeName = attribute.getAttributes()
 					.getNamedItem(AzureChatConstants.NAME_ATTRIBUTE)
 					.getNodeValue();
+			LOGGER.debug("Attribute Name :"+attributeName);
 			String claimName = attributeName.substring(attributeName
 					.lastIndexOf(AzureChatConstants.CONSTANT_BACK_SLASH) + 1);
+			LOGGER.debug("Claim Name :"+claimName);
 
 			if (AzureChatConstants.ATTR_IDENTITY_PROVIDER
 					.equalsIgnoreCase(claimName)) {
@@ -151,7 +160,6 @@ public class AzureChatUtils {
 				.getResourceAsStream(AzureChatConstants.RESOURCE_PROP_FILE);
 		InputStream inputStream1 = AzureChatUtils.class.getClassLoader()
 				.getResourceAsStream(AzureChatConstants.MSG_PROP_FILE);
-		
 		if (inputStream != null) {
 			try {
 				PROPERTIES.load(inputStream);
@@ -252,29 +260,25 @@ public class AzureChatUtils {
 		}
 
 		StringBuilder connectionString = new StringBuilder(
-				AzureChatUtils.getProperty(AzureChatConstants.DB_PROP_KEY_URL)
-						+ TOKEN_SEPARATOR
-						+ "database="
-						+ AzureChatUtils
-								.getProperty(AzureChatConstants.DB_PROP_KEY_DATABASE)
-						+ TOKEN_SEPARATOR
-						+ "user="
-						+ AzureChatUtils
-								.getProperty(AzureChatConstants.DB_PROP_KEY_USER)
-						+ TOKEN_SEPARATOR
-						+ "password="
-						+ AzureChatUtils
-								.getProperty(AzureChatConstants.DB_PROP_KEY_PASSWORD)
-						+ TOKEN_SEPARATOR
-						+ "encrypt="
-						+ AzureChatUtils
-								.getProperty(AzureChatConstants.DB_PROP_KEY_ENCRYPT)
-						+ TOKEN_SEPARATOR
-						+ "hostNameInCertificate="
-						+ AzureChatUtils
-								.getProperty(AzureChatConstants.DB_PROP_KEY_HOST_NAME_IN_CERT)
-						+ TOKEN_SEPARATOR + "loginTimeout=" + timeout
-						+ TOKEN_SEPARATOR);
+				AzureChatUtils.getProperty(AzureChatConstants.DB_PROP_KEY_URL));
+		
+		connectionString.append(TOKEN_SEPARATOR).append("database=").
+				append( AzureChatUtils.getProperty(AzureChatConstants.DB_PROP_KEY_DATABASE));
+		
+		connectionString.append(TOKEN_SEPARATOR).append("user=").append(AzureChatUtils
+								.getProperty(AzureChatConstants.DB_PROP_KEY_USER));
+		
+		connectionString.append(TOKEN_SEPARATOR).append("password=").append(AzureChatUtils
+								.getProperty(AzureChatConstants.DB_PROP_KEY_PASSWORD));
+		
+		connectionString.append(TOKEN_SEPARATOR).append("encrypt=").append(AzureChatUtils
+				.getProperty(AzureChatConstants.DB_PROP_KEY_ENCRYPT));
+
+		connectionString.append(TOKEN_SEPARATOR).append("hostNameInCertificate=").append(AzureChatUtils
+								.getProperty(AzureChatConstants.DB_PROP_KEY_HOST_NAME_IN_CERT));
+		
+		connectionString.append(TOKEN_SEPARATOR).append("loginTimeout=").append(timeout).append(TOKEN_SEPARATOR);
+		
 		return connectionString.toString();
 	}
 
@@ -286,7 +290,7 @@ public class AzureChatUtils {
 	 */
 	public static Long getMegaBytes(Long bytes) {
 		if (null != bytes) {
-			return bytes / 1000000;
+			return bytes / 1048576;
 		}
 		return null;
 	}
@@ -300,26 +304,96 @@ public class AzureChatUtils {
 	public static Long getNumbers(String str) {
 		Long num = null;
 		if (null != str) {
-			str = str.replaceAll("[^0-9]", "");
+			str = str.replaceAll(AzureChatConstants.REGEX_ONLY_DIGITS,
+					AzureChatConstants.CONSTANT_EMPTY_STRING);
 			num = Long.parseLong(str);
 		}
 		return num;
 	}
-	
+
 	/**
 	 * This method populates the error in input bean.
+	 * 
 	 * @param baseBean
 	 * @param excpCode
 	 * @param excpMsg
 	 */
-	public static void populateErrors(BaseBean baseBean,String excpCode,String excpMsg){
-		ErrorListBean errorListBean=new ErrorListBean();
-		List<ErrorBean> errorBeanList=new ArrayList<ErrorBean>();
-		ErrorBean errorBean=new ErrorBean();
+	public static void populateErrors(BaseBean baseBean, String excpCode,
+			String excpMsg) {
+		ErrorListBean errorListBean = new ErrorListBean();
+		List<ErrorBean> errorBeanList = new ArrayList<ErrorBean>();
+		ErrorBean errorBean = new ErrorBean();
 		errorBean.setExcpMsg(excpMsg);
 		errorListBean.setExcpCode(excpCode);
 		errorBeanList.add(errorBean);
 		errorListBean.setErrorList(errorBeanList);
 		baseBean.setErrorList(errorListBean);
 	}
+
+	/**
+	 * This method returns the SAS URL for the input container name.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getSASUrl(String containerName) throws Exception {
+		CloudBlobContainer cloudBlobContainer = AzureChatStorageUtils
+				.getCloudBlobContainer(containerName);
+		String signature = AzureChatStorageUtils
+				.generateSASURL(cloudBlobContainer);
+		return signature;
+	}
+
+	/**
+	 * This method generates and return the random guid using java.util.UUID.
+	 * 
+	 * @return
+	 */
+	public static String getGUID() {
+		return UUID.randomUUID().toString();
+	}
+
+	/**
+	 * This method returns the current time stamp.
+	 */
+	public static Timestamp getCurrentTimestamp() {
+		return new Timestamp(new Date().getTime());
+	}
+
+	/**
+	 * This method converts the string number value to the integer
+	 * 
+	 * @param expiryTime
+	 * @return
+	 */
+	public static int covertMinToSec(String min) {
+		if (!isEmptyOrNull(min)) {
+			return (60 * Integer.valueOf(min));
+		}
+		return 0;
+	}
+
+	/**
+	 * This method converts the string to integer value.
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static long covertStringToLong(String str) {
+		if (!isEmptyOrNull(str)) {
+			return Long.parseLong(str);
+		}
+		return 0;
+	}
+	
+	public static List<String> getPreferences() throws AzureChatException{
+		List<String> list = new ArrayList<String>();
+		Properties properties = getProperties();
+		int propertyCount = Integer.parseInt(properties.getProperty("preference.count"));
+		for(int i=1; i<=propertyCount; i++){
+			list.add(properties.getProperty("preference"+i));
+		}
+		return list;
+	}
+
 }

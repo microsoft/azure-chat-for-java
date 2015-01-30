@@ -15,6 +15,12 @@
  */
 package com.microsoftopentechnologies.azchat.web.data.beans;
 
+/**
+ * This data bean hold the data for User preferences.
+ * 
+ * @author Dnyaneshwar_Pawar
+ *
+ */
 public class UserPrefBean extends BaseBean {
 
 	/**
@@ -47,7 +53,8 @@ public class UserPrefBean extends BaseBean {
 	}
 
 	/**
-	 * @param isChecked the isChecked to set
+	 * @param isChecked
+	 *            the isChecked to set
 	 */
 	public void setIsChecked(Boolean isChecked) {
 		this.isChecked = isChecked;

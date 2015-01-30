@@ -34,6 +34,14 @@ import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserEntity;
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.FriendRequestEntity;
 
+/**
+ * Implementation class for the FriendRequestDAO.This class provides operations
+ * for AzChat friend management like add,search and approve/reject friend
+ * requests.
+ * 
+ * @author Rupesh_Shirude
+ *
+ */
 @Service("friendRequestDAO")
 public class FriendRequestDAOImpl implements FriendRequestDAO {
 	private static final Logger LOGGER = LogManager
@@ -43,11 +51,16 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 	@Autowired
 	private UserDAO userDao;
 
+	/**
+	 * This method provides functionality to add the friend request to the azure
+	 * storage account.
+	 */
 	public void addFriendRequest(String userID, String friendID,
 			String friendName, String friendProfileBlobURL, String requestStatus)
 			throws Exception {
-		LOGGER.info("[FriendRequestDAOImpl][addFriendRequest]         start ");
-		LOGGER.debug("User Details    " + userID);
+		LOGGER.info("[FriendRequestDAOImpl][addFriendRequest]start ");
+		LOGGER.debug("User Details    " + userID + " Request Status : "
+				+ requestStatus);
 		if (requestStatus
 				.equalsIgnoreCase(AzureChatConstants.FRIEND_REQUEST_PENDING_APPROVAL)) {
 			FriendRequestEntity friendRequestSent = new FriendRequestEntity(
@@ -80,13 +93,19 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 			AzureChatStorageUtils.insertOrReplaceEntity(FRIEND_REQ_TBL_NAME,
 					friendRequestSent);
 		}
-		LOGGER.info("[FriendRequestDAOImpl][addFriendRequest]         end ");
+		LOGGER.info("[FriendRequestDAOImpl][addFriendRequest] end ");
 
 	}
 
+	/**
+	 * This method call the azure storage and azure sql to fetch the registered
+	 * users.
+	 * 
+	 * @return friendRequestEntities
+	 */
 	public List<FriendRequestEntity> getFriendListForUser(String userID)
 			throws Exception {
-		LOGGER.info("[FriendRequestDAOImpl][getFriendListForUser]         start ");
+		LOGGER.info("[FriendRequestDAOImpl][getFriendListForUser] start ");
 		LOGGER.debug("User Details    " + userID);
 		List<FriendRequestEntity> friendRequestEntities = new ArrayList<FriendRequestEntity>();
 		String partitionFilter = TableQuery.generateFilterCondition(
@@ -104,14 +123,20 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 				.execute(friendListQuery)) {
 			friendRequestEntities.add(entity);
 		}
-		LOGGER.info("[FriendRequestDAOImpl][getFriendListForUser]         end ");
+		LOGGER.info("[FriendRequestDAOImpl][getFriendListForUser] end ");
 		return friendRequestEntities;
 
 	}
 
+	/**
+	 * This method calls the azure storage and fetch the pending friend requests
+	 * for the user.
+	 * 
+	 * @return friendRequestEntities
+	 */
 	public List<FriendRequestEntity> getPendingFriendRequestsForUser(
 			String userID) throws Exception {
-		LOGGER.info("[FriendRequestDAOImpl][getPendingFriendRequestsForUser]         start ");
+		LOGGER.info("[FriendRequestDAOImpl][getPendingFriendRequestsForUser] start ");
 		LOGGER.debug("User Details    " + userID);
 		List<FriendRequestEntity> friendRequestEntities = new ArrayList<FriendRequestEntity>();
 		String partitionFilter = TableQuery.generateFilterCondition(
@@ -129,13 +154,20 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 						pendingFriendRequestsQuery)) {
 			friendRequestEntities.add(entity);
 		}
-		LOGGER.info("[FriendRequestDAOImpl][getPendingFriendRequestsForUser]         end ");
+		LOGGER.info("[FriendRequestDAOImpl][getPendingFriendRequestsForUser] end ");
 		return friendRequestEntities;
 	}
 
+	/**
+	 * Gets the status of friend request is approved or not
+	 * 
+	 * @param userID
+	 * @param friendID
+	 * @return true\false
+	 */
 	public boolean isFriendRequestApproved(String userID, String friendID)
 			throws Exception {
-		LOGGER.info("[FriendRequestDAOImpl][isFriendRequestApproved]         start ");
+		LOGGER.info("[FriendRequestDAOImpl][isFriendRequestApproved] start ");
 		LOGGER.debug("User Details    " + userID);
 		TableOperation tableOperation = TableOperation.retrieve(userID,
 				friendID, FriendRequestEntity.class);
@@ -146,18 +178,26 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 				&& AzureChatConstants.FRIEND_REQUEST_APPROVED
 						.equals(friendRequestEntity.getStatus())) {
 			LOGGER.info("Both are friend..");
-			LOGGER.info("[FriendRequestDAOImpl][acceptFriendRequest]          end ");
+			LOGGER.info("[FriendRequestDAOImpl][acceptFriendRequest] end ");
 			return true;
-		} else {
-			LOGGER.info("Both are not friend..");
-			LOGGER.info("[FriendRequestDAOImpl][acceptFriendRequest]          end ");
-			return false;
 		}
+		LOGGER.debug("Both are not friend..");
+		LOGGER.info("[FriendRequestDAOImpl][acceptFriendRequest] end ");
+		return false;
 	}
 
+	/**
+	 * This method is used to accept friend request and create the friend
+	 * relationship by adding the entry to the azure storage.
+	 * 
+	 * @param userID
+	 * @param friendID
+	 * @param userName
+	 * @param userProfileBlobURL
+	 */
 	public void acceptFriendRequest(String userID, String friendID,
 			String userName, String userProfileBlobURL) throws Exception {
-		LOGGER.info("[FriendRequestDAOImpl][acceptFriendRequest]         start ");
+		LOGGER.info("[FriendRequestDAOImpl][acceptFriendRequest] start ");
 		LOGGER.debug("User Details    " + userID);
 		addFriendRequest(userID, friendID, userName, userProfileBlobURL,
 				AzureChatConstants.FRIEND_REQUEST_APPROVED);
@@ -167,12 +207,21 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 				entity.getFirstName() + " " + entity.getLastName(),
 				entity.getPhotoBlobUrl(),
 				AzureChatConstants.FRIEND_REQUEST_APPROVED);
-		LOGGER.info("[FriendRequestDAOImpl][acceptFriendRequest]          end ");
+		LOGGER.info("[FriendRequestDAOImpl][acceptFriendRequest] end ");
 	}
 
+	/**
+	 * This method is used to reject friend request and add the entries to the
+	 * azure table.
+	 * 
+	 * @param userID
+	 * @param friendID
+	 * @param userName
+	 * @param userProfileBlobURL
+	 */
 	public void rejectFriendRequest(String userID, String friendID,
 			String userName, String userProfileBlobURL) throws Exception {
-		LOGGER.info("[FriendRequestDAOImpl][rejectFriendRequest]         start ");
+		LOGGER.info("[FriendRequestDAOImpl][rejectFriendRequest] start ");
 		LOGGER.debug("User Details    " + userID);
 		addFriendRequest(userID, friendID, userName, userProfileBlobURL,
 				AzureChatConstants.FRIEND_REQUEST_NO_FRIEND);
@@ -182,13 +231,20 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 				entity.getFirstName() + " " + entity.getLastName(),
 				entity.getPhotoBlobUrl(),
 				AzureChatConstants.FRIEND_REQUEST_REJECTED);
-		LOGGER.info("[FriendRequestDAOImpl][rejectFriendRequest]          end ");
+		LOGGER.info("[FriendRequestDAOImpl][rejectFriendRequest] end ");
 	}
 
+	/**
+	 * This method used to find friend request status by querying the azure
+	 * storage.
+	 * 
+	 * @param userID
+	 * @param friendId
+	 */
 	public FriendRequestEntity getFriendStatusForUserWithFriend(String userID,
 			String friendId) throws Exception {
-		LOGGER.info("[FriendRequestDAOImpl][getFriendStatusForUserWithFriend]         start ");
-		LOGGER.debug("User Details    " + userID);
+		LOGGER.info("[FriendRequestDAOImpl][getFriendStatusForUserWithFriend] start ");
+		LOGGER.debug("User ID  :   " + userID);
 		if (!userID.equalsIgnoreCase(friendId)) {
 
 			List<FriendRequestEntity> friendRequestEntities = new ArrayList<FriendRequestEntity>();
@@ -198,12 +254,6 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 			String rowFilter = TableQuery.generateFilterCondition(
 					AzureChatConstants.ROW_KEY, QueryComparisons.EQUAL,
 					friendId);
-			// String pendingApprovalFilter =
-			// TableQuery.generateFilterCondition("Status",
-			// QueryComparisons.EQUAL, AZChatConstants.FRIEND_REQUEST_APPROVED);
-			// String combinedFilter =
-			// TableQuery.combineFilters(partitionFilter, Operators.AND,
-			// pendingApprovalFilter);
 			String combinedFilter = TableQuery.combineFilters(partitionFilter,
 					Operators.AND, rowFilter);
 			TableQuery<FriendRequestEntity> friendListQuery = TableQuery.from(
@@ -214,11 +264,11 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 				friendRequestEntities.add(entity);
 			}
 			if (!AzureChatUtils.isEmpty(friendRequestEntities)) {
-				LOGGER.info("friendRequestEntities not empty ...");
-				LOGGER.info("[FriendRequestDAOImpl][getFriendStatusForUserWithFriend]          end ");
+				LOGGER.debug("User ID and Frined ID relationship found in azure storage.");
+				LOGGER.info("[FriendRequestDAOImpl][getFriendStatusForUserWithFriend] end ");
 				return friendRequestEntities.get(0);
 			} else {
-				LOGGER.info("friendRequestEntities empty : building noFriend object...");
+				LOGGER.debug("User ID and Friend ID relationship not found.Returning noFriend status.");
 				FriendRequestEntity noFriendResponse = new FriendRequestEntity();
 				noFriendResponse
 						.setStatus(AzureChatConstants.FRIEND_REQUEST_NO_FRIEND);
@@ -227,13 +277,13 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 				UserEntity entity = userDao.getUserDetailsByUserId(Integer
 						.parseInt(friendId));
 				if (null != entity) {
-					populateFriendPhotoUrl(noFriendResponse,entity);
+					populateFriendPhotoUrl(noFriendResponse, entity);
 				}
-				LOGGER.info("[FriendRnoFriendResponseequestDAOImpl][getFriendStatusForUserWithFriend]          end ");
+				LOGGER.info("[FriendRnoFriendResponseequestDAOImpl][getFriendStatusForUserWithFriend] end ");
 				return noFriendResponse;
 			}
 		} else {
-			LOGGER.info("same user searched as login user...");
+			LOGGER.debug("User ID and Friend ID is same.User is queried self information.");
 			FriendRequestEntity noFriendResponse = new FriendRequestEntity();
 			noFriendResponse.setStatus(AzureChatConstants.FRIEND_REQUEST_YOU);
 			noFriendResponse.setPartitionKey(userID);
@@ -241,19 +291,25 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 			UserEntity entity = userDao.getUserDetailsByUserId(Integer
 					.parseInt(friendId));
 			if (null != entity) {
-				populateFriendPhotoUrl(noFriendResponse,entity);
+				populateFriendPhotoUrl(noFriendResponse, entity);
 			}
-			LOGGER.info("[FriendRequestDAOImpl][getFriendStatusForUserWithFriend]          end ");
+			LOGGER.info("[FriendRequestDAOImpl][getFriendStatusForUserWithFriend] end ");
 			return noFriendResponse;
 		}
 
 	}
 
+	/**
+	 * This method is used for getting pending friend request count for the
+	 * logged in user by querying the azure storage.
+	 * 
+	 * @param userID
+	 */
 	@Override
 	public Integer getPendingFriendRequestsCountForUser(String userID)
 			throws Exception {
-		LOGGER.info("[FriendRequestDAOImpl][getPendingFriendRequestsCountForUser]         start ");
-		LOGGER.debug("User Details    " + userID);
+		LOGGER.info("[FriendRequestDAOImpl][getPendingFriendRequestsCountForUser] start ");
+		LOGGER.debug("User ID :   " + userID);
 		int count = 0;
 		String partitionFilter = TableQuery.generateFilterCondition(
 				AzureChatConstants.PARTITION_KEY, QueryComparisons.EQUAL,
@@ -265,12 +321,12 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 				Operators.AND, pendingApprovalFilter);
 		TableQuery<FriendRequestEntity> pendingFriendRequestsQuery = TableQuery
 				.from(FriendRequestEntity.class).where(combinedFilter);
-		for (FriendRequestEntity entity : AzureChatStorageUtils
-				.getTableReference(FRIEND_REQ_TBL_NAME).execute(
-						pendingFriendRequestsQuery)) {
+		for (@SuppressWarnings("unused")
+		FriendRequestEntity entity : AzureChatStorageUtils.getTableReference(
+				FRIEND_REQ_TBL_NAME).execute(pendingFriendRequestsQuery)) {
 			count++;
 		}
-		LOGGER.info("[FriendRequestDAOImpl][getPendingFriendRequestsCountForUser]          end ");
+		LOGGER.info("[FriendRequestDAOImpl][getPendingFriendRequestsCountForUser] end ");
 		return count;
 	}
 

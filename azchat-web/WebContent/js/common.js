@@ -1,4 +1,6 @@
-// Static JSON Object code containing country list
+/**
+ *  This js file contains static JSON Object code which contains country list.
+ */
 var countryMap = '{ "countries" : ['
 		+ '{ "countryName":"India" , "countryCD":"91" },'
 		+ '{ "countryName":"Australia" , "countryCD":"44" },'

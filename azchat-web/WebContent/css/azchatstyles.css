@@ -35,6 +35,7 @@ html, body {
 	height: 100%;
 	font-family: verdana, arial, sans-serif;
 	color: #555555;
+	overflow : hidden;
 }
 
 .nav {
@@ -118,9 +119,14 @@ hr {
 	padding-left: 30px;
 }
 
-.navbar-lblue li>a:hover, .navbar-lblue li>a:focus,.navbar-lblue .open>a, .navbar-lblue .open>a:hover, .navbar-lblue .open>a:focus
+.navbar-lblue li>a:hover, .navbar-lblue li>a:focus, .navbar-lblue .open>a, .navbar-lblue .open>a:hover, .navbar-lblue .open>a:focus
 	{
 	background-color: #3B5893;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+	background-color: #3B5893 !important;
+	text-decoration: none;
 }
 
 #main {
@@ -181,14 +187,6 @@ hr {
 }
 
 .update-box .communicate {
-	-webkit-transition: 0.1s ease-out height;
-	-moz-transition: 0.1s ease-out height;
-	-ms-transition: 0.1s ease-out height;
-	-o-transition: 0.1s ease-out height;
-	transition: 0.1s ease-out height;
-	clear: both;
-	background: white;
-	border: 2px solid #dddddd;
 	margin-bottom: 10px;
 	position: relative;
 }
@@ -201,10 +199,6 @@ hr {
 	left: 10px;
 	display: inline;
 	top: -10px;
-	-webkit-transition: 0.3s ease-out all;
-	-moz-transition: 0.3s ease-out all;
-	-ms-transition: 0.3s ease-out all;
-	-o-transition: 0.3s ease-out all;
 	transition: 0.3s ease-out all;
 }
 
@@ -310,27 +304,6 @@ h1, h2, h3 {
 	width: 100%;
 }
 
-.modal-header, .modal-footer {
-	background-color: #f2f2f2;
-	font-weight: 800;
-	font-size: 12px;
-}
-
-.modal-footer i, .well i {
-	font-size: 20px;
-	color: #c0c0c0;
-}
-
-.modal-body {
-	padding: 0px;
-}
-
-.modal-body textarea.form-control {
-	resize: none;
-	border: 0;
-	box-shadow: 0 0 0;
-}
-
 small.text-muted {
 	font-family: courier, courier-new, monospace;
 }
@@ -342,7 +315,7 @@ small.text-muted {
     filter: alpha(opacity=0);
     opacity: 0;
 }
-input, [type=file] + label {
+.upload-text {
   border: 1px solid #CCC;
   border-radius: 3px;
   text-align: left;
@@ -352,15 +325,79 @@ input, [type=file] + label {
   left: 0;
   position: relative;
 }
-[type=file] + label {
-  text-align: center;
-  left: 7.35em;
-  top: 0.5em;
-  background: #333;
-  color: #fff;
-  border: none;
-  cursor: pointer;
+
+/* Custom CSS */
+
+.avatar-label {
+	text-align:left; 
+	width: 278px !important;
+	font-weight: 200;
+	margin-left: 10px;
+	margin-top: 10px;
 }
-[type=file] + label:hover {
-  background: #3399ff;
+
+/* Custom CSS for status Feed Block*/
+
+.friend-info-box {
+	height:120px;
+	display:inline-block;
+}
+.friend-image-size {
+	min-height: 50px;
+	max-height: 120px;
+	min-width: 50px;
+	max-width: 120px;
+}
+.status-update-box {
+	height: 500px;
+	overflow-x: hidden;
+}
+.profilePic{
+	position: fixed;
+}
+.profileUserName{
+	height: 50px;
+    text-align: left;
+}
+.userStatus {
+	margin-top: 55px;
+    padding: 10px;
+}
+.videoContent, .imageContent {
+	min-height: 100px;
+	max-height: 612px;
+	min-width: 100px;
+	max-width: 612px;
+}
+.time-ago {
+	display: inline;
+	font-weight: lighter !important;
+	text-align: right;
+	opacity: 5;
+}
+.like-comment-status {
+	margin-top: 10px;
+	border: 1px solid activeborder;
+	background-color: #EFEFEF;
+	cursor: pointer;
+	position: absolute;
+	
+}
+.like-comment-data {
+	display: none;
+	padding-top: 10px;
+}
+.statusBorder {
+	padding-bottom: 20px;
+	padding-top: 10px;
+	border-width:thin;
+	border-bottom-style: dashed;
+	border-spacing: 10px;
+}
+.friendComment {
+	padding-bottom: 60px;
+}
+.typeahead-srch-frnd {
+	font-weight: bolder;
+	font-stretch: wider;
 }

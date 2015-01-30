@@ -1,3 +1,6 @@
+/**
+ * This js file contains function of typeahead to Auto populate Country List while typing.
+ */
 $(document).ready(function() {
 		$("#input_countryCD").typeahead({
 			source : function(query, process) {

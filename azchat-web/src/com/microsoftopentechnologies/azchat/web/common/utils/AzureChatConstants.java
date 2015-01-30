@@ -28,7 +28,7 @@ public interface AzureChatConstants {
 	String EXCEP_CODE_JAVA_EXCEPTION = "JE";
 	String EXCEP_TYPE_BUSSINESS_EXCEPTION = "com.microsoftopentechnologies.azchat.web.common.exceptions.AZChatBusinessExcdeption";
 	String EXCEP_TYPE_SYSTYEM_EXCEPTION = "com.microsoftopentechnologies.azchat.web.common.exceptions.AZChatSystemException";
-	
+
 	// Add Handler mapping Here
 	String FROM_PAGE_INDEX = "index.htm";
 	String FROM_PAGE_LOGIN = "login.htm";
@@ -39,9 +39,14 @@ public interface AzureChatConstants {
 
 	String FROM_PAGE_GET_PENDING_FRND = "getPendingFriendList.htm";
 	String FROM_PAGE_UPDATE_PENDING_FRNDREQ = "updateFrndReqstatus.htm";
-	String FROM_PAGE_CONTENT_SHARE="contentShare.htm";
+	String FROM_PAGE_CONTENT_SHARE = "contentShare.htm";
+	String FROM_PAGE_UPDATE_MSG_COMMENT = "updateMesageComment.htm";
+	String FROM_PAGE_USER_LIKE = "updateMesageLikeStatus.htm";
 
 	String FROM_PAGE_UPDATE_USR_PROF = "updateUserProfile.htm";
+	String FROM_PAGE_GET_USER_CONTENT = "getUserContent.htm";
+	String FROM_PAGE_GET_MSG_COMMENTS = "getMessageComment.htm";
+	String FROM_PAGE_PENDING_FRIEND_CNT="getPendingFriendCount.htm";
 
 	// Add View Names Here
 	String VIEW_NAME_ERROR = "error";
@@ -74,15 +79,18 @@ public interface AzureChatConstants {
 	String SUCCESS_MSG_ADD_FRIEND = "Friend Added Successfully.";
 	String SUCCESS_MSG_USR_PROF_UPDT = "User profile updated successfully.";
 	String SUCCESS_MSG_APPROVE_FRND_REQ = "Friend Added successfully.";
-	String SUCCESS_MSG_CONTENT_SHARE="User status updated successfully.";
-	
+	String SUCCESS_MSG_CONTENT_SHARE = "User status updated successfully.";
+	String SUCCESS_MSG_COMMENT_UPDATE = "Comment updated successfully.";
+	String SUCCESS_MSG_LIKE_STATUS = "Like status updated successfully.";
+	String SUCCESS_MSG_VIDEO_SHARE = "Video encoding is in progress.";
+
 	// Failure Messages
 	String FAILURE_MSG_REG = "Unable to register!";
 	String FAILURE_MSG_USR_PROF_UPDT = "User profile update process failed.";
 	String FAILURE_MSG_REJECT_FRND_REQ = "Friend request rejected successfully.";
-	
-	//Exception Messages
-	String EXCEP_MSG_UPLOAD_SIZE_EXCEEDS="File upload size exceeds 200MB.File upload size should not exceeds 200MB.";
+
+	// Exception Messages
+	String EXCEP_MSG_UPLOAD_SIZE_EXCEEDS = "Unable to upload file.File upload size should not exceeds ";
 
 	// Property File Names
 	String MSG_PROP_FILE = "azchatMessages.properties";
@@ -96,7 +104,7 @@ public interface AzureChatConstants {
 	String KEY_ACOUNT_KEY = "AccountKey";
 	String OPERATOR_EQUALS = "=";
 	String CONSTANT_SEMICOLON = ";";
-	String DEF_ENDPOINT_PROTOCOL_DEFVAL="DefaultEndpointsProtocol=http;";
+	String DEF_ENDPOINT_PROTOCOL_DEFVAL = "DefaultEndpointsProtocol=http;";
 
 	// Azure SQL Constants
 	String DB_PROP_KEY_DATABASE = "db.name";
@@ -107,16 +115,17 @@ public interface AzureChatConstants {
 	String DB_PROP_KEY_LOG_IN_TIMEOUT = "db.loginTimeout";
 	String DB_PROP_KEY_ENCRYPT = "db.encrypt";
 	String DRIVER = "db.driver.classname";
-	String DB_PROP_TIMEOUT_VAL="30";
+	String DB_PROP_TIMEOUT_VAL = "30";
 
 	// Storage Table Names
 	String TABLE_NAME_FRIEND_REQ = "FriendRequest";
 	String TABLE_NAME_MESSAGE_COMMENTS = "MessageComments";
 	String TABLE_NAME_MESSAGE_LIKES = "MessageLikes";
-	String TABLE_NAME_USER_MESSAGE = "UserMessages";
-	
-	// Storage queue 
+	String TABLE_NAME_USER_MESSAGE = "UserMessage";
+
+	// Storage queue
 	String QUEUE_NAME_MESSAGE = "messageexpiryqueue";
+	String QUEUE_NAME_EMAIL_NOTIFICATION = "emailnotification";
 
 	String FRIEND_REQUEST_APPROVED = "approved";
 	String FRIEND_REQUEST_REJECTED = "rejected";
@@ -136,12 +145,48 @@ public interface AzureChatConstants {
 	String CONSTANT_SPACE = " ";
 	String CONSTANT_EMPTY_STRING = "";
 	String TIMEZONE_UTC = "UTC";
-	
-	String MAX_UPLOAD_SIZE_KEY="max.upload.size";
+
+	// Azure BLOB containers
+	String PROFILE_IMAGE_CONTAINER = "userprofilepics";
+	String PHOTO_UPLOAD_CONTAINER = "photos";
+	String TEMP_UPLOAD_CONTAINER = "temp";
+
+	String MAX_UPLOAD_SIZE_KEY = "max.upload.size";
 
 	// Image Types
 	String MEDIA_TYPE_IMAGE_JPEG = "image/jpeg";
 	String MEDIA_TYPE_IMAGE_PNG = "image/png";
 	String MEDIA_TYPE_VIDEO_MOV = "video/quicktime";
 	String MEDIA_TYPE_VIDEO_MP4 = "video/mp4";
+
+	String USER_PROFILE_CONTAINER = "userprofilepics";
+
+	// REGEX
+	String REGEX_ONLY_DIGITS = "[^0-9]";
+
+	String UI_MEDIA_TYPE_IMAGE = "image";
+	String UI_MEDIA_TYPE_VIDEO = "video";
+
+	// Service bus constants
+	String SERVICE_BUS_NAMESPACE = "service.bus.namespace";
+	String SERVICE_BUS_SASKEYNAME = "service.bus.sasKeyName";
+	String SERVICE_BUS_SASKEY = "service.bus.sasKey";
+	String SERVICE_BUS_QUEUENAME = "azchatqueue";
+	String SERVICE_BUS_ROOT_URI= "service.bus.rooturi";
+
+	String GET_USER_ONLY_CONTENTS = "UserOnly";
+	String GET_USER_AND_FRIENDS_CONTENT = "UserAndFriends";
+
+	// Media service constants
+	String MEDIA_SERVICE_ACCOUNTNAME = "media.service.accName";
+	String MEDIA_SERVICE_PRIKEY = "media.service.primarykey";
+	String MEDIA_SERVICE_URI = "https://media.windows.net/API/";
+	String MEDIA_SERVICE_OAUTHURI = "https://wamsprodglobal001acs.accesscontrol.windows.net/v2/OAuth2-13";
+	String MEDIA_SERVICE_SCOPE = "urn:WindowsAzureMediaServices";
+	
+	String TIMER_TASK_MSGEXPIRY_TIME_KEY="timer.task.period.msg.expiry";
+	String TIMER_TASK_SERVICEBUS_TIME_KEY="timer.task.period.service.bus";
+	String TIMER_TASK_EMAIL_NOTIFICATION="timer.task.period.email.notif";
+	
+
 }

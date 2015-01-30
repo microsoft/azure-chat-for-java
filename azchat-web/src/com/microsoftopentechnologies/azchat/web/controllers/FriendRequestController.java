@@ -34,6 +34,9 @@ import com.microsoftopentechnologies.azchat.web.data.beans.UserBean;
 import com.microsoftopentechnologies.azchat.web.services.BaseService;
 
 /**
+ * This controller handles the Friend Request Add/Delete,Search Friends and
+ * Retrieve and Update friend status requests.
+ * 
  * @author Dnyaneshwar_Pawar
  *
  */
@@ -48,7 +51,7 @@ public class FriendRequestController extends BaseController {
 	private BaseService friendRequestService;
 
 	/**
-	 * This method finds the friend by calling FriendRequest Service.
+	 * This method handles the get friend list request and response the JSON.
 	 * 
 	 * @param request
 	 * @return
@@ -65,7 +68,8 @@ public class FriendRequestController extends BaseController {
 	}
 
 	/**
-	 * This method finds the friend by calling FriendRequest Service.
+	 * This method handles the friend request status request and response.This
+	 * method also parse the response to the JSON.
 	 * 
 	 * @param request
 	 * @return
@@ -85,7 +89,8 @@ public class FriendRequestController extends BaseController {
 	}
 
 	/**
-	 * This method finds the friend by calling FriendRequest Service.
+	 * This method handles the add friend request and response.This method also
+	 * parse the response to the JSON.
 	 * 
 	 * @param request
 	 * @return
@@ -101,12 +106,16 @@ public class FriendRequestController extends BaseController {
 		friendRequestBean.setServiceAction(ServiceActionEnum.ADD_FRIEND);
 		friendRequestBean = (FriendRequestBean) friendRequestService
 				.invokeService(friendRequestBean);
+		if (!friendRequestBean.hasErrors()) {
+			friendRequestBean.setMsg(AzureChatConstants.SUCCESS_MSG_ADD_FRIEND);
+		}
 		LOGGER.info("[FriendRequestController][addFriend] end");
 		return friendRequestBean;
 	}
 
 	/**
-	 * This method get the list of pending Friend Requests.
+	 * This method handles the pending friend request and response.This method
+	 * also parse the response to the JSON.
 	 * 
 	 * @param request
 	 * @return
@@ -124,7 +133,8 @@ public class FriendRequestController extends BaseController {
 	}
 
 	/**
-	 * This method updates the status of pending Friend Requests.
+	 * This method handles the update friend request status request and
+	 * response.This method also parse the response to the JSON.
 	 * 
 	 * @param request
 	 * @return
@@ -144,5 +154,24 @@ public class FriendRequestController extends BaseController {
 				.invokeService(frndBean);
 		LOGGER.info("[FriendRequestController][updateFriendReqStatus] end");
 		return frndBean;
+	}
+
+	/**
+	 * This method handles the pending friend request count request and
+	 * response.This method also parse the response to the JSON.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = AzureChatConstants.FROM_PAGE_PENDING_FRIEND_CNT, method = RequestMethod.POST)
+	public @ResponseBody UserBean getPendingFriendRequestCount(
+			HttpServletRequest request) {
+		LOGGER.info("[FriendRequestController][updateFriendReqStatus] start");
+		UserBean userBean = new UserBean();
+		userBean.setUserID(request.getParameter("userID"));
+		userBean.setServiceAction(ServiceActionEnum.GET_PENDING_FRIEND_COUNT);
+		userBean = (UserBean) friendRequestService.invokeService(userBean);
+		LOGGER.info("[FriendRequestController][updateFriendReqStatus] end");
+		return userBean;
 	}
 }

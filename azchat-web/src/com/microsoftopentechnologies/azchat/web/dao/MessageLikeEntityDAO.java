@@ -15,13 +15,12 @@
  */
 package com.microsoftopentechnologies.azchat.web.dao;
 
-import java.util.List;
+import java.util.Map;
 
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.MessageLikesEntity;
 /**
  * This interface used to add, get likes over message.
  * 
- * @author
  *
  */
 public interface MessageLikeEntityDAO {
@@ -40,7 +39,7 @@ public interface MessageLikeEntityDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<MessageLikesEntity> getMessageLikeEntity(String messageId) throws Exception;
+	public Map<String,MessageLikesEntity> getMessageLikeEntity(String messageId) throws Exception;
 	/**
 	 * This method is used to get this like by message id & friend id. 
 	 * 
@@ -50,4 +49,36 @@ public interface MessageLikeEntityDAO {
 	 * @throws Exception
 	 */
 	public MessageLikesEntity getMessageLikeEntity(String messageId, String friendId) throws Exception;
+	/**
+	 * this method is used to get the likes count by message id.
+	 * 
+	 * @param messageId
+	 * @return
+	 * @throws Exception
+	 */
+	public Integer getMessageLikeEntityCount(String messageId) throws Exception;
+	/**
+	 * This method is used to get like count by message id & friend id. 
+	 * 
+	 * @param messageId
+	 * @param friendId
+	 * @return
+	 * @throws Exception
+	 */
+	public Integer getMessageLikeEntityCount(String messageId, String friendId) throws Exception;
+	/**
+	 * This method is used to delete like by message id & friend id. 
+	 * 
+	 * @param messageId
+	 * @param friendId
+	 * @return
+	 * @throws Exception
+	 */
+	public void deleteMessageLikeEntity(MessageLikesEntity messageLikesEntity) throws Exception;
+	/**
+	 * This method is used to delete like by message id.
+	 * @param messageId
+	 * @throws Exception
+	 */
+	public void deleteMessageLikeByMessageId(String messageId) throws Exception;
 }
