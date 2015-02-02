@@ -274,7 +274,7 @@
 														 	 		</div>
 													 	 			<c:if test="${userMessageBean.mediaType eq 'video'}">
 														 	 			<div>
-														 	 				<video class="videoContent" id="video_${userMessageBean.msgID}" width="640" height="360" poster="${pageContext.request.contextPath}/images/posterCover.jpg" controls preload="none" onclick="startVideo(this);">
+														 	 				<video class="videoContent" id="video_${status.index}" width="640" height="360" poster="${pageContext.request.contextPath}/images/posterCover.jpg" controls preload="none" onclick="startVideo(this);">
 														 	 					<source src="<c:out value="${userMessageBean.mediaUrl}"/>" type="<c:out value="${userMessageBean.mediaType}"/>"></source>
 														 	 				</video>											 	 			
 														 	 			</div>

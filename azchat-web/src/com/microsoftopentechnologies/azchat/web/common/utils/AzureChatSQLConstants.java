@@ -16,54 +16,54 @@
 package com.microsoftopentechnologies.azchat.web.common.utils;
 
 /**
- * Interface to hold the common SQL queries that are used throughout the application.
+ * Interface to hold the common SQL queries that are used throughout the
+ * application.
  * 
  * @author Rupesh_Shirude
  *
  */
 public interface AzureChatSQLConstants {
+
+	public static final String CREATE_USER_TABLE = "IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='User') "
+			+ "CREATE TABLE [User] ("
+			+ "[USER_ID] [int] IDENTITY(1,1) NOT NULL,"
+			+ "[NAME_ID] [nvarchar](250) NOT NULL,"
+			+ "[IDENTITY_PROVIDER] [nvarchar](100) NOT NULL,"
+			+ "[FIRST_NAME] [nvarchar](50) ,"
+			+ "[LAST_NAME] [nvarchar](50) ,"
+			+ "[PHOTO_BLOB_URL] [nvarchar](1024),"
+			+ "[EMAIL_ADDRESS] [nvarchar](50) ,"
+			+ "[PHONE_COUNTRY_CODE] [int] ,"
+			+ "[PHONE_NUMBER] [bigint] ,"
+			+ "[DATE_CREATED] [date]  ,"
+			+ "[CREATED_BY] [date] ,"
+			+ "[DATE_MODIFIED] [date]  ," + "[MODIFIED_BY] [date]   " + ")";
 	
+	public static final String CREATE_USER_TABLE_INDEX = "IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name like 'userTableIndex') "
+			+ "CREATE CLUSTERED INDEX [userTableIndex] ON [User] ([USER_ID])";
+
+	public static final String CREATE_PREFERENCE_METADATA_TABLE = "IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='preference_metadata') "
+			+ "CREATE TABLE [preference_metadata]("
+			+ "[preference_metadata_id] [int] IDENTITY(1,1) NOT NULL,"
+			+ "[PREFERENCE_DESCRIPTION] [nvarchar](50) NOT NULL,"
+			+ "[DATE_CREATED] [date]  ,"
+			+ "[CREATED_BY] [date] ,"
+			+ "[DATE_MODIFIED] [date]  ," + "[MODIFIED_BY] [date]   " + ")";
+
+	public static final String CREATE_PREFERENCE_METADATA_TABLE_INDEX = "IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name like 'prefMetaDataIndex') "
+			+ "CREATE CLUSTERED INDEX [prefMetaDataIndex] ON [preference_metadata] ([preference_metadata_id])";
+
+	public static final String CREATE_USER_PREFERENCES_TABLE = "IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='user_preferences') "
+			+ "CREATE TABLE [user_preferences]("
+			+ "[user_preferences_id] [int] IDENTITY(1,1) NOT NULL,"
+			+ "[USER_ID] [int] NOT NULL,"
+			+ "[PREFERENCE_ID] [int] NOT NULL,"
+			+ "[DATE_CREATED] [date]  ,"
+			+ "[CREATED_BY] [date]  ,"
+			+ "[DATE_MODIFIED] [date]  ," + "[MODIFIED_BY] [date]  " + ")";
 	
-	public static final String CREATE_USER_TABLE =
-			"IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='User') "+
-				    "CREATE TABLE [User] (" + 
-				    "[USER_ID] [int] IDENTITY(1,1) NOT NULL," +
-				    "[NAME_ID] [nvarchar](250) NOT NULL," + 
-				    "[IDENTITY_PROVIDER] [nvarchar](100) NOT NULL,"+
-					"[FIRST_NAME] [nvarchar](50) ,"+
-					"[LAST_NAME] [nvarchar](50) ,"+
-					"[PHOTO_BLOB_URL] [nvarchar](1024),"+
-					"[EMAIL_ADDRESS] [nvarchar](50) ,"+
-					"[PHONE_COUNTRY_CODE] [int] ,"+
-					"[PHONE_NUMBER] [bigint] ,"+
-					"[DATE_CREATED] [date]  ,"+
-					"[CREATED_BY] [date] ,"+
-					"[DATE_MODIFIED] [date]  ,"+
-					"[MODIFIED_BY] [date]   " +
-			 ")";
-	
-	public static final String CREATE_PREFERENCE_METADATA_TABLE =
-			"IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='preference_metadata') "+
-					"CREATE TABLE [preference_metadata](" + 
-			    	"[preference_metadata_id] [int] IDENTITY(1,1) NOT NULL," +
-			    	"[PREFERENCE_DESCRIPTION] [nvarchar](50) NOT NULL," + 
-					"[DATE_CREATED] [date]  ,"+
-					"[CREATED_BY] [date] ,"+
-					"[DATE_MODIFIED] [date]  ,"+
-					"[MODIFIED_BY] [date]   " +
-			 ")";
-	
-	public static final String CREATE_USER_PREFERENCES_TABLE =
-			"IF NOT EXISTS (SELECT * FROM sys.tables WHERE name='user_preferences') "+
-					"CREATE TABLE [user_preferences](" + 
-			    	"[user_preferences_id] [int] IDENTITY(1,1) NOT NULL," +
-			    	"[USER_ID] [int] NOT NULL," + 
-					"[PREFERENCE_ID] [int] NOT NULL,"+
-					"[DATE_CREATED] [date]  ,"+
-					"[CREATED_BY] [date]  ,"+
-					"[DATE_MODIFIED] [date]  ,"+
-					"[MODIFIED_BY] [date]  " +
-			 ")";
+	public static final String CREATE_USER_PREFERENCES_TABLE_INDEX = "IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name like 'userprefTableIndex') "
+			+ "CREATE CLUSTERED INDEX [userprefTableIndex] ON [user_preferences] ([user_preferences_id])";
 
 	String SAVE_NEW_USER = "INSERT INTO [user] (NAME_ID, IDENTITY_PROVIDER, FIRST_NAME, LAST_NAME,"
 			+ "PHOTO_BLOB_URL, EMAIL_ADDRESS, PHONE_COUNTRY_CODE, PHONE_NUMBER,"

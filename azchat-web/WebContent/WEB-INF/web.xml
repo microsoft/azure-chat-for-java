@@ -18,15 +18,16 @@
 		<filter-class>com.microsoftopentechnologies.acs.federation.ACSFederationAuthFilter</filter-class>
 		<init-param>
 			<param-name>PassiveRequestorEndpoint</param-name>
-			<param-value>https://azchatlocal.accesscontrol.windows.net:443/v2/wsfederation</param-value>
+			<param-value><Replace With Your Passive Requestor End Point></param-value>
 		</init-param>
 		<init-param>
 			<param-name>RelyingPartRealm</param-name>
-			<param-value>http://localhost:8080/azchat-web/</param-value>
+
+			<param-value><Replace with Your Application URL></param-value>
 		</init-param>
 		<init-param>
 			<param-name>SecretKey</param-name>
-			<param-value>8pKwOoyarTegDZB9E3Rlbg==</param-value>
+			<param-value><Replace with ACS Cirtificate Secret Key></param-value>
 		</init-param>
 		<init-param>
 			<param-name>AllowHTTP</param-name>

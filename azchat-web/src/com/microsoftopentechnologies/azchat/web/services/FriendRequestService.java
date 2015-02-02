@@ -112,7 +112,7 @@ public class FriendRequestService extends BaseServiceImpl {
 		
 		// Used to add preference entries in metadata table, if table is newly created.
 		List<PreferenceMetadataEntity> list = preferenceMetadataDAO.getPreferenceMetadataEntities();
-		if(list!=null && list.size()==0){
+		if(AzureChatUtils.isEmpty(list)){
 			List<String> listOfPreferences = AzureChatUtils.getPreferences();
 			for(String preference : listOfPreferences){
 				PreferenceMetadataEntity preferenceMetadataEntity = buildPreferenceMetadata(preference);

@@ -340,6 +340,8 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 					AzureChatSQLConstants.CREATE_PREFERENCE_METADATA_TABLE);
 			preparedStatement = connection.prepareStatement(sqlString);
 			preparedStatement.execute();
+			preparedStatement=connection.prepareStatement(AzureChatSQLConstants.CREATE_PREFERENCE_METADATA_TABLE_INDEX);
+			preparedStatement.execute();
 		} catch (SQLException e) {
 
 			LOGGER.error("Exception occurred while executing createUserTable query on azure sql. Exception Mesage : "

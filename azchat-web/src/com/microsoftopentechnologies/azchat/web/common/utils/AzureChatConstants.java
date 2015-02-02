@@ -171,7 +171,7 @@ public interface AzureChatConstants {
 	String SERVICE_BUS_NAMESPACE = "service.bus.namespace";
 	String SERVICE_BUS_SASKEYNAME = "service.bus.sasKeyName";
 	String SERVICE_BUS_SASKEY = "service.bus.sasKey";
-	String SERVICE_BUS_QUEUENAME = "azchatqueue";
+	String SERVICE_BUS_QUEUENAME = "azchatqueue1";
 	String SERVICE_BUS_ROOT_URI= "service.bus.rooturi";
 
 	String GET_USER_ONLY_CONTENTS = "UserOnly";

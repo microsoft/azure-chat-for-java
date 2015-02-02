@@ -36,7 +36,7 @@ import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserPrefer
 
 /**
  * This class is for handling User Preference functionality.
- *   
+ * 
  * @author Rupesh_Shirude
  *
  */
@@ -77,7 +77,8 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 			LOGGER.info("Exception while addUserPreferenceEntity_getting connection  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : "
+							+ e.getMessage());
 		}
 		try {
 			sqlString = new String(AzureChatSQLConstants.ADD_USER_PREFERENCE);
@@ -139,7 +140,8 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 			LOGGER.info("Exception while getUserPreferenceEntity_getting connection  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : "
+							+ e.getMessage());
 		}
 		try {
 			sqlString = new String(
@@ -199,7 +201,8 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 			LOGGER.info("Exception while getUserPreferenceEntity_getting connection  : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
+					"Exception occurred connecting with sql : "
+							+ e.getMessage());
 		}
 		try {
 			sqlString = new String(
@@ -235,6 +238,7 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 
 	/**
 	 * This method is for generating Prepared Statement
+	 * 
 	 * @param preparedStatement
 	 * @param userPreferenceEntity
 	 * @return
@@ -258,6 +262,7 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 
 	/**
 	 * This method is to generate user object
+	 * 
 	 * @param resultSet
 	 * @return
 	 * @throws SQLException
@@ -279,19 +284,24 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 
 	/**
 	 * Used to create User Preference table.
+	 * 
 	 * @throws Exception
 	 * @author Rupesh_shirude
 	 */
 	@Override
-	public void createUserPreferenceTable(Connection connection) throws Exception {
+	public void createUserPreferenceTable(Connection connection)
+			throws Exception {
 		try {
-			sqlString = new String(AzureChatSQLConstants.CREATE_USER_PREFERENCES_TABLE);
+			sqlString = new String(
+					AzureChatSQLConstants.CREATE_USER_PREFERENCES_TABLE);
 			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement.execute();
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.CREATE_USER_PREFERENCES_TABLE_INDEX);
 			preparedStatement.execute();
 		} catch (SQLException e) {
 
-			LOGGER.info("Exception while createUserTable : "
-					+ e.getMessage());
+			LOGGER.info("Exception while createUserTable : " + e.getMessage());
 			throw new AzureChatSystemException("Exception executing sql : "
 					+ e.getMessage());
 		} finally {

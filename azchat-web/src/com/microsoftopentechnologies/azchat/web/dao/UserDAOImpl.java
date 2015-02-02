@@ -681,6 +681,8 @@ public class UserDAOImpl implements UserDAO {
 			sqlString = new String(AzureChatSQLConstants.CREATE_USER_TABLE);
 			preparedStatement = connection.prepareStatement(sqlString);
 			preparedStatement.execute();
+			preparedStatement = connection.prepareStatement(AzureChatSQLConstants.CREATE_USER_TABLE_INDEX);
+			preparedStatement.execute();
 		} catch (SQLException e) {
 
 			LOGGER.info("Exception while createUserTable : " + e.getMessage());
