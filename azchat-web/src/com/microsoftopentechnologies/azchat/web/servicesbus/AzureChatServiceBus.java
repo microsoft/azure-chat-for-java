@@ -20,6 +20,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +42,7 @@ import com.microsoft.windowsazure.services.servicebus.models.ReceiveMode;
 import com.microsoft.windowsazure.services.servicebus.models.ReceiveQueueMessageResult;
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatException;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
+import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatStartupUtils;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatStorageUtils;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
 import com.microsoftopentechnologies.azchat.web.dao.QueueRequestDAO;
@@ -68,6 +70,9 @@ public class AzureChatServiceBus {
 
 	private static ServiceBusContract service = null;
 
+	@Autowired
+	private AzureChatStartupUtils azureChatStartupUtils;
+
 	/**
 	 * BeanPostProcessor initialization method to create service bus and
 	 * queue.Also start the timer task to read and process the video messages.
@@ -76,9 +81,32 @@ public class AzureChatServiceBus {
 	 * @throws ServiceException
 	 */
 	@PostConstruct
-	public void init() throws AzureChatException, ServiceException {
-		getServicebus();
-		createQueue();
+	public void init() {
+		String excpMsg = null;
+		try {
+			excpMsg = AzureChatUtils
+					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_SERVICE_BUS);
+			getServicebus();
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while creating azure service bus object from the existing configuration. Exception Message : "
+					+ e.getMessage());
+			azureChatStartupUtils.populateStartupErrors(new AzureChatException(
+					AzureChatConstants.EXCEP_CODE_SYSTEM_EXCEPTION,
+					AzureChatConstants.EXCEP_TYPE_SYSTYEM_EXCEPTION, excpMsg
+							+ e.getMessage()));
+		}
+		try {
+			excpMsg = AzureChatUtils
+					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_SERVICE_QUEUE);
+			createQueue();
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while creating azure service bus queue. Exception Message :"
+					+ e.getMessage());
+			azureChatStartupUtils.populateStartupErrors(new AzureChatException(
+					AzureChatConstants.EXCEP_CODE_SYSTEM_EXCEPTION,
+					AzureChatConstants.EXCEP_TYPE_SYSTYEM_EXCEPTION, excpMsg
+							+ e.getMessage()));
+		}
 	}
 
 	/**
@@ -138,7 +166,7 @@ public class AzureChatServiceBus {
 					if (outputObject != null) {
 						UserMessageEntity userMessageEntity = new UserMessageEntity(
 								message.getProperty("uid").toString(),
-								outputObject.getAssetToDeleteId());
+								AzureChatUtils.getGUID());
 						userMessageEntity.setTextContent(message.getProperty(
 								"msg").toString());
 						userMessageEntity.setMediaURL(outputObject
@@ -149,12 +177,13 @@ public class AzureChatServiceBus {
 								.unescapeJava(message.getProperty("photoblob")
 										.toString()));
 						userMessageEntity.setMediaType("video");
+						userMessageEntity.setAssetID(outputObject.getAssetID());
 						UserMessageEntityDAO dao = new UserMessageEntityDAOImpl();
 						dao.addUserMessageEntity(userMessageEntity);
 
 						QueueRequestDAO queueRequestDAO = new QueueRequestDAOImpl();
 						queueRequestDAO.postMessage(
-								outputObject.getAssetToDeleteId(),
+								userMessageEntity.getMessageID(),
 								Integer.parseInt(expiryTime));
 
 						// Remove temporary stored non encoded video from blob

@@ -100,7 +100,8 @@ public class AzureChatStorageUtils {
 	}
 
 	/**
-	 * Method inserts or replace the entity on azure cloud.
+	 * Method inserts new entity or replace if exists on the azure storage
+	 * table.
 	 * 
 	 * @param tableName
 	 * @param tableEntity
@@ -118,7 +119,7 @@ public class AzureChatStorageUtils {
 	}
 
 	/**
-	 * This method returns the cloud blob block.
+	 * This method returns the azure blob block.
 	 * 
 	 * @param containerName
 	 * @param blobName
@@ -135,7 +136,7 @@ public class AzureChatStorageUtils {
 
 	/**
 	 * This method gets reference to the cloud container corresponding to the
-	 * application configuration paramerters.
+	 * application configuration parameters.
 	 * 
 	 * @param containerName
 	 * @return
@@ -191,14 +192,9 @@ public class AzureChatStorageUtils {
 		sharedAccessBlobPolicy.setSharedAccessStartTime(calendar.getTime());
 		calendar.add(Calendar.HOUR, 23);
 		sharedAccessBlobPolicy.setSharedAccessExpiryTime(calendar.getTime());
-		sharedAccessBlobPolicy.setPermissions(EnumSet.of(
-				SharedAccessBlobPermissions.READ
-//				SharedAccessBlobPermissions.WRITE,
-//				SharedAccessBlobPermissions.DELETE,
-//				SharedAccessBlobPermissions.LIST
-				));
+		sharedAccessBlobPolicy.setPermissions(EnumSet
+				.of(SharedAccessBlobPermissions.READ));
 		BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
-//		containerPermissions.setPublicAccess(BlobContainerPublicAccessType.OFF);
 		container.uploadPermissions(containerPermissions);
 		LOGGER.debug("Private Access Permissions uploaded Successfully.");
 		signature = container.generateSharedAccessSignature(
@@ -299,7 +295,10 @@ public class AzureChatStorageUtils {
 	}
 
 	/**
-	 * This method forms storage connection string
+	 * Utility method to create the storage connection string.
+	 * 
+	 * @return
+	 * @throws Exception
 	 */
 	public static String getStorageConnectionString() throws Exception {
 		String accName = AzureChatConstants.KEY_ACOUNT_NAME

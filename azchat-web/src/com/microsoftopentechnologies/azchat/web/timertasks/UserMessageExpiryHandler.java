@@ -112,7 +112,7 @@ public class UserMessageExpiryHandler {
 	 */
 	public void deleteMessage(UserMessageEntity messageEntity) throws Exception {
 		LOGGER.info("[UserMessageExpiryHandler][deleteMessage]         start ");
-		// First delete associated media photo from photo table.
+		// 1 : delete associated media photo from photo table.
 		if (messageEntity.getMediaURL() != null
 				&& messageEntity.getMediaURL().length() > 0) {
 			int startIndex = messageEntity.getMediaURL().indexOf(
@@ -122,15 +122,15 @@ public class UserMessageExpiryHandler {
 			ProfileImageRequestDAO profileImageRequestDAO = new ProfileImageRequestDAOImpl();
 			profileImageRequestDAO.deletePhoto(fileName);
 		}
-		// Second delete associated comments for this message.
+		// 2 : delete associated comments for this message.
 		MessageCommentsDAO messageCommentsDAO = new MessageCommentsDAOImpl();
 		messageCommentsDAO.deleteAllMessageComments(messageEntity
 				.getMessageID());
-		// Third delete associated likes for this message.
+		// 3 :  delete associated likes for this message.
 		MessageLikeEntityDAO messageLikeEntityDAO = new MessageLikeEntityDAOImpl();
 		messageLikeEntityDAO.deleteMessageLikeByMessageId(messageEntity
 				.getMessageID());
-		// Fourth delete the actual message from user message table.
+		// 4 : delete the actual message from user message table.
 		CloudTable cloudTable = AzureChatStorageUtils
 				.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE);
 		String rowFilter = TableQuery.generateFilterCondition(
@@ -144,12 +144,12 @@ public class UserMessageExpiryHandler {
 			TableOperation deleteOperation = TableOperation.delete(entity);
 			cloudTable.execute(deleteOperation);
 		}
-		// Fifth delete video asset from media service account after expiry
+		// 5 :  delete video asset from media service account after expiry
 		// time.
 		if (null != messageEntity.getMediaType()
 				&& messageEntity.getMediaType().contains(
 						AzureChatConstants.UI_MEDIA_TYPE_VIDEO)) {
-			AzureChatMediaServices.deleteAsset(messageEntity.getMessageID());
+			AzureChatMediaServices.deleteAsset(messageEntity.getAssetID());
 		}
 		LOGGER.info("[UserMessageExpiryHandler][deleteMessage] end ");
 	}

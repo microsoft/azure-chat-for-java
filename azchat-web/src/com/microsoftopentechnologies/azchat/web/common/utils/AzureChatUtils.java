@@ -49,7 +49,7 @@ import com.microsoftopentechnologies.azchat.web.data.beans.ErrorBean;
 import com.microsoftopentechnologies.azchat.web.data.beans.ErrorListBean;
 
 /**
- * This class contains common utility methods.
+ * This class contains common utility methods to be used in the application.
  * 
  * @author Dnyaneshwar_Pawar
  *
@@ -63,7 +63,7 @@ public class AzureChatUtils {
 	private static final String TOKEN_SEPARATOR = ";";
 
 	/**
-	 * Gets XML DOM object from string data
+	 * Gets XML DOM object from string data.
 	 * 
 	 * @param data
 	 * @return
@@ -88,7 +88,7 @@ public class AzureChatUtils {
 	}
 
 	/**
-	 * Retrieves nameID assertion from ACS token
+	 * Retrieves nameID assertion from ACS token.
 	 * 
 	 * @param xPath
 	 * @param assertionDoc
@@ -126,10 +126,10 @@ public class AzureChatUtils {
 			String attributeName = attribute.getAttributes()
 					.getNamedItem(AzureChatConstants.NAME_ATTRIBUTE)
 					.getNodeValue();
-			LOGGER.debug("Attribute Name :"+attributeName);
+			LOGGER.debug("Attribute Name :" + attributeName);
 			String claimName = attributeName.substring(attributeName
 					.lastIndexOf(AzureChatConstants.CONSTANT_BACK_SLASH) + 1);
-			LOGGER.debug("Claim Name :"+claimName);
+			LOGGER.debug("Claim Name :" + claimName);
 
 			if (AzureChatConstants.ATTR_IDENTITY_PROVIDER
 					.equalsIgnoreCase(claimName)) {
@@ -185,7 +185,7 @@ public class AzureChatUtils {
 	}
 
 	/**
-	 * Fetches property value for given property name
+	 * get property value for given property name.
 	 * 
 	 * @param propName
 	 * @return
@@ -261,24 +261,40 @@ public class AzureChatUtils {
 
 		StringBuilder connectionString = new StringBuilder(
 				AzureChatUtils.getProperty(AzureChatConstants.DB_PROP_KEY_URL));
-		
-		connectionString.append(TOKEN_SEPARATOR).append("database=").
-				append( AzureChatUtils.getProperty(AzureChatConstants.DB_PROP_KEY_DATABASE));
-		
-		connectionString.append(TOKEN_SEPARATOR).append("user=").append(AzureChatUtils
-								.getProperty(AzureChatConstants.DB_PROP_KEY_USER));
-		
-		connectionString.append(TOKEN_SEPARATOR).append("password=").append(AzureChatUtils
-								.getProperty(AzureChatConstants.DB_PROP_KEY_PASSWORD));
-		
-		connectionString.append(TOKEN_SEPARATOR).append("encrypt=").append(AzureChatUtils
-				.getProperty(AzureChatConstants.DB_PROP_KEY_ENCRYPT));
 
-		connectionString.append(TOKEN_SEPARATOR).append("hostNameInCertificate=").append(AzureChatUtils
-								.getProperty(AzureChatConstants.DB_PROP_KEY_HOST_NAME_IN_CERT));
-		
-		connectionString.append(TOKEN_SEPARATOR).append("loginTimeout=").append(timeout).append(TOKEN_SEPARATOR);
-		
+		connectionString
+				.append(TOKEN_SEPARATOR)
+				.append("database=")
+				.append(AzureChatUtils
+						.getProperty(AzureChatConstants.DB_PROP_KEY_DATABASE));
+
+		connectionString
+				.append(TOKEN_SEPARATOR)
+				.append("user=")
+				.append(AzureChatUtils
+						.getProperty(AzureChatConstants.DB_PROP_KEY_USER));
+
+		connectionString
+				.append(TOKEN_SEPARATOR)
+				.append("password=")
+				.append(AzureChatUtils
+						.getProperty(AzureChatConstants.DB_PROP_KEY_PASSWORD));
+
+		connectionString
+				.append(TOKEN_SEPARATOR)
+				.append("encrypt=")
+				.append(AzureChatUtils
+						.getProperty(AzureChatConstants.DB_PROP_KEY_ENCRYPT));
+
+		connectionString
+				.append(TOKEN_SEPARATOR)
+				.append("hostNameInCertificate=")
+				.append(AzureChatUtils
+						.getProperty(AzureChatConstants.DB_PROP_KEY_HOST_NAME_IN_CERT));
+
+		connectionString.append(TOKEN_SEPARATOR).append("loginTimeout=")
+				.append(timeout).append(TOKEN_SEPARATOR);
+
 		return connectionString.toString();
 	}
 
@@ -345,7 +361,7 @@ public class AzureChatUtils {
 	}
 
 	/**
-	 * This method generates and return the random guid using java.util.UUID.
+	 * This method generates and return the random GUID using java.util.UUID.
 	 * 
 	 * @return
 	 */
@@ -385,13 +401,22 @@ public class AzureChatUtils {
 		}
 		return 0;
 	}
-	
-	public static List<String> getPreferences() throws AzureChatException{
+
+	/**
+	 * This method retrieve the preferences from the property file.Prepare and
+	 * return the ArrayList.
+	 * 
+	 * @return
+	 * @throws AzureChatException
+	 */
+	public static List<String> getPreferences() throws AzureChatException {
 		List<String> list = new ArrayList<String>();
 		Properties properties = getProperties();
-		int propertyCount = Integer.parseInt(properties.getProperty("preference.count"));
-		for(int i=1; i<=propertyCount; i++){
-			list.add(properties.getProperty("preference"+i));
+		int propertyCount = Integer.parseInt(properties
+				.getProperty(AzureChatConstants.USER_PREF_COUNT_KEY));
+		for (int i = 1; i <= propertyCount; i++) {
+			list.add(properties
+					.getProperty(AzureChatConstants.USER_PREF_PREP_KEY + i));
 		}
 		return list;
 	}

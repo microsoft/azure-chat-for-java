@@ -23,11 +23,11 @@ package com.microsoftopentechnologies.azchat.web.data.beans;
  */
 public class MediaServiceOutputBean {
 	private String streamingUrl;
-	private String assetToDeleteId;
+	private String assetID;
 	
 	public MediaServiceOutputBean(String streamingUrl, String assetToDeleteId) {
 		this.streamingUrl = streamingUrl;
-		this.assetToDeleteId = assetToDeleteId;
+		this.assetID = assetToDeleteId;
 	}
 	
 	public MediaServiceOutputBean() {
@@ -50,14 +50,14 @@ public class MediaServiceOutputBean {
 	/**
 	 * @return the assetToDeleteId
 	 */
-	public String getAssetToDeleteId() {
-		return assetToDeleteId;
+	public String getAssetID() {
+		return assetID;
 	}
 
 	/**
 	 * @param assetToDeleteId the assetToDeleteId to set
 	 */
-	public void setAssetToDeleteId(String assetToDeleteId) {
-		this.assetToDeleteId = assetToDeleteId;
+	public void setAssetID(String assetToDeleteId) {
+		this.assetID = assetToDeleteId;
 	}
 }

@@ -16,7 +16,7 @@
 package com.microsoftopentechnologies.azchat.web.common.exceptions;
 
 /**
- * Parent class for used to raise the application specific exception.This class
+ * Parent class used to raise the application specific exception.This class
  * can hold the more information about exception like exception code and type
  * with customized exception message. 
  * 
@@ -45,7 +45,7 @@ public class AzureChatException extends Exception {
 
 	/**
 	 * Parameterized constructor calling superclass with the customized message
-	 * and having the additional information about exception code and exception
+	 * and having additional information about exception code and exception
 	 * type. Exception code is the exception severity level mainly Business and
 	 * System exception and exception type is exception class identifies
 	 * exception area.

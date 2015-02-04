@@ -59,7 +59,7 @@ public class ContentShareController extends BaseController {
 
 	/**
 	 * This method handles the user request for content share includes text
-	 * message,photo.vedio.Also parse the response into JSON format.
+	 * message,photo,video.Also parse the response into JSON format.
 	 * 
 	 * @param request
 	 * @return
@@ -76,12 +76,18 @@ public class ContentShareController extends BaseController {
 			userBean.setServiceAction(ServiceActionEnum.CONTENT_SHARE);
 			userBean = (UserBean) contentShareService.invokeService(userBean);
 			if (!userBean.hasErrors()) {
-				userBean.setMultipartFile(null);	
+				// Need to set the multi-part file null while going back to
+				// avoid
+				// the Content Resolve error.
+				userBean.setMultipartFile(null);
 				if (null != userBean.getUserMessageListBean()) {
-
+					// Set the additional message of encoding in case of video
+					// message.
 					String medType = userBean.getUserMessageListBean()
 							.getMediaType();
-					if (null != medType && medType.contains(AzureChatConstants.UI_MEDIA_TYPE_VIDEO)) {
+					if (null != medType
+							&& medType
+									.contains(AzureChatConstants.UI_MEDIA_TYPE_VIDEO)) {
 						userBean.setMsg(AzureChatConstants.SUCCESS_MSG_CONTENT_SHARE
 								+ AzureChatConstants.CONSTANT_SPACE
 								+ AzureChatConstants.SUCCESS_MSG_VIDEO_SHARE);
@@ -99,7 +105,7 @@ public class ContentShareController extends BaseController {
 	}
 
 	/**
-	 * This method populates the user bean value from multi-part request
+	 * This method populates the user bean value from multi-part ajax request
 	 * 
 	 * @param userBean
 	 * @param request
@@ -108,9 +114,9 @@ public class ContentShareController extends BaseController {
 	private void populateUserBean(UserBean userBean,
 			MultipartHttpServletRequest request) throws AzureChatException {
 		UserMessageListBean userMessageListBean = new UserMessageListBean();
-		MultipartFile photoVedioFile = request.getFile("mediaPhoto");
-		if (null != photoVedioFile) {
-			if (AzureChatUtils.getMegaBytes(photoVedioFile.getSize()) > AzureChatUtils
+		MultipartFile photoVideoFile = request.getFile("mediaPhoto");
+		if (null != photoVideoFile) {
+			if (AzureChatUtils.getMegaBytes(photoVideoFile.getSize()) > AzureChatUtils
 					.getNumbers(AzureChatUtils
 							.getProperty(AzureChatConstants.MAX_UPLOAD_SIZE_KEY))) {
 				AzureChatUtils
@@ -123,14 +129,14 @@ public class ContentShareController extends BaseController {
 				userBean.setHasErrors(true);
 
 			} else {
-				userMessageListBean.setPhotoVedioFile(photoVedioFile);
+				userMessageListBean.setPhotoVideoFile(photoVideoFile);
 			}
-			userMessageListBean.setMediaType(photoVedioFile.getContentType());
+			userMessageListBean.setMediaType(photoVideoFile.getContentType());
 		}
 		userMessageListBean.setExpiryTime(request.getParameter("expiryTime"));
 		userMessageListBean.setMsgText(request.getParameter("msgText"));
 		userBean.setUserMessageListBean(userMessageListBean);
-		userBean.setUserID(request.getParameter("logedInUserID"));
+		userBean.setUserID(request.getParameter("loggedInUserID"));
 		userBean.setNameID(request.getParameter("nameID"));
 		userBean.setPhotoUrl(request.getParameter("photoUrl"));
 	}
@@ -195,7 +201,7 @@ public class ContentShareController extends BaseController {
 	public @ResponseBody UserBean getUserContents(HttpServletRequest request) {
 		LOGGER.info("[ContentShareController][getUserContents] start");
 		UserBean userBean = new UserBean();
-		userBean.setUserID(request.getParameter("logedInUserID"));
+		userBean.setUserID(request.getParameter("loggedInUserID"));
 		userBean.setContentLevel(request.getParameter("contentType"));
 		userBean.setServiceAction(ServiceActionEnum.GET_USER_CONTENT);
 		userBean = (UserBean) contentShareService.invokeService(userBean);
@@ -239,11 +245,11 @@ public class ContentShareController extends BaseController {
 	private void populateUserMessageBean(UserMessageBean userMessageBean,
 			HttpServletRequest request) {
 		String operation = request.getParameter("operation");
-		userMessageBean.setOwnerID(request.getParameter("logedInUserID"));
+		userMessageBean.setOwnerID(request.getParameter("loggedInUserID"));
 		userMessageBean.setOwnerName(request.getParameter("userName"));
 		userMessageBean.setPhotoUrl(request.getParameter("photoUrl"));
 		userMessageBean.setMsgID(request.getParameter("msgID"));
-		if ("like".equalsIgnoreCase(operation)) {
+		if (AzureChatConstants.UI_OPERATION_LIKE.equalsIgnoreCase(operation)) {
 			userMessageBean.setIsLike(true);
 		} else {
 			userMessageBean.setIsLike(false);
@@ -259,7 +265,7 @@ public class ContentShareController extends BaseController {
 	private void populateMessageCommentBean(
 			MessageCommentBean messageCommentBean, HttpServletRequest request) {
 		messageCommentBean.setComment(request.getParameter("comment"));
-		messageCommentBean.setFriendID(request.getParameter("logedInUserID"));
+		messageCommentBean.setFriendID(request.getParameter("loggedInUserID"));
 		messageCommentBean.setFriendName(request.getParameter("userName"));
 		messageCommentBean.setMsgID(request.getParameter("msgID"));
 		messageCommentBean.setPhotoUrl(request.getParameter("photoUrl"));

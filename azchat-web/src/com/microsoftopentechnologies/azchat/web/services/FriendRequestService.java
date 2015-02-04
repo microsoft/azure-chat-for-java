@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatBusinessException;
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatException;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
+import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatStartupUtils;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatStorageUtils;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
 import com.microsoftopentechnologies.azchat.web.dao.FriendRequestDAO;
@@ -81,6 +82,9 @@ public class FriendRequestService extends BaseServiceImpl {
 	@Autowired
 	private QueueRequestDAO queueRequestDAO;
 
+	@Autowired
+	private AzureChatStartupUtils azureChatStartupUtils;
+
 	/**
 	 * BeanPostProcessor initialization code to create and get reference to the
 	 * AZURE TABLE from azure storage.
@@ -88,43 +92,92 @@ public class FriendRequestService extends BaseServiceImpl {
 	 * @throws Exception
 	 */
 	@PostConstruct
-	public void init() throws Exception {
+	public void init() {
 		LOGGER.info("[FriendRequestService][init] start");
 		LOGGER.debug("Creating Friend Request Table.");
-
-		// CREATE AZURE TABLES
-		AzureChatStorageUtils
-				.createTable(AzureChatConstants.TABLE_NAME_FRIEND_REQ);
-		AzureChatStorageUtils
-				.createTable(AzureChatConstants.TABLE_NAME_MESSAGE_COMMENTS);
-		AzureChatStorageUtils
-				.createTable(AzureChatConstants.TABLE_NAME_MESSAGE_LIKES);
-		AzureChatStorageUtils
-				.createTable(AzureChatConstants.TABLE_NAME_USER_MESSAGE);
-
-		// CREATE AZURE SQL TABLES
-		String connectionString = AzureChatUtils.buildConnectionString();
-		Connection connection = AzureChatUtils.getConnection(connectionString);
-		userDAO.createUserTable(connection);
-		preferenceMetadataDAO.createPreferenceMatedateTable(connection);
-		userPreferenceDAO.createUserPreferenceTable(connection);
-		connection.close();
-		
-		// Used to add preference entries in metadata table, if table is newly created.
-		List<PreferenceMetadataEntity> list = preferenceMetadataDAO.getPreferenceMetadataEntities();
-		if(AzureChatUtils.isEmpty(list)){
-			List<String> listOfPreferences = AzureChatUtils.getPreferences();
-			for(String preference : listOfPreferences){
-				PreferenceMetadataEntity preferenceMetadataEntity = buildPreferenceMetadata(preference);
-				preferenceMetadataDAO.addPreferenceMetadataEntity(preferenceMetadataEntity);
-			}
+		String excpMsg = null;
+		try {
+			// CREATE AZURE TABLES
+			excpMsg = AzureChatUtils
+					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_FRINED_REQ);
+			AzureChatStorageUtils
+					.createTable(AzureChatConstants.TABLE_NAME_FRIEND_REQ);
+			AzureChatStorageUtils
+					.createTable(AzureChatConstants.TABLE_NAME_MESSAGE_COMMENTS);
+			AzureChatStorageUtils
+					.createTable(AzureChatConstants.TABLE_NAME_MESSAGE_LIKES);
+			AzureChatStorageUtils
+					.createTable(AzureChatConstants.TABLE_NAME_USER_MESSAGE);
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while creating azure storage tables for the friend request management. Exception Message : "
+					+ e.getMessage());
+			azureChatStartupUtils.populateStartupErrors(new AzureChatException(
+					AzureChatConstants.EXCEP_CODE_SYSTEM_EXCEPTION,
+					AzureChatConstants.EXCEP_TYPE_SYSTYEM_EXCEPTION, excpMsg
+							+ e.getMessage()));
 		}
-		
-		
-		// CREATE QUEUE
-		AzureChatStorageUtils
-				.createQueue(AzureChatConstants.QUEUE_NAME_EMAIL_NOTIFICATION);
 
+		try {
+			// CREATE AZURE SQL TABLES
+			excpMsg = AzureChatUtils
+					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_USER_SQL_TABLES);
+			String connectionString = AzureChatUtils.buildConnectionString();
+			Connection connection = AzureChatUtils
+					.getConnection(connectionString);
+			userDAO.createUserTable(connection);
+			preferenceMetadataDAO.createPreferenceMatedateTable(connection);
+			userPreferenceDAO.createUserPreferenceTable(connection);
+			connection.close();
+		} catch (Exception e) {
+
+			LOGGER.error("Exception occurred while creating SQL tables for user profile management. Exception Message :"
+					+ e.getMessage());
+			azureChatStartupUtils.populateStartupErrors(new AzureChatException(
+					AzureChatConstants.EXCEP_CODE_SYSTEM_EXCEPTION,
+					AzureChatConstants.EXCEP_TYPE_SYSTYEM_EXCEPTION, excpMsg
+							+ e.getMessage()));
+		}
+
+		try {
+			// Used to add preference entries in metadata table, if table is
+			// newly created.
+			excpMsg = AzureChatUtils
+					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_USER_PREF);
+			List<PreferenceMetadataEntity> list = preferenceMetadataDAO
+					.getPreferenceMetadataEntities();
+			if (AzureChatUtils.isEmpty(list)) {
+				List<String> listOfPreferences = AzureChatUtils
+						.getPreferences();
+				for (String preference : listOfPreferences) {
+					PreferenceMetadataEntity preferenceMetadataEntity = buildPreferenceMetadata(preference);
+					preferenceMetadataDAO
+							.addPreferenceMetadataEntity(preferenceMetadataEntity);
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while preparing user preference meta data in azure SQL. Exception Message : "
+					+ e.getMessage());
+			azureChatStartupUtils.populateStartupErrors(new AzureChatException(
+					AzureChatConstants.EXCEP_CODE_SYSTEM_EXCEPTION,
+					AzureChatConstants.EXCEP_TYPE_SYSTYEM_EXCEPTION, excpMsg
+							+ e.getMessage()));
+
+		}
+
+		try {
+			excpMsg = AzureChatUtils
+					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_EMAIL_NOTIFICATION_QUEUE);
+			// CREATE QUEUE
+			AzureChatStorageUtils
+					.createQueue(AzureChatConstants.QUEUE_NAME_EMAIL_NOTIFICATION);
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while creating email notification queue . Exception Message :"
+					+ e.getMessage());
+			azureChatStartupUtils.populateStartupErrors(new AzureChatException(
+					AzureChatConstants.EXCEP_CODE_SYSTEM_EXCEPTION,
+					AzureChatConstants.EXCEP_TYPE_SYSTYEM_EXCEPTION, excpMsg
+							+ e.getMessage()));
+		}
 		LOGGER.info("[FriendRequestService][init] end");
 	}
 
@@ -154,7 +207,7 @@ public class FriendRequestService extends BaseServiceImpl {
 			baseBean = updateFriendReqStatus((FriendRequestBean) baseBean);
 			break;
 		case GET_PENDING_FRIEND_COUNT:
-			baseBean=getPendingFriendRequestCount((UserBean)baseBean);
+			baseBean = getPendingFriendRequestCount((UserBean) baseBean);
 			break;
 		default:
 			break;
@@ -380,7 +433,7 @@ public class FriendRequestService extends BaseServiceImpl {
 				LOGGER.debug("Input FriendRequestBean : "
 						+ friendRequestBean.toString());
 			if (AzureChatConstants.FRIEND_REQUEST_APPROVE
-					.equalsIgnoreCase(friendRequestBean.getStatus())) {
+					.equalsIgnoreCase(trim(friendRequestBean.getStatus()))) {
 				friendRequestDAO.acceptFriendRequest(
 						friendRequestBean.getUserID(),
 						friendRequestBean.getFriendID(),
@@ -389,7 +442,7 @@ public class FriendRequestService extends BaseServiceImpl {
 				friendRequestBean
 						.setMsg(AzureChatConstants.SUCCESS_MSG_APPROVE_FRND_REQ);
 			} else if (AzureChatConstants.FRIEND_REQUEST_REJECT
-					.equalsIgnoreCase(friendRequestBean.getStatus())) {
+					.equalsIgnoreCase(trim(friendRequestBean.getStatus()))) {
 				friendRequestDAO.rejectFriendRequest(
 						friendRequestBean.getUserID(),
 						friendRequestBean.getFriendID(),
@@ -480,14 +533,14 @@ public class FriendRequestService extends BaseServiceImpl {
 		LOGGER.info("[FriendRequestService][getPendingFriendRequestCount] end");
 		return userBean;
 	}
-	
+
 	/**
 	 * This method is used to create preference metadata object .
 	 * 
 	 * @param preference
 	 * @return
 	 */
-	private PreferenceMetadataEntity buildPreferenceMetadata(String preference){
+	private PreferenceMetadataEntity buildPreferenceMetadata(String preference) {
 		PreferenceMetadataEntity entity = new PreferenceMetadataEntity();
 		Date date = new Date();
 		entity.setCreatedBy(date);
@@ -497,5 +550,5 @@ public class FriendRequestService extends BaseServiceImpl {
 		entity.setPreferenceDesc(preference);
 		return entity;
 	}
-	
+
 }

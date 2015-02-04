@@ -12,12 +12,12 @@ $(document).ready(function() {
 	hideErrorDiv();
 	var isFriendPageVisited=false;
 	
-	$('input[id=input_shareContentPhotoVedio]').change(function() {
+	$('input[id=input_shareContentPhotoVideo]').change(function() {
 		$('#picUrl').val($(this).val());
 	});
 	
 	$('#openMedia').click(function() {
-		$('input[id=input_shareContentPhotoVedio]').click();
+		$('input[id=input_shareContentPhotoVideo]').click();
 	});
 	
 	$('.status').click(function() {
@@ -25,13 +25,15 @@ $(document).ready(function() {
 			$("#staticContent").show();
 			$("#mediaContent").hide();
 			$('#picUrl').val("");
-			$("#input_shareContentPhotoVedio")[0].files[0]='';
+			document.getElementById('input_shareContentPhotoVideo').value = ''
+			//$("#input_shareContentPhotoVideo")[0].files[0]='';
 	});
 	$('.photos').click(function() {
 			$('.arrow').css("left", 170);
 			$("#staticContent").hide();
 			$("#mediaContent").show();
-			$("#input_shareContentPhotoVedio")[0].files[0]='';
+			document.getElementById('input_shareContentPhotoVideo').value = ''
+			//$("#input_shareContentPhotoVideo")[0].files[0]='';
 	});
 	
 	$('body').on('click', '.like-comment-status', function(event) {
@@ -54,7 +56,7 @@ $(document).ready(function() {
 							"firstName" : query
 						},
 						dayaType : "JSON",
-						cache : false,
+						cache : true,
 						success : function(data) {
 							//Service Layer Errors          
 							var serErrMsg="";
@@ -137,7 +139,7 @@ $("#li_userIcon").click(function(event){
 		url : "getPendingFriendList.htm",
 		type : "GET",
 		data : { 
-			    "logedInUserID" : $("#hi_UserID").val(),
+			    "loggedInUserID" : $("#hi_UserID").val(),
 				},
 		dayaType : "JSON",
 		cache : false,
@@ -194,9 +196,9 @@ $("ul#pndngFrndList").on('click','button',function (){
 /**
  * This click events triggers the ajax call for addFriend and approveReject friend based on the button value.
  */	
-$("#btn_status,btn_reject").click(function(event){
+$("body").on('click','#btn_status,#btn_reject',function(){
 	hideErrorDiv();
-	var btn_val=$("#btn_status").text();
+	var btn_val=$(this).text();
 	if(btn_val=='Rejected' || btn_val=='Friend' || btn_val=='Pending Approval' || btn_val == 'Friend Request Sent' )	{
 		return false;
 	}
@@ -249,7 +251,7 @@ $("#btn_profUpdt_submt").click(function(event){
 	hideErrorDiv();
 	//Create the multipart form
 	var fd = new FormData();
-	fd.append('logedInUserID',$("#hi_UserID").val());
+	fd.append('loggedInUserID',$("#hi_UserID").val());
 	fd.append('firstName',$("#input_profUpdt_fname").val());
 	fd.append('lastName',$("#input_profUpdt_lname").val());
 	fd.append('country',getCountryByName($("#input_profUpdt_country").val()).countryCD);
@@ -378,7 +380,7 @@ function processSelectedFriend(friendID,userID,friend){
 		url : "friendStatus.htm",
 		type : "GET",
 		data : {"friendID" : friendID ,
-				"logedInUserID" :userID
+				"loggedInUserID" :userID
 				},
 		dayaType : "JSON",
 		cache : false,
@@ -441,7 +443,7 @@ function addFriend(friendID,userID,friendName,friendPhotoUrl){
 		url : "addFriend.htm",
 		type : "GET",
 		data : {"friendID" : friendID ,
-				"logedInUserID" : userID,
+				"loggedInUserID" : userID,
 				"friendName" : friendName ,
 				"photoUrl" : friendPhotoUrl
 				},
@@ -482,7 +484,7 @@ function approveRejectFriend(friendID,userID,friendName,friendPhotoUrl,status){
 		type : "POST",
 		data : {
 				"friendID" : friendID,
-			 	"logedInUserID" :userID ,
+			 	"loggedInUserID" :userID ,
 				"friendName" : friendName,
 				"photoUrl" : friendPhotoUrl,
 			    "status" : status,    
@@ -567,13 +569,13 @@ function goUpdateProfile(){
 }
 
 /**
- *  This function triggers the ajax call to stote the user text messages and photo or vedio. 
+ *  This function triggers the ajax call to stote the user text messages and photo or video. 
  */
 function shareContent(){
 	var fd = new FormData();
-    fd.append('logedInUserID',$("#hi_UserID").val());
+    fd.append('loggedInUserID',$("#hi_UserID").val());
 	fd.append('msgText',$("#textArea_status_message").val());
-	fd.append('mediaPhoto',$("#input_shareContentPhotoVedio")[0].files[0]);
+	fd.append('mediaPhoto',$("#input_shareContentPhotoVideo")[0].files[0]);
 	fd.append('expiryTime',$("#select_msgExpiryTime").val());
 	fd.append('nameID',$("#hi_nameID").val());
 	fd.append('photoUrl',$("#hi_photoUrl").val());
@@ -607,7 +609,7 @@ function shareContent(){
 			 getUserContnet($("#hi_UserID").val(),"UserAndFriends");
 			//Refresh the user content          end
 			//Reset Input File
-			 $("#input_shareContentPhotoVedio")[0].files[0]='';
+			 $("#input_shareContentPhotoVideo")[0].files[0]='';
 			//Reset Input File
 			}
 		},
@@ -621,7 +623,7 @@ function shareContent(){
  */
 function updateMessageComment(msgID){
 	var fd = new FormData();
-    fd.append('logedInUserID',$("#hi_UserID").val());
+    fd.append('loggedInUserID',$("#hi_UserID").val());
 	fd.append('userName',$("#lb_usrMsgCommentFrndName").text());
 	fd.append('photoUrl',$("#hi_photoUrl").val());
 	fd.append('comment',$("#ta_usrMsgComment_"+msgID).val());
@@ -664,7 +666,7 @@ function updateMessageComment(msgID){
  */
 function updateUserLike(msgID,operation){
 	var fd = new FormData();
-    fd.append('logedInUserID',$("#hi_UserID").val());
+    fd.append('loggedInUserID',$("#hi_UserID").val());
 	fd.append('msgID',msgID);
 	fd.append('userName',$("#lb_usrMsgCommentFrndName").text());
 	fd.append('photoUrl',$("#hi_photoUrl").val());
@@ -718,7 +720,7 @@ function updateUserLike(msgID,operation){
  */
 function getUserContnet(userID,contentType){
 	var fd = new FormData();
-    fd.append('logedInUserID',userID);
+    fd.append('loggedInUserID',userID);
     fd.append('contentType',contentType)
 	 $.ajax ({
 			url : "getUserContent.htm",
@@ -809,7 +811,7 @@ function refreshUserContents(userBean){
 		  $("#div_imgContent_"+userMessageBean.msgID).append('<img class="img_imageContent imageContent" src="'+userMessageBean.mediaUrl+'"/>');
 	  }else if(userMessageBean.mediaType=='video'){
 		  $("#div_vedContent_"+userMessageBean.msgID).removeClass('hide');
-		  $("#div_vedContent_"+userMessageBean.msgID).append('<video class="videoContent" id="video_'+index+'" width="640" height="360" controls preload="none" poster="../images/posterCover.jpg" onclick="startVideo(this);"><source src="'+userMessageBean.mediaUrl+'"/>" type="'+userMessageBean.mediaType+'"/>"></source></video>');
+		  $("#div_vedContent_"+userMessageBean.msgID).append('<video class="videoContent" id="video_'+userMessageBean.msgID+'" width="640" height="360" controls preload="none" poster="../images/posterCover.jpg" onclick="startVideo(this);"><source src="'+userMessageBean.mediaUrl+'"/>" type="'+userMessageBean.mediaType+'"/>"></source></video>');
 	  }
 	  //Render Like Unlike status
 	  if(userMessageBean.isLike == true){

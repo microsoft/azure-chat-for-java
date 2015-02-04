@@ -78,7 +78,7 @@
 												<li id="li_shareupdate" class="post-case"><a class="status" title="" href="#">
 													<i class="glyphicon glyphicon-file"></i><spring:message code="label.share.update"/></a>
 												</li>
-												<li id="li_updatePhotoVedio" class="post-case"><a class="photos" href="#">
+												<li id="li_updatePhotoVideo" class="post-case"><a class="photos" href="#">
 													<i class="glyphicon glyphicon-picture" style="margin-right:3px;"></i><spring:message code="label.upload.photo.video"/></a>
 												</li>
 											</ul>
@@ -91,7 +91,7 @@
 														</div>
 														<div id="mediaContent" hidden="true">
 															<div class="panel-title">
-															<input type="file" id="input_shareContentPhotoVedio"/>
+															<input type="file" id="input_shareContentPhotoVideo"/>
 																<div class="input-append">			
 																<input id="picUrl" class="input-sm upload-text" type="text">
 																	<a href="#" id="openMedia">
@@ -274,7 +274,7 @@
 														 	 		</div>
 													 	 			<c:if test="${userMessageBean.mediaType eq 'video'}">
 														 	 			<div>
-														 	 				<video class="videoContent" id="video_${status.index}" width="640" height="360" poster="${pageContext.request.contextPath}/images/posterCover.jpg" controls preload="none" onclick="startVideo(this);">
+														 	 				<video class="videoContent" id="video_${userMessageBean.msgID}" width="640" height="360" poster="${pageContext.request.contextPath}/images/posterCover.jpg" controls preload="none" onclick="startVideo(this);">
 														 	 					<source src="<c:out value="${userMessageBean.mediaUrl}"/>" type="<c:out value="${userMessageBean.mediaType}"/>"></source>
 														 	 				</video>											 	 			
 														 	 			</div>

@@ -33,6 +33,7 @@ public class UserMessageEntity extends TableServiceEntity implements
 	private String textContent;
 	private String mediaURL;
 	private String mediaType;
+	private String assetID;
 
 	public UserMessageEntity(String userID, String messageID) {
 		this.partitionKey = userID;
@@ -105,5 +106,20 @@ public class UserMessageEntity extends TableServiceEntity implements
 				+ textContent + ", mediaURL=" + mediaURL + ", mediaType="
 				+ mediaType + ", partitionKey=" + partitionKey + ", rowKey="
 				+ rowKey + ", timeStamp=" + timeStamp + "]";
+	}
+
+	/**
+	 * @return the assetID
+	 */
+	public String getAssetID() {
+		return assetID;
+	}
+
+	/**
+	 * @param assetID
+	 *            the assetID to set
+	 */
+	public void setAssetID(String assetID) {
+		this.assetID = assetID;
 	}
 }

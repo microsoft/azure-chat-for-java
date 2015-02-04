@@ -37,7 +37,7 @@ public class UserMessageBean extends BaseBean implements Serializable {
 	private String msgText;
 	private String mediaUrl;
 	private String mediaType;
-	private MultipartFile photoVedioFile;
+	private MultipartFile photoVideoFile;
 	private String photoUrl;
 	private String msgID;
 	private Boolean isLike = false;
@@ -93,18 +93,18 @@ public class UserMessageBean extends BaseBean implements Serializable {
 	}
 
 	/**
-	 * @return the photoVedioFile
+	 * @return the photoVideoFile
 	 */
-	public MultipartFile getPhotoVedioFile() {
-		return photoVedioFile;
+	public MultipartFile getPhotoVideoFile() {
+		return photoVideoFile;
 	}
 
 	/**
-	 * @param photoVedioFile
-	 *            the photoVedioFile to set
+	 * @param photoVideoFile
+	 *            the photoVideoFile to set
 	 */
-	public void setPhotoVedioFile(MultipartFile photoVedioFile) {
-		this.photoVedioFile = photoVedioFile;
+	public void setPhotoVideoFile(MultipartFile photoVideoFile) {
+		this.photoVideoFile = photoVideoFile;
 	}
 
 	/**

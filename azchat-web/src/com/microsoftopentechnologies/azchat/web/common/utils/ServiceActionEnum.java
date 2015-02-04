@@ -17,7 +17,7 @@ package com.microsoftopentechnologies.azchat.web.common.utils;
 
 /**
  * Enum class to hold the service action constant.These constants can be used to
- * identify the service.
+ * identify the AzChat services uniquely during the server call.
  * 
  * @author Dnyaneshwar_Pawar
  *
@@ -42,6 +42,10 @@ public enum ServiceActionEnum {
 
 	private String serviceAction;
 
+	/**
+	 * Enum constructor.
+	 * @param serviceAction
+	 */
 	private ServiceActionEnum(String serviceAction) {
 		this.serviceAction = serviceAction;
 	}

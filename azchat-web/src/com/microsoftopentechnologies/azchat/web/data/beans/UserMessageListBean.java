@@ -36,7 +36,7 @@ public class UserMessageListBean implements Serializable {
 	private String mediaUrl;
 	private String mediaType;
 	private List<UserMessageBean> userMsgList;
-	private MultipartFile photoVedioFile;
+	private MultipartFile photoVideoFile;
 	private String expiryTime;
 	private Boolean isLike;
 	private String msgID;
@@ -104,18 +104,18 @@ public class UserMessageListBean implements Serializable {
 	}
 
 	/**
-	 * @return the photoVedioFile
+	 * @return the photoVideoFile
 	 */
-	public MultipartFile getPhotoVedioFile() {
-		return photoVedioFile;
+	public MultipartFile getPhotoVideoFile() {
+		return photoVideoFile;
 	}
 
 	/**
-	 * @param photoVedioFile
-	 *            the photoVedioFile to set
+	 * @param photoVideoFile
+	 *            the photoVideoFile to set
 	 */
-	public void setPhotoVedioFile(MultipartFile photoVedioFile) {
-		this.photoVedioFile = photoVedioFile;
+	public void setPhotoVideoFile(MultipartFile photoVideoFile) {
+		this.photoVideoFile = photoVideoFile;
 	}
 
 	/**

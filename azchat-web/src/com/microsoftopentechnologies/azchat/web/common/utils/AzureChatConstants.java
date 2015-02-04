@@ -16,7 +16,8 @@
 package com.microsoftopentechnologies.azchat.web.common.utils;
 
 /**
- * Interface to hold the common constant values.
+ * Interface to hold the common constant values to be used in the AzChat
+ * application.
  * 
  * @author Dnyaneshwar_Pawar
  *
@@ -28,6 +29,14 @@ public interface AzureChatConstants {
 	String EXCEP_CODE_JAVA_EXCEPTION = "JE";
 	String EXCEP_TYPE_BUSSINESS_EXCEPTION = "com.microsoftopentechnologies.azchat.web.common.exceptions.AZChatBusinessExcdeption";
 	String EXCEP_TYPE_SYSTYEM_EXCEPTION = "com.microsoftopentechnologies.azchat.web.common.exceptions.AZChatSystemException";
+	String EXCEP_MSG_STARTUP_CONTENT_SHARE = "excp.msg.content.share.startup";
+	String EXCEP_MSG_STARTUP_FRINED_REQ = "excp.msg.friend.req.startup";
+	String EXCEP_MSG_STARTUP_USER_SQL_TABLES = "excp.msg.user.sql.tables.startup";
+	String EXCEP_MSG_STARTUP_USER_PREF = "excp.msg.user.pref.startup";
+	String EXCEP_MSG_STARTUP_EMAIL_NOTIFICATION_QUEUE = "excp.msg.email.notification.queue.startup";
+	String EXCEP_MSG_STARTUP_SERVICE_BUS = "excp.msg.servicebus.startup";
+	String EXCEP_MSG_STARTUP_SERVICE_QUEUE = "excp.msg.service.queuestartup";
+	String EXCEP_MSG_STARTUP_SERVER_RESTART = "excp.msg.server.restart";
 
 	// Add Handler mapping Here
 	String FROM_PAGE_INDEX = "index.htm";
@@ -46,7 +55,7 @@ public interface AzureChatConstants {
 	String FROM_PAGE_UPDATE_USR_PROF = "updateUserProfile.htm";
 	String FROM_PAGE_GET_USER_CONTENT = "getUserContent.htm";
 	String FROM_PAGE_GET_MSG_COMMENTS = "getMessageComment.htm";
-	String FROM_PAGE_PENDING_FRIEND_CNT="getPendingFriendCount.htm";
+	String FROM_PAGE_PENDING_FRIEND_CNT = "getPendingFriendCount.htm";
 
 	// Add View Names Here
 	String VIEW_NAME_ERROR = "error";
@@ -73,6 +82,7 @@ public interface AzureChatConstants {
 	// Bean name constants
 	String USER_BEAN = "userBean";
 	String BASE_BEAN = "baseBean";
+	String STARTUP_ERRORS = "startupErrors";
 
 	// Success Messages
 	String SUCCESS_MSG_REG = "Registrered Successfully.Sign In to proceed.";
@@ -121,7 +131,7 @@ public interface AzureChatConstants {
 	String TABLE_NAME_FRIEND_REQ = "FriendRequest";
 	String TABLE_NAME_MESSAGE_COMMENTS = "MessageComments";
 	String TABLE_NAME_MESSAGE_LIKES = "MessageLikes";
-	String TABLE_NAME_USER_MESSAGE = "UserMessage";
+	String TABLE_NAME_USER_MESSAGE = "UserMessages";
 
 	// Storage queue
 	String QUEUE_NAME_MESSAGE = "messageexpiryqueue";
@@ -171,8 +181,8 @@ public interface AzureChatConstants {
 	String SERVICE_BUS_NAMESPACE = "service.bus.namespace";
 	String SERVICE_BUS_SASKEYNAME = "service.bus.sasKeyName";
 	String SERVICE_BUS_SASKEY = "service.bus.sasKey";
-	String SERVICE_BUS_QUEUENAME = "azchatqueue1";
-	String SERVICE_BUS_ROOT_URI= "service.bus.rooturi";
+	String SERVICE_BUS_QUEUENAME = "azchatqueue";
+	String SERVICE_BUS_ROOT_URI = "service.bus.rooturi";
 
 	String GET_USER_ONLY_CONTENTS = "UserOnly";
 	String GET_USER_AND_FRIENDS_CONTENT = "UserAndFriends";
@@ -183,10 +193,14 @@ public interface AzureChatConstants {
 	String MEDIA_SERVICE_URI = "https://media.windows.net/API/";
 	String MEDIA_SERVICE_OAUTHURI = "https://wamsprodglobal001acs.accesscontrol.windows.net/v2/OAuth2-13";
 	String MEDIA_SERVICE_SCOPE = "urn:WindowsAzureMediaServices";
-	
-	String TIMER_TASK_MSGEXPIRY_TIME_KEY="timer.task.period.msg.expiry";
-	String TIMER_TASK_SERVICEBUS_TIME_KEY="timer.task.period.service.bus";
-	String TIMER_TASK_EMAIL_NOTIFICATION="timer.task.period.email.notif";
-	
 
+	String TIMER_TASK_MSGEXPIRY_TIME_KEY = "timer.task.period.msg.expiry";
+	String TIMER_TASK_SERVICEBUS_TIME_KEY = "timer.task.period.service.bus";
+	String TIMER_TASK_EMAIL_NOTIFICATION = "timer.task.period.email.notif";
+
+	// User Preference Property Key
+	String USER_PREF_COUNT_KEY = "preference.count";
+	String USER_PREF_PREP_KEY = "preference";
+
+	String UI_OPERATION_LIKE = "like";
 }

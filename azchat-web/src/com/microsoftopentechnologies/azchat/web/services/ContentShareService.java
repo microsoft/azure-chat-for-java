@@ -15,6 +15,7 @@
  */
 package com.microsoftopentechnologies.azchat.web.services;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,6 +34,7 @@ import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatBusinessException;
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatException;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
+import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatStartupUtils;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatStorageUtils;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
 import com.microsoftopentechnologies.azchat.web.dao.MessageCommentsDAO;
@@ -83,6 +85,9 @@ public class ContentShareService extends BaseServiceImpl {
 	@Autowired
 	private QueueRequestDAO queueRequestDAO;
 
+	@Autowired
+	private AzureChatStartupUtils azureChatStartupUtils;
+
 	/**
 	 * BeanPostProcessor initialization code to create and get reference to the
 	 * MessageCommemnt,MessageLike and UserMessage table from azure storage.
@@ -90,17 +95,28 @@ public class ContentShareService extends BaseServiceImpl {
 	 * @throws Exception
 	 */
 	@PostConstruct
-	public void init() throws Exception {
+	public void init() {
 		LOGGER.info("[FriendRequestService][init] start");
 		LOGGER.debug("Creating Friend Request related tables and queues.");
-		AzureChatStorageUtils
-				.createTable(AzureChatConstants.TABLE_NAME_MESSAGE_COMMENTS);
-		AzureChatStorageUtils
-				.createTable(AzureChatConstants.TABLE_NAME_MESSAGE_LIKES);
-		AzureChatStorageUtils
-				.createTable(AzureChatConstants.TABLE_NAME_USER_MESSAGE);
-		AzureChatStorageUtils
-				.createQueue(AzureChatConstants.QUEUE_NAME_MESSAGE);
+		String excpMsg = null;
+		try {
+			excpMsg = AzureChatUtils
+					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_CONTENT_SHARE);
+			AzureChatStorageUtils
+					.createTable(AzureChatConstants.TABLE_NAME_MESSAGE_COMMENTS);
+			AzureChatStorageUtils
+					.createTable(AzureChatConstants.TABLE_NAME_MESSAGE_LIKES);
+			AzureChatStorageUtils
+					.createTable(AzureChatConstants.TABLE_NAME_USER_MESSAGE);
+			AzureChatStorageUtils
+					.createQueue(AzureChatConstants.QUEUE_NAME_MESSAGE);
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while creating azure storage tables and message expiry queue for the content share services. Exception Message : "
+					+ e.getMessage());
+			azureChatStartupUtils.populateStartupErrors(new AzureChatException(
+					AzureChatConstants.EXCEP_CODE_SYSTEM_EXCEPTION,
+					AzureChatConstants.EXCEP_TYPE_SYSTYEM_EXCEPTION, excpMsg+e.getMessage()));
+		}
 		LOGGER.info("[FriendRequestService][init] end");
 	}
 
@@ -276,7 +292,7 @@ public class ContentShareService extends BaseServiceImpl {
 	}
 
 	/**
-	 * This method retrieve the user content i.e. messages and phoho's/vedio's
+	 * This method retrieve the user content i.e. messages and phoho's/video's
 	 * shared by user and his direct friends.
 	 * 
 	 * @param baseBean
@@ -323,7 +339,7 @@ public class ContentShareService extends BaseServiceImpl {
 	}
 
 	/**
-	 * This method get input user text messages,photo's and vedio's.Update the
+	 * This method get input user text messages,photo's and video's.Update the
 	 * same using respective DAO object.
 	 * 
 	 * @param userBean
@@ -336,8 +352,10 @@ public class ContentShareService extends BaseServiceImpl {
 		String expiryTime = userBean.getUserMessageListBean().getExpiryTime();
 		try {
 			if (null != userMessageEntity.getMediaType()
-					&& userMessageEntity.getMediaType().contains("video")) {
-				BrokeredMessage message = new BrokeredMessage("");
+					&& userMessageEntity.getMediaType().contains(
+							AzureChatConstants.UI_MEDIA_TYPE_VIDEO)) {
+				BrokeredMessage message = new BrokeredMessage(
+						AzureChatConstants.CONSTANT_EMPTY_STRING);
 				message.setProperty("msg", userMessageEntity.getTextContent());
 				message.setProperty("url", (userMessageEntity.getMediaURL()
 						+ "?" + AzureChatUtils
@@ -495,13 +513,15 @@ public class ContentShareService extends BaseServiceImpl {
 			userMessageEntity.setMediaType(userMessageBean.getMediaType());
 			String uri = null;
 			try {
-				if (null != userMessageBean.getPhotoVedioFile()
-						&& userMessageBean.getPhotoVedioFile().getSize() > 0) {
+				if (null != userMessageBean.getPhotoVideoFile()
+						&& userMessageBean.getPhotoVideoFile().getSize() > 0) {
 					if (null != userMessageBean.getMediaType()
-							&& userMessageBean.getMediaType().contains(AzureChatConstants.UI_MEDIA_TYPE_IMAGE)) {
+							&& userMessageBean.getMediaType().contains(
+									AzureChatConstants.UI_MEDIA_TYPE_IMAGE)) {
 						uri = profileImageRequestDAO.savePhoto(userMessageBean
-								.getPhotoVedioFile(), (Calendar.getInstance().getTimeInMillis() + userMessageBean
-								.getPhotoVedioFile().getOriginalFilename()));
+								.getPhotoVideoFile(), (Calendar.getInstance()
+								.getTimeInMillis() + userMessageBean
+								.getPhotoVideoFile().getOriginalFilename()));
 						userBean.getUserMessageListBean()
 								.setMediaUrl(
 										uri
@@ -510,11 +530,15 @@ public class ContentShareService extends BaseServiceImpl {
 														.getSASUrl(AzureChatConstants.PHOTO_UPLOAD_CONTAINER));
 						LOGGER.debug("Photo URI : " + uri);
 					} else if (null != userMessageBean.getMediaType()
-							&& userMessageBean.getMediaType().contains(AzureChatConstants.UI_MEDIA_TYPE_VIDEO)) {
-						uri = profileImageRequestDAO.saveTempVideo(
-								userMessageBean.getPhotoVedioFile(),(Calendar.getInstance().getTimeInMillis() +
-								userMessageBean.getPhotoVedioFile()
-										.getOriginalFilename()));
+							&& userMessageBean.getMediaType().contains(
+									AzureChatConstants.UI_MEDIA_TYPE_VIDEO)) {
+						uri = profileImageRequestDAO
+								.saveTempVideo(
+										userMessageBean.getPhotoVideoFile(),
+										(Calendar.getInstance()
+												.getTimeInMillis() + userMessageBean
+												.getPhotoVideoFile()
+												.getOriginalFilename()));
 						LOGGER.debug("Raw Video URI : " + uri);
 					}
 

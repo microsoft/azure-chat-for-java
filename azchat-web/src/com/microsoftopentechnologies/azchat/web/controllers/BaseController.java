@@ -29,7 +29,7 @@ import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
 import com.microsoftopentechnologies.azchat.web.data.beans.BaseBean;
 
 /**
- * BaseController for azchat application includes operations common amongst the
+ * BaseController for AzChat application includes operations common amongst the
  * controllers.
  * 
  * @author Dnyaneshwar_Pawar

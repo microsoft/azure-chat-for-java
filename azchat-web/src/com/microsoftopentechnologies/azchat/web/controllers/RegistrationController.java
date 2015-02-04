@@ -35,7 +35,8 @@ import com.microsoftopentechnologies.azchat.web.data.beans.UserBean;
 import com.microsoftopentechnologies.azchat.web.services.BaseService;
 
 /**
- * This controller handle the registration request from user.
+ * This controller handle the registration and profile update request's from
+ * user.
  * 
  * @author Dnyaneshwar_Pawar
  *
@@ -51,7 +52,7 @@ public class RegistrationController extends BaseController {
 
 	/**
 	 * This method handles the user registration request and
-	 * response.Successfull registration of the user redirected to the
+	 * response.Successfull registration of the user will be redirected to the
 	 * home/landing page.
 	 * 
 	 * @param userBean
@@ -60,7 +61,6 @@ public class RegistrationController extends BaseController {
 	 */
 	@RequestMapping(name = AzureChatConstants.FROM_PAGE_REG, method = RequestMethod.POST)
 	public ModelAndView doRegistration(UserBean userBean, ModelMap model) {
-
 		LOGGER.info("[RegistrationController][doRegistration] start");
 		userBean.setServiceAction(ServiceActionEnum.REGISTRATION);
 		userBean = (UserBean) registrationService.invokeService(userBean);
@@ -75,7 +75,7 @@ public class RegistrationController extends BaseController {
 
 	/**
 	 * This method handles the update user profile request and parse the
-	 * response into JSON format..
+	 * response into JSON format.
 	 * 
 	 * @param request
 	 * @return
@@ -92,14 +92,14 @@ public class RegistrationController extends BaseController {
 	}
 
 	/**
-	 * This method populate the userBean from request parameters.
+	 * This method populate the userBean from ajax request.
 	 * 
 	 * @param userBean
 	 * @param request
 	 */
 	private void populateUserBean(UserBean userBean,
 			MultipartHttpServletRequest request) {
-		userBean.setUserID(request.getParameter("logedInUserID"));
+		userBean.setUserID(request.getParameter("loggedInUserID"));
 		userBean.setFirstName(request.getParameter("firstName"));
 		userBean.setLastName(request.getParameter("lastName"));
 		userBean.setEmail(request.getParameter("email"));

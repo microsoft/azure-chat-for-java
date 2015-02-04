@@ -188,4 +188,14 @@ public abstract class BaseServiceImpl implements BaseService {
 
 	}
 
+	/**
+	 * This method used by all the services trim the input string.
+	 * 
+	 * @param str
+	 * @return
+	 */
+	protected String trim(String str) {
+		return str != null ? str.trim() : str;
+	}
+
 }

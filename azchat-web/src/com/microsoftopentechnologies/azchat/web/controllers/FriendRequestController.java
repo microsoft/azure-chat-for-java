@@ -72,7 +72,7 @@ public class FriendRequestController extends BaseController {
 	 * method also parse the response to the JSON.
 	 * 
 	 * @param request
-	 * @return
+	 * @return JSON friendRequestBean
 	 */
 	@RequestMapping(value = AzureChatConstants.FROM_PAGE_FRIND_STATUS, method = RequestMethod.GET)
 	public @ResponseBody FriendRequestBean getFriendStatus(
@@ -80,7 +80,7 @@ public class FriendRequestController extends BaseController {
 		LOGGER.info("[FriendRequestController][getFriendStatuRs] start");
 		FriendRequestBean friendRequestBean = new FriendRequestBean();
 		friendRequestBean.setFriendID(request.getParameter("friendID"));
-		friendRequestBean.setUserID(request.getParameter("logedInUserID"));
+		friendRequestBean.setUserID(request.getParameter("loggedInUserID"));
 		friendRequestBean.setServiceAction(ServiceActionEnum.FRIEND_STATUS);
 		friendRequestBean = (FriendRequestBean) friendRequestService
 				.invokeService(friendRequestBean);
@@ -100,7 +100,7 @@ public class FriendRequestController extends BaseController {
 		LOGGER.info("[FriendRequestController][addFriend] start");
 		FriendRequestBean friendRequestBean = new FriendRequestBean();
 		friendRequestBean.setFriendID(request.getParameter("friendID"));
-		friendRequestBean.setUserID(request.getParameter("logedInUserID"));
+		friendRequestBean.setUserID(request.getParameter("loggedInUserID"));
 		friendRequestBean.setFriendName(request.getParameter("friendName"));
 		friendRequestBean.setFriendPhotoUrl(request.getParameter("photoUrl"));
 		friendRequestBean.setServiceAction(ServiceActionEnum.ADD_FRIEND);
@@ -125,7 +125,7 @@ public class FriendRequestController extends BaseController {
 			HttpServletRequest request) {
 		LOGGER.info("[FriendRequestController][getPendingFriendList] start");
 		UserBean userBean = new UserBean();
-		userBean.setUserID(request.getParameter("logedInUserID"));
+		userBean.setUserID(request.getParameter("loggedInUserID"));
 		userBean.setServiceAction(ServiceActionEnum.GET_PENDING_FRIENDS);
 		userBean = (UserBean) friendRequestService.invokeService(userBean);
 		LOGGER.info("[FriendRequestController][getPendingFriendList] end");
@@ -144,7 +144,7 @@ public class FriendRequestController extends BaseController {
 			HttpServletRequest request) {
 		LOGGER.info("[FriendRequestController][updateFriendReqStatus] start");
 		FriendRequestBean frndBean = new FriendRequestBean();
-		frndBean.setUserID(request.getParameter("logedInUserID"));
+		frndBean.setUserID(request.getParameter("loggedInUserID"));
 		frndBean.setStatus(request.getParameter("status"));
 		frndBean.setFriendID(request.getParameter("friendID"));
 		frndBean.setFriendName(request.getParameter("friendName"));
