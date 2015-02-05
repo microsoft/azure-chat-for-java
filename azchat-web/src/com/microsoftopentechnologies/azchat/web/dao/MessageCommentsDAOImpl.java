@@ -65,7 +65,8 @@ public class MessageCommentsDAOImpl implements MessageCommentsDAO {
 
 	/**
 	 * This method fetch the list of message comments for input message id from
-	 * the azure storage.
+	 * the azure storage.Also sorts the comments according to the ascending
+	 * order of time-stamp.
 	 *
 	 * @param messageId
 	 * @return userMessageEntities
@@ -92,7 +93,8 @@ public class MessageCommentsDAOImpl implements MessageCommentsDAO {
 
 	/**
 	 * This method fetch the message comments for the input message id and user
-	 * id combination.
+	 * id combination.Also sorts the comments according to the ascending order
+	 * of time-stamp.
 	 * 
 	 * @param messageId
 	 * @param friendId
@@ -123,8 +125,7 @@ public class MessageCommentsDAOImpl implements MessageCommentsDAO {
 	}
 
 	/**
-	 * This method is used to get count of comments over message by message id &
-	 * friend id.
+	 * This method retrieve the message comment count for input message id.
 	 * 
 	 * @param messageId
 	 * @return count
@@ -183,7 +184,7 @@ public class MessageCommentsDAOImpl implements MessageCommentsDAO {
 	}
 
 	/**
-	 * This method deletes the comments of corresponding message id..
+	 * This method deletes all the comments for corresponding message id.
 	 * 
 	 * @param messageId
 	 * @return

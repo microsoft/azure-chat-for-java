@@ -35,7 +35,8 @@ import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserPreferenceEntity;
 
 /**
- * This class is for handling User Preference functionality.
+ * This class provides operations to add,delete and update the user preferences
+ * to the azure SQL user preference table.
  * 
  * @author Rupesh_Shirude
  *
@@ -48,11 +49,10 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 	private Connection connection = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
-	private String connectionString = null;
-	private String sqlString = null;
 
 	/**
-	 * Used to add User preference entity object in azure sql.
+	 * This method executes add user preference query on azure SQL user
+	 * preference table.
 	 * 
 	 * @param userPreferenceEntity
 	 * @return
@@ -62,25 +62,12 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 	@Override
 	public UserPreferenceEntity addUserPreferenceEntity(
 			UserPreferenceEntity userPreferenceEntity) throws Exception {
-		LOGGER.info("[UserPreferenceEntity][addUserPreferenceEntity]         start ");
+		LOGGER.info("[UserPreferenceEntity][addUserPreferenceEntity] start ");
 		int userPreferenceId = 0;
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while addUserPreferenceEntity_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while addUserPreferenceEntity_getting connection  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : "
-							+ e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(AzureChatSQLConstants.ADD_USER_PREFERENCE);
 			preparedStatement = connection.prepareStatement(sqlString,
 					Statement.RETURN_GENERATED_KEYS);
@@ -92,30 +79,23 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 				userPreferenceId = resultSet.getInt(1);
 			}
 		} catch (SQLException e) {
-			LOGGER.info("Exception while addUserPreferenceEntity : "
+			LOGGER.error("Exception occurred while executing add user preference query on azure SQL user preference table. Exception Message  : "
 					+ e.getMessage());
-			throw new AzureChatSystemException("Exception executing sql : "
-					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing add user preference query on azure SQL user preference table. Exception Message  : "
+							+ e.getMessage());
 		} finally {
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.info("Exception while addUserPreferenceEntity_closing DB resources : "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		userPreferenceEntity.setUserPreferenceID(userPreferenceId);
-		LOGGER.info("[UserPreferenceEntity][addUserPreferenceEntity]         end ");
+		LOGGER.info("[UserPreferenceEntity][addUserPreferenceEntity] end ");
 		return userPreferenceEntity;
 	}
 
 	/**
-	 * Used to get user preference entity object by user id.
+	 * This method executes query on azure SQL user preference table to get user
+	 * preference entity object by user id.
 	 * 
 	 * @param userId
 	 * @return
@@ -127,23 +107,10 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 			throws Exception {
 		LOGGER.info("[UserPreferenceDAOImpl][getUserPreferenceEntity]         start ");
 		List<UserPreferenceEntity> userPreferenceEntities = new ArrayList<UserPreferenceEntity>();
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while getUserPreferenceEntity_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while getUserPreferenceEntity_getting connection  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : "
-							+ e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(
 					AzureChatSQLConstants.GET_USER_PREFERENCE_BY_USERID);
 			preparedStatement = connection.prepareStatement(sqlString);
@@ -153,29 +120,22 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 				userPreferenceEntities.add(generateUserObject(resultSet));
 			}
 		} catch (SQLException e) {
-			LOGGER.info("Exception while getUserPreferenceEntity : "
+			LOGGER.error("Exception occurred while executing get user preferences query on azure SQL user preference table. Exception Message  : "
 					+ e.getMessage());
-			throw new AzureChatSystemException("Exception executing sql : "
-					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing get user preferences query on azure SQL user preference table. Exception Message  : "
+							+ e.getMessage());
 		} finally {
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.info("Exception while getUserPreferenceEntity_closing DB resources : "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		LOGGER.info("[UserPreferenceEntity][getUserPreferenceEntity]         end ");
 		return userPreferenceEntities;
 	}
 
 	/**
-	 * Used to get user preference entity object by user id & prefMetadataId.
+	 * This method executes query on azure SQL user preference table to get user
+	 * preferences by user id & prefMetadataId.
 	 * 
 	 * @param userId
 	 * @param prefMetadataId
@@ -186,25 +146,12 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 	@Override
 	public List<UserPreferenceEntity> getUserPreferenceEntity(Integer userId,
 			Integer preferenceMetadataId) throws Exception {
-		LOGGER.info("[UserPreferenceDAOImpl][getUserPreferenceEntity]         start ");
+		LOGGER.info("[UserPreferenceDAOImpl][getUserPreferenceEntity] start ");
 		List<UserPreferenceEntity> userPreferenceEntities = new ArrayList<UserPreferenceEntity>();
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while getUserPreferenceEntity_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while getUserPreferenceEntity_getting connection  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : "
-							+ e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(
 					AzureChatSQLConstants.GET_USER_PREFERENCE_BY_USERID_PREFERENCEID);
 			preparedStatement = connection.prepareStatement(sqlString);
@@ -215,29 +162,22 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 				userPreferenceEntities.add(generateUserObject(resultSet));
 			}
 		} catch (SQLException e) {
-			LOGGER.info("Exception while getUserPreferenceEntity : "
+			LOGGER.error("Exception occurred while executing get user preferences query on azure SQL user preference table. Exception Message  : "
 					+ e.getMessage());
-			throw new AzureChatSystemException("Exception executing sql : "
-					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing get user preferences query on azure SQL user preference table. Exception Message  : "
+							+ e.getMessage());
 		} finally {
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.info("Exception while getUserPreferenceEntity_closing DB resources : "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
-		LOGGER.info("[UserPreferenceEntity][getUserPreferenceEntity]         end ");
+		LOGGER.info("[UserPreferenceEntity][getUserPreferenceEntity] end ");
 		return userPreferenceEntities;
 	}
 
 	/**
-	 * This method is for generating Prepared Statement
+	 * This method populates Prepared Statement from userPreferenceEntity
+	 * object.
 	 * 
 	 * @param preparedStatement
 	 * @param userPreferenceEntity
@@ -261,12 +201,11 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 	}
 
 	/**
-	 * This method is to generate user object
+	 * This method populates userPreferenceEntity object from input resultSet.
 	 * 
 	 * @param resultSet
 	 * @return
 	 * @throws SQLException
-	 * @author Rupesh_Shirude
 	 */
 	public UserPreferenceEntity generateUserObject(ResultSet resultSet)
 			throws SQLException {
@@ -283,43 +222,34 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 	}
 
 	/**
-	 * Used to create User Preference table.
+	 * This method executes create User Preference table query on the azure SQL
+	 * database.
 	 * 
 	 * @throws Exception
 	 * @author Rupesh_shirude
 	 */
 	@Override
-	public void createUserPreferenceTable(Connection connection)
-			throws Exception {
+	public void createUserPreferenceTable() throws Exception {
+		String sqlString = null;
 		try {
 			sqlString = new String(
 					AzureChatSQLConstants.CREATE_USER_PREFERENCES_TABLE);
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			preparedStatement = connection.prepareStatement(sqlString);
 			preparedStatement.execute();
 			preparedStatement = connection
 					.prepareStatement(AzureChatSQLConstants.CREATE_USER_PREFERENCES_TABLE_INDEX);
 			preparedStatement.execute();
-		} catch (SQLException e) {
-
-			LOGGER.info("Exception while createUserTable : " + e.getMessage());
-			throw new AzureChatSystemException("Exception executing sql : "
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while executing create user preference table in Azure SQL database. Exception Message  : "
 					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing create user preference table in Azure SQL database. Exception Message  : "
+							+ e.getMessage());
 		} finally {
-
-			try {
-				preparedStatement.close();
-			} catch (SQLException e) {
-
-				LOGGER.info("Exception while createUserTable_closing DB resources : "
-						+ e.getMessage());
-
-				LOGGER.info("Exception while createUserTable_closing DB resources : "
-						+ e.getMessage());
-
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils
+					.closeDatabaseResources(preparedStatement, connection);
 		}
 
 	}

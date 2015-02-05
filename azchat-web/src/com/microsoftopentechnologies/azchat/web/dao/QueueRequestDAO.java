@@ -20,7 +20,7 @@ import java.util.Set;
 import com.microsoft.azure.storage.queue.CloudQueueMessage;
 
 /**
- * This interface used to provide methods for azure queue operations for
+ * This interface defines contract methods for azure queue operations for
  * messages.
  * 
  * @author Rupesh_Shirude

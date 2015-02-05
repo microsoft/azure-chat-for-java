@@ -15,13 +15,13 @@ limitations under the License.
  */
 package com.microsoftopentechnologies.azchat.web.dao;
 
-import java.sql.Connection;
 import java.util.List;
 
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserEntity;
 
 /**
- * Interface to interact with User table in Azure SQL.
+ * This interface defines contract methods needs to be implemented by the user
+ * DAO implementation class.
  * 
  * @author Rupesh_Shirude
  *
@@ -29,52 +29,51 @@ import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserEntity
 public interface UserDAO {
 
 	/**
-	 * Used to save the new user object into Azure SQL.
+	 * save the new user object into Azure SQL.
 	 */
 	public UserEntity saveNewUser(UserEntity user) throws Exception;
 
 	/**
-	 * Used to get the user details from Azure SQL by userid
+	 * get the user details from Azure SQL by user id
 	 */
 	UserEntity getUserDetailsByUserId(Integer userId) throws Exception;
 
 	/**
-	 * Used to get the user details from Azure SQL by nameId
+	 * get the user details from Azure SQL by nameId
 	 */
 	List<UserEntity> getUserDetailsByNameID(String nameId) throws Exception;
 
 	/**
-	 * Used to get the user details from Azure SQL by nameId and
-	 * identityProvider
+	 * get the user details from Azure SQL by nameId and identityProvider
 	 */
 	List<UserEntity> getUserDetailsByNameIdAndIdentityProvider(String nameId,
 			String identityProvider) throws Exception;
 
 	/**
-	 * Used to get the user details from Azure SQL by first name
+	 * get the user details from Azure SQL by first name
 	 */
 	List<UserEntity> getUserDetailsByFirstName(String firstName)
 			throws Exception;
 
 	/**
-	 * Used to get the user details from Azure SQL by last name
+	 * get the user details from Azure SQL by last name
 	 */
 	List<UserEntity> getUserDetailsByLastName(String lastName) throws Exception;
 
 	/**
-	 * Used to get the user details from Azure SQL by first name or last name
+	 * get the user details from Azure SQL by first name or last name
 	 */
 	List<UserEntity> getUserDetailsByFirstNameOrLastName(String name)
 			throws Exception;
 
 	/**
-	 * Used to save the update user object into Azure SQL
+	 * save the update user object into Azure SQL
 	 * 
 	 */
 	public UserEntity updateNewUser(UserEntity user) throws Exception;
 
 	/**
-	 * Used to get user profile image url by his userId.
+	 * get user profile image URL by his userId.
 	 * 
 	 * @param userId
 	 * @return
@@ -83,9 +82,9 @@ public interface UserDAO {
 	public String getUserPhotoBlobURL(Integer userId) throws Exception;
 
 	/**
-	 * Used to create User table.
+	 * create User table.
 	 * 
 	 * @throws Exception
 	 */
-	public void createUserTable(Connection connection) throws Exception;
+	public void createUserTable() throws Exception;
 }

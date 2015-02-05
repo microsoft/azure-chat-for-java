@@ -47,13 +47,12 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 	private Connection connection = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
-	private String connectionString = null;
-	private String sqlString = null;
 
 	/**
 	 * This method adds the user preference data in the azure SQL table.
 	 * 
 	 * @return preferenceMetadataEntity
+	 * @throws SQLException
 	 */
 	@Override
 	public PreferenceMetadataEntity addPreferenceMetadataEntity(
@@ -61,23 +60,11 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 		LOGGER.info("[PreferenceMetadataEntity][addPreferenceMetadataEntity]         start ");
 		LOGGER.debug("PreferenceMetadataEntity    "
 				+ preferenceMetadataEntity.getPreferenceDesc());
-		connectionString = AzureChatUtils.buildConnectionString();
 		int prefMetadataId = 0;
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while addPreferenceMetadataEntity_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while addPreferenceMetadataEntity_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(
 					AzureChatSQLConstants.ADD_PREFERENCE_METADATA);
 			preparedStatement = connection.prepareStatement(sqlString,
@@ -89,23 +76,14 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 			if (resultSet.next()) {
 				prefMetadataId = resultSet.getInt(1);
 			}
-		} catch (SQLException e) {
-			LOGGER.info("Exception while addPreferenceMetadataEntity : "
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while adding preference metadata entity to the azure SQL table. Exception Message : "
 					+ e.getMessage());
-			throw new AzureChatSystemException("Exception executing sql : "
-					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while adding preference metadata entity to the azure SQL table. Exception Message : "
+							+ e.getMessage());
 		} finally {
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.info("Exception while addPreferenceMetadataEntity_closing DB resources : "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet);
 		}
 		preferenceMetadataEntity.setPreferenceId(prefMetadataId);
 		LOGGER.info("[PreferenceMetadataEntity][addPreferenceMetadataEntity]         end ");
@@ -113,7 +91,8 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 	}
 
 	/**
-	 * This method fetch the user preferences from the azure SQL table.
+	 * This method fetch the user preference from the azure SQL table for the
+	 * input preference id.
 	 * 
 	 * @return preferenceMetadataEntity
 	 */
@@ -124,22 +103,10 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 		LOGGER.debug("PreferenceMetadataEntity   id "
 				+ preferenceMetadataEntityId);
 		PreferenceMetadataEntity preferenceMetadataEntity = null;
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while getPreferenceMetadataEntityById_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while getPreferenceMetadataEntityById_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(
 					AzureChatSQLConstants.GET_PREFERENCE_METADATA_BY_ID);
 			preparedStatement = connection.prepareStatement(sqlString);
@@ -148,31 +115,22 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 			if (resultSet.next()) {
 				preferenceMetadataEntity = generateUserObject(resultSet);
 			}
-		} catch (SQLException e) {
-			LOGGER.error("SQL Exception executing prepfernce metadata sql. Exception Message :  "
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while executing get preference meta data query on azure SQL table. Exception Message : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"SQL Exception executing prepfernce metadata sql. Exception Message :  "
+					"Exception occurred while executing get preference meta data query on azure SQL table. Exception Message : "
 							+ e.getMessage());
 		} finally {
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.error("Exception while getPreferenceMetadataEntityById_closing DB resources. Exception Message :  "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception while getPreferenceMetadataEntityById_closing DB resources. Exception Message :"
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		LOGGER.info("[PreferenceMetadataEntity][getPreferenceMetadataEntityById]         end ");
 		return preferenceMetadataEntity;
 	}
 
 	/**
-	 * This method fetch the user preferences from the azure SQL table.
+	 * This method fetch the all user preferences from the azure SQL table.
 	 * 
 	 * @return preferenceMetadataEntities
 	 */
@@ -181,23 +139,10 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 			throws Exception {
 		LOGGER.info("[PreferenceMetadataEntity][getPreferenceMetadataEntityById]         start ");
 		List<PreferenceMetadataEntity> preferenceMetadataEntities = new ArrayList<PreferenceMetadataEntity>();
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.error("Exception occurred while getPreferenceMetadataEntityById_loading sql driver class. Exception Message :  "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred while getPreferenceMetadataEntityById_loading sql driver class. Exception Message :  "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.error("Exception occurred while getPreferenceMetadataEntityById_loading sql driver class. Exception Message :  "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred while getPreferenceMetadataEntityById_loading sql driver class. Exception Message :  "
-							+ e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(
 					AzureChatSQLConstants.GET_PREFERENCE_METADATA_ALL);
 			preparedStatement = connection.prepareStatement(sqlString);
@@ -206,20 +151,14 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 				preferenceMetadataEntities.add(generateUserObject(resultSet));
 			}
 		} catch (SQLException e) {
-			throw new AzureChatSystemException("Exception executing sql : "
+			LOGGER.error("Exception occurred while executing get preference meta data query on azure SQL table. Exception Message : "
 					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing get preference meta data query on azure SQL table. Exception Message : "
+							+ e.getMessage());
 		} finally {
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.info("Exception occured while getPreferenceMetadataEntityById_closing DB resources. Exception Message :  "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception occured while getPreferenceMetadataEntityById_closing DB resources. Exception Message :  "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		LOGGER.info("[PreferenceMetadataEntity][getPreferenceMetadataEntityById]         end ");
 		return preferenceMetadataEntities;
@@ -252,7 +191,7 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 	}
 
 	/**
-	 * this method used to set preferenceMetadataEntity object from returned
+	 * This method used to set preferenceMetadataEntity object from returned
 	 * result set object.
 	 * 
 	 * @param resutSet
@@ -282,23 +221,10 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 			throws Exception {
 		LOGGER.info("[PreferenceMetadataEntity][getPreferenceMetadataEntityById]         start ");
 		Integer id = new Integer(0);
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.error("ClassNotFoundException while getPreferenceMetadataEntityById_loading sql driver class. Exception Message :  "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"ClassNotFoundException while getPreferenceMetadataEntityById_loading sql driver class. Exception Message :  "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.error("SQLException while getPreferenceMetadataEntityById_loading sql driver class. Exception Message :  "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"SQLException while getPreferenceMetadataEntityById_loading sql driver class. Exception Message :   "
-							+ e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(
 					AzureChatSQLConstants.GET_PREFERENCE_METADATA_BY_DESC);
 			preparedStatement = connection.prepareStatement(sqlString);
@@ -307,24 +233,15 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 			if (resultSet.next()) {
 				id = resultSet.getInt(1);
 			}
-		} catch (SQLException e) {
-			LOGGER.error("SQLException occurred while retrieving the preference mata data entities. Exception Message : "
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while retrieving the preference mata data for input description from azure SQL table. Exception Message : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"SQLException occurred while retrieving the preference mata data entities. Exception Message : "
+					"Exception occurred while retrieving the preference mata data for input description from azure SQL table. Exception Message : "
 							+ e.getMessage());
 		} finally {
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.error("Exception occurred while getPreferenceMetadataEntityById_closing DB resources. Exception Message :  "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception occurred while getPreferenceMetadataEntityById_closing DB resources. Exception Message : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		LOGGER.info("[PreferenceMetadataEntity][getPreferenceMetadataEntityById]         end ");
 		return id;
@@ -334,34 +251,33 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 	 * This method creates the preference meta data table.
 	 */
 	@Override
-	public void createPreferenceMatedateTable(Connection connection) throws Exception {
+	public void createPreferenceMatedateTable() throws Exception {
+		String sqlString = null;
+		PreparedStatement prepStmtIndex = null;
+		Connection connIndex = null;
 		try {
 			sqlString = new String(
 					AzureChatSQLConstants.CREATE_PREFERENCE_METADATA_TABLE);
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			preparedStatement = connection.prepareStatement(sqlString);
+			connIndex = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			preparedStatement.execute();
-			preparedStatement=connection.prepareStatement(AzureChatSQLConstants.CREATE_PREFERENCE_METADATA_TABLE_INDEX);
-			preparedStatement.execute();
+			prepStmtIndex = connIndex
+					.prepareStatement(AzureChatSQLConstants.CREATE_PREFERENCE_METADATA_TABLE_INDEX);
+			prepStmtIndex.execute();
 		} catch (SQLException e) {
-
-			LOGGER.error("Exception occurred while executing createUserTable query on azure sql. Exception Mesage : "
+			LOGGER.error("Exception occurred while executing create user table  query on azure SQL table. Exception Mesage : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
 					"Exception occurred while executing createUserTable query on azure sql. Exception Mesage :  "
 							+ e.getMessage());
 		} finally {
-
-			try {
-				preparedStatement.close();
-			} catch (SQLException e) {
-
-				LOGGER.error("Exception occurred while createUserTable_closing DB resources. Exception Message :  "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception occurred while createUserTable_closing DB resources. Exception Message :  "
-								+ e.getMessage());
-			}
+			AzureChatUtils
+					.closeDatabaseResources(preparedStatement, connection);
+			AzureChatUtils.closeDatabaseResources(prepStmtIndex, connIndex);
 		}
-
 	}
+
 }

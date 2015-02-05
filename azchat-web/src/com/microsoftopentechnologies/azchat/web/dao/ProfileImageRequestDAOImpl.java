@@ -43,8 +43,8 @@ public class ProfileImageRequestDAOImpl implements ProfileImageRequestDAO {
 			.getLogger(ProfileImageRequestDAOImpl.class);
 
 	/**
-	 * This method add the records/image to the profile image storage for the
-	 * corresponding user..
+	 * This method add the image to the profile image storage for the
+	 * corresponding user.
 	 */
 	@Override
 	public String saveProfileImage(MultipartFile file, String fileName)
@@ -83,7 +83,7 @@ public class ProfileImageRequestDAOImpl implements ProfileImageRequestDAO {
 	}
 
 	/**
-	 * This method adds the record/image to the azure storage.
+	 * This method adds the image to the azure storage.
 	 */
 	@Override
 	public String savePhoto(MultipartFile file, String fileName)
@@ -136,7 +136,7 @@ public class ProfileImageRequestDAOImpl implements ProfileImageRequestDAO {
 	}
 
 	/**
-	 * This method deletes the user profile image.
+	 * This method deletes the user profile image from azure storage.
 	 */
 	@Override
 	public void deletePhoto(String fileName) throws Exception {

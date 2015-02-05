@@ -68,7 +68,7 @@ public class MessageLikeEntityDAOImpl implements MessageLikeEntityDAO {
 
 	/**
 	 * This method is used to get the likes by message id by fetching azure
-	 * storage records..
+	 * storage records.
 	 * 
 	 * @param messageId
 	 * @return List of MessageLikeEntity
@@ -212,7 +212,7 @@ public class MessageLikeEntityDAOImpl implements MessageLikeEntityDAO {
 
 	/**
 	 * This method is used to delete like by message id by deleting the record
-	 * from the azure storage..
+	 * from the azure storage.
 	 * 
 	 * @param messageId
 	 * @param friendId

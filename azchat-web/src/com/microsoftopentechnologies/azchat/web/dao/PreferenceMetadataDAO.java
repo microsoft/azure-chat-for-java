@@ -15,14 +15,13 @@ limitations under the License.
  */
 package com.microsoftopentechnologies.azchat.web.dao;
 
-import java.sql.Connection;
 import java.util.List;
 
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.PreferenceMetadataEntity;
 
 /**
- * This interface defines the methods to be implemented to add user preference
- * functionality.
+ * This interface defines contract methods to be implemented by user preference
+ * DAO object to add user preference functionality.
  * 
  * @author Rupesh_Shirude
  *
@@ -73,5 +72,5 @@ public interface PreferenceMetadataDAO {
 	 * 
 	 * @throws Exception
 	 */
-	public void createPreferenceMatedateTable(Connection connection) throws Exception;
+	public void createPreferenceMatedateTable() throws Exception;
 }

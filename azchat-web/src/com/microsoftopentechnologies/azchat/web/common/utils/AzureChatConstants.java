@@ -203,4 +203,13 @@ public interface AzureChatConstants {
 	String USER_PREF_PREP_KEY = "preference";
 
 	String UI_OPERATION_LIKE = "like";
+	String CONSTANT_PERCENTAGE = "%";
+
+	// Media Service Utility Method Constants
+	int LITERAL_BACKSLASH = '/';
+	int LITERAL_DOT = '.';
+	int LITERAL_QUESTION_MARK = '?';
+	int CONSTANT_INT_ZERO = 0;
+	int CONSTANT_INT_ONE = 1;
+
 }

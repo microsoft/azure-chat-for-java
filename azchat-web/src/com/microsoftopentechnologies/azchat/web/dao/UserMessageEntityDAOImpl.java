@@ -37,13 +37,13 @@ import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.Friend
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.UserMessageEntity;
 
 /**
- * This class used to add, get messages to/from azure table.
+ * This class provides operations to add, get messages to/from azure table.
  * 
  * @author Rupesh_Shirude
  *
  */
 @Service("userMessageEntityDAO")
-public class UserMessageEntityDAOImpl implements UserMessageEntityDAO{
+public class UserMessageEntityDAOImpl implements UserMessageEntityDAO {
 	private static final Logger LOGGER = LogManager
 			.getLogger(FriendRequestDAOImpl.class);
 
@@ -58,8 +58,10 @@ public class UserMessageEntityDAOImpl implements UserMessageEntityDAO{
 
 	@Autowired
 	private MessageLikeEntityDAO messageLikeEntityDAO;
+
 	/**
-	 * This method used to add user message.
+	 * This method This method executes query on azure user message storage to
+	 * add user message.
 	 * 
 	 * @param userMessageEntity
 	 * @return
@@ -69,157 +71,170 @@ public class UserMessageEntityDAOImpl implements UserMessageEntityDAO{
 	@Override
 	public UserMessageEntity addUserMessageEntity(
 			UserMessageEntity userMessageEntity) throws Exception {
-		LOGGER.info("[UserMessageEntityDAOImpl][addUserMessageEntity]         start ");
-		AzureChatStorageUtils.insertOrReplaceEntity(AzureChatConstants.TABLE_NAME_USER_MESSAGE, userMessageEntity);
-		LOGGER.info("[UserMessageEntityDAOImpl][addUserMessageEntity]         end ");
+		LOGGER.info("[UserMessageEntityDAOImpl][addUserMessageEntity] start ");
+		AzureChatStorageUtils.insertOrReplaceEntity(
+				AzureChatConstants.TABLE_NAME_USER_MESSAGE, userMessageEntity);
+		LOGGER.info("[UserMessageEntityDAOImpl][addUserMessageEntity] end ");
 		return userMessageEntity;
 	}
 
 	/**
-	 *This method used to get user message by user id.
+	 * This method executes query on azure user message storage to get user
+	 * message by user id.
 	 * 
 	 * @param userId
 	 * @return
 	 * @throws Exception
-	 * @author Rupesh_Shirude
 	 */
 	@Override
 	public List<UserMessageEntity> getUserMessageEntities(String userId)
 			throws Exception {
-		LOGGER.info("[UserMessageEntityDAOImpl][getUserMessageEntities]         start ");
+		LOGGER.info("[UserMessageEntityDAOImpl][getUserMessageEntities] start ");
 		List<UserMessageEntity> userMessageEntities = new ArrayList<UserMessageEntity>();
-		//GET THE USER MESSAGES AND ADDED TO LIST.
 		String partitionFilter = TableQuery.generateFilterCondition(
 				AzureChatConstants.PARTITION_KEY, QueryComparisons.EQUAL,
 				userId);
 		TableQuery<UserMessageEntity> friendListQuery = TableQuery.from(
 				UserMessageEntity.class).where(partitionFilter);
 		for (UserMessageEntity entity : AzureChatStorageUtils
-				.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE).execute(
-						friendListQuery)) {
+				.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE)
+				.execute(friendListQuery)) {
 			userMessageEntities.add(entity);
 		}
 		Collections.sort(userMessageEntities);
-		LOGGER.info("[UserMessageEntityDAOImpl][getUserMessageEntities]         end ");
+		LOGGER.info("[UserMessageEntityDAOImpl][getUserMessageEntities] end ");
 		return userMessageEntities;
 	}
 
 	/**
-	 * This method used to get user messages by user id & message id.
+	 * This method executes query on azure user message storage to get user
+	 * messages by user id & message id.
 	 * 
 	 * @param userId
 	 * @param messageId
 	 * @return
 	 * @throws Exception
-	 * @author Rupesh_Shirude
 	 */
 	@Override
 	public UserMessageEntity getUserMessageEntities(String userId,
 			String messageId) throws Exception {
-		LOGGER.info("[UserMessageEntityDAOImpl][getUserMessageEntities]         start ");
+		LOGGER.info("[UserMessageEntityDAOImpl][getUserMessageEntities] start ");
 		List<UserMessageEntity> userMessageEntities = new ArrayList<UserMessageEntity>();
 		String partitionFilter = TableQuery.generateFilterCondition(
 				AzureChatConstants.PARTITION_KEY, QueryComparisons.EQUAL,
 				userId);
 		String rowFilter = TableQuery.generateFilterCondition(
-				AzureChatConstants.ROW_KEY, QueryComparisons.EQUAL,
-				messageId);
+				AzureChatConstants.ROW_KEY, QueryComparisons.EQUAL, messageId);
 		String combinedFilter = TableQuery.combineFilters(partitionFilter,
 				Operators.AND, rowFilter);
 		TableQuery<UserMessageEntity> friendListQuery = TableQuery.from(
 				UserMessageEntity.class).where(combinedFilter);
 		for (UserMessageEntity entity : AzureChatStorageUtils
-				.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE).execute(
-						friendListQuery)) {
+				.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE)
+				.execute(friendListQuery)) {
 			userMessageEntities.add(entity);
 		}
-		LOGGER.info("[UserMessageEntityDAOImpl][getUserMessageEntities]         end ");
+		LOGGER.info("[UserMessageEntityDAOImpl][getUserMessageEntities] end ");
 		return userMessageEntities.get(0);
 	}
 
 	/**
-	 * This method used to get user message by user id.
+	 * This method executes query on azure user message storage to get user
+	 * message by user id.
 	 * 
 	 * @param userId
-	 * @return
+	 * @return userMessageEntities
 	 * @throws Exception
-	 * @author Rupesh_Shirude
 	 */
 	@Override
 	public List<UserMessageEntity> getUserAndFriendsMessages(String userId)
 			throws Exception {
-		LOGGER.info("[UserMessageEntityDAOImpl][getUserAndFriendsMessages]         start ");
+		LOGGER.info("[UserMessageEntityDAOImpl][getUserAndFriendsMessages] start ");
 		List<UserMessageEntity> userMessageEntities = new ArrayList<UserMessageEntity>();
-		// GET THE LIST OF USER MESSAGES AND ADD TO LIST.
 		userMessageEntities = getUserMessageEntities(userId);
-
-		//GET THE LIST OF USER'S FRIENDS.
-		List<FriendRequestEntity> friendRequestEntities = friendRequestDAO.getFriendListForUser(userId);
-
-		//FOR EACH FRIEND, GET THE MESSAGES UPLOADED BY THEM AND APPEND TO ABOVE LIST.
-		for(FriendRequestEntity friendRequestEntity : friendRequestEntities){
-			userMessageEntities.addAll(getUserMessageEntities(friendRequestEntity.getFriendID()));
+		List<FriendRequestEntity> friendRequestEntities = friendRequestDAO
+				.getFriendListForUser(userId);
+		for (FriendRequestEntity friendRequestEntity : friendRequestEntities) {
+			userMessageEntities
+					.addAll(getUserMessageEntities(friendRequestEntity
+							.getFriendID()));
 		}
 		Collections.sort(userMessageEntities);
-		LOGGER.info("[UserMessageEntityDAOImpl][getUserAndFriendsMessages]         end ");
+		LOGGER.info("[UserMessageEntityDAOImpl][getUserAndFriendsMessages] end ");
 		return userMessageEntities;
 	}
+
 	/**
-	 * This method used to get all user message ids.
+	 * This method executes query on azure user message storage to get all user
+	 * message ID's.
 	 * 
 	 * @param userId
-	 * @return
+	 * @return strings
 	 * @throws Exception
-	 * @author Rupesh_Shirude
 	 */
 	@Override
 	public Set<String> getAllUserMessageIds() throws Exception {
+		LOGGER.info("[UserMessageEntityDAOImpl][getAllUserMessageIds] start ");
 		Set<String> strings = new HashSet<String>();
-		TableQuery<UserMessageEntity> userMessages = TableQuery.from(
-				UserMessageEntity.class);
+		TableQuery<UserMessageEntity> userMessages = TableQuery
+				.from(UserMessageEntity.class);
 		for (UserMessageEntity entity : AzureChatStorageUtils
-				.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE).execute(
-						userMessages)) {
+				.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE)
+				.execute(userMessages)) {
 			strings.add(entity.getMessageID());
 		}
+		LOGGER.debug("Message Count : " + strings != null ? strings.size()
+				: null);
+		LOGGER.info("[UserMessageEntityDAOImpl][getAllUserMessageIds] start ");
 		return strings;
 	}
 
 	/**
-	 * This method used to get all user message ids.
+	 * This method executes query on azure user message storage to delete user
+	 * message by input ID's.
 	 * 
 	 * @param userId
 	 * @return
 	 * @throws Exception
-	 * @author Rupesh_Shirude
 	 */
 	@Override
 	public void deleteMessageById(String messageId) throws Exception {
+		LOGGER.info("[UserMessageEntityDAOImpl][deleteMessageById] start ");
 		UserMessageEntity messageEntity = getMessageById(messageId);
-		if(messageEntity!=null){
-			int startIndex = messageEntity.getMediaURL().indexOf(AzureChatConstants.PHOTO_UPLOAD_CONTAINER + "/") + AzureChatConstants.PHOTO_UPLOAD_CONTAINER.length() + 1;
+		if (messageEntity != null) {
+			int startIndex = messageEntity.getMediaURL().indexOf(
+					AzureChatConstants.PHOTO_UPLOAD_CONTAINER + "/")
+					+ AzureChatConstants.PHOTO_UPLOAD_CONTAINER.length() + 1;
 			String fileName = messageEntity.getMediaURL().substring(startIndex);
 			profileImageRequestDAO.deletePhoto(fileName);
+			LOGGER.debug("Photo for message id : " + messageId + " is deleted.");
 			messageCommentsDAO.deleteAllMessageComments(messageId);
+			LOGGER.debug("Comments for message id : " + messageId
+					+ " are deleted.");
 			messageLikeEntityDAO.deleteMessageLikeByMessageId(messageId);
-			CloudTable cloudTable = AzureChatStorageUtils.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE);	
+			LOGGER.debug("Likes for message id : " + messageId
+					+ " are deleted.");
+			CloudTable cloudTable = AzureChatStorageUtils
+					.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE);
 			String rowFilter = TableQuery.generateFilterCondition(
 					AzureChatConstants.ROW_KEY, QueryComparisons.EQUAL,
 					messageId);
 			TableQuery<UserMessageEntity> userMessages = TableQuery.from(
 					UserMessageEntity.class).where(rowFilter);
 			for (UserMessageEntity entity : AzureChatStorageUtils
-					.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE).execute(
-							userMessages)) {
+					.getTableReference(
+							AzureChatConstants.TABLE_NAME_USER_MESSAGE)
+					.execute(userMessages)) {
 				TableOperation deleteOperation = TableOperation.delete(entity);
 				cloudTable.execute(deleteOperation);
 			}
 		}
-
+		LOGGER.info("[UserMessageEntityDAOImpl][deleteMessageById] end");
 	}
 
 	/**
-	 * This method used to get user message by id.
+	 * This method executes query on azure user message storage to get user
+	 * message by id.
 	 * 
 	 * @param messageId
 	 * @return
@@ -228,23 +243,25 @@ public class UserMessageEntityDAOImpl implements UserMessageEntityDAO{
 	 */
 	@Override
 	public UserMessageEntity getMessageById(String messageId) throws Exception {
-		LOGGER.info("[UserMessageEntityDAOImpl][getUserMessageEntities]         start ");
+		LOGGER.info("[UserMessageEntityDAOImpl][getUserMessageEntities] start ");
 		List<UserMessageEntity> userMessageEntities = new ArrayList<UserMessageEntity>();
+		UserMessageEntity userMessage = null;
 		String rowFilter = TableQuery.generateFilterCondition(
-				AzureChatConstants.ROW_KEY, QueryComparisons.EQUAL,
-				messageId);
+				AzureChatConstants.ROW_KEY, QueryComparisons.EQUAL, messageId);
 		TableQuery<UserMessageEntity> friendListQuery = TableQuery.from(
 				UserMessageEntity.class).where(rowFilter);
 		for (UserMessageEntity entity : AzureChatStorageUtils
-				.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE).execute(
-						friendListQuery)) {
+				.getTableReference(AzureChatConstants.TABLE_NAME_USER_MESSAGE)
+				.execute(friendListQuery)) {
 			userMessageEntities.add(entity);
 		}
-		LOGGER.info("[UserMessageEntityDAOImpl][getUserMessageEntities]         end ");
-		if(userMessageEntities!= null && userMessageEntities.size()>0){
-			return userMessageEntities.get(0);
-		}else{
-			return null;
+		if (userMessageEntities != null && userMessageEntities.size() > 0) {
+			LOGGER.debug("User Message Entities Size : "
+					+ userMessageEntities.size());
+			userMessage = userMessageEntities.get(0);
 		}
+		LOGGER.info("[UserMessageEntityDAOImpl][getAllUserMessageIds] end ");
+		return userMessage;
+
 	}
 }

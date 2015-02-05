@@ -46,7 +46,6 @@ import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.Friend
 public class FriendRequestDAOImpl implements FriendRequestDAO {
 	private static final Logger LOGGER = LogManager
 			.getLogger(FriendRequestDAOImpl.class);
-	private static final String FRIEND_REQ_TBL_NAME = "FriendRequest";
 
 	@Autowired
 	private UserDAO userDao;
@@ -58,7 +57,7 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 	public void addFriendRequest(String userID, String friendID,
 			String friendName, String friendProfileBlobURL, String requestStatus)
 			throws Exception {
-		LOGGER.info("[FriendRequestDAOImpl][addFriendRequest]start ");
+		LOGGER.info("[FriendRequestDAOImpl][addFriendRequest] start ");
 		LOGGER.debug("User Details    " + userID + " Request Status : "
 				+ requestStatus);
 		if (requestStatus
@@ -68,8 +67,10 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 			friendRequestSent.setFriendName(friendName);
 			friendRequestSent.setFriendProfileBlobURL(friendProfileBlobURL);
 			friendRequestSent.setStatus(AzureChatConstants.FRIEND_REQUEST_SENT);
-			AzureChatStorageUtils.insertOrReplaceEntity(FRIEND_REQ_TBL_NAME,
-					friendRequestSent);
+			AzureChatStorageUtils
+					.insertOrReplaceEntity(
+							AzureChatConstants.TABLE_NAME_FRIEND_REQ,
+							friendRequestSent);
 
 			UserEntity entity = userDao.getUserDetailsByUserId(Integer
 					.parseInt(userID));
@@ -82,7 +83,8 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 					.getPhotoBlobUrl());
 			friendRequestPending
 					.setStatus(AzureChatConstants.FRIEND_REQUEST_PENDING_APPROVAL);
-			AzureChatStorageUtils.insertOrReplaceEntity(FRIEND_REQ_TBL_NAME,
+			AzureChatStorageUtils.insertOrReplaceEntity(
+					AzureChatConstants.TABLE_NAME_FRIEND_REQ,
 					friendRequestPending);
 		} else {
 			FriendRequestEntity friendRequestSent = new FriendRequestEntity(
@@ -90,15 +92,17 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 			friendRequestSent.setFriendName(friendName);
 			friendRequestSent.setFriendProfileBlobURL(friendProfileBlobURL);
 			friendRequestSent.setStatus(requestStatus);
-			AzureChatStorageUtils.insertOrReplaceEntity(FRIEND_REQ_TBL_NAME,
-					friendRequestSent);
+			AzureChatStorageUtils
+					.insertOrReplaceEntity(
+							AzureChatConstants.TABLE_NAME_FRIEND_REQ,
+							friendRequestSent);
 		}
 		LOGGER.info("[FriendRequestDAOImpl][addFriendRequest] end ");
 
 	}
 
 	/**
-	 * This method call the azure storage and azure sql to fetch the registered
+	 * This method call the azure storage and azure SQL to fetch the registered
 	 * users.
 	 * 
 	 * @return friendRequestEntities
@@ -119,7 +123,7 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 		TableQuery<FriendRequestEntity> friendListQuery = TableQuery.from(
 				FriendRequestEntity.class).where(combinedFilter);
 		for (FriendRequestEntity entity : AzureChatStorageUtils
-				.getTableReference(FRIEND_REQ_TBL_NAME)
+				.getTableReference(AzureChatConstants.TABLE_NAME_FRIEND_REQ)
 				.execute(friendListQuery)) {
 			friendRequestEntities.add(entity);
 		}
@@ -150,8 +154,8 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 		TableQuery<FriendRequestEntity> pendingFriendRequestsQuery = TableQuery
 				.from(FriendRequestEntity.class).where(combinedFilter);
 		for (FriendRequestEntity entity : AzureChatStorageUtils
-				.getTableReference(FRIEND_REQ_TBL_NAME).execute(
-						pendingFriendRequestsQuery)) {
+				.getTableReference(AzureChatConstants.TABLE_NAME_FRIEND_REQ)
+				.execute(pendingFriendRequestsQuery)) {
 			friendRequestEntities.add(entity);
 		}
 		LOGGER.info("[FriendRequestDAOImpl][getPendingFriendRequestsForUser] end ");
@@ -172,16 +176,14 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 		TableOperation tableOperation = TableOperation.retrieve(userID,
 				friendID, FriendRequestEntity.class);
 		FriendRequestEntity friendRequestEntity = AzureChatStorageUtils
-				.getTableReference(FRIEND_REQ_TBL_NAME).execute(tableOperation)
-				.getResultAsType();
+				.getTableReference(AzureChatConstants.TABLE_NAME_FRIEND_REQ)
+				.execute(tableOperation).getResultAsType();
 		if (friendRequestEntity != null
 				&& AzureChatConstants.FRIEND_REQUEST_APPROVED
 						.equals(friendRequestEntity.getStatus())) {
-			LOGGER.info("Both are friend..");
-			LOGGER.info("[FriendRequestDAOImpl][acceptFriendRequest] end ");
+			LOGGER.debug("[FriendRequestDAOImpl][acceptFriendRequest] end ");
 			return true;
 		}
-		LOGGER.debug("Both are not friend..");
 		LOGGER.info("[FriendRequestDAOImpl][acceptFriendRequest] end ");
 		return false;
 	}
@@ -259,8 +261,8 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 			TableQuery<FriendRequestEntity> friendListQuery = TableQuery.from(
 					FriendRequestEntity.class).where(combinedFilter);
 			for (FriendRequestEntity entity : AzureChatStorageUtils
-					.getTableReference(FRIEND_REQ_TBL_NAME).execute(
-							friendListQuery)) {
+					.getTableReference(AzureChatConstants.TABLE_NAME_FRIEND_REQ)
+					.execute(friendListQuery)) {
 				friendRequestEntities.add(entity);
 			}
 			if (!AzureChatUtils.isEmpty(friendRequestEntities)) {
@@ -323,7 +325,8 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 				.from(FriendRequestEntity.class).where(combinedFilter);
 		for (@SuppressWarnings("unused")
 		FriendRequestEntity entity : AzureChatStorageUtils.getTableReference(
-				FRIEND_REQ_TBL_NAME).execute(pendingFriendRequestsQuery)) {
+				AzureChatConstants.TABLE_NAME_FRIEND_REQ).execute(
+				pendingFriendRequestsQuery)) {
 			count++;
 		}
 		LOGGER.info("[FriendRequestDAOImpl][getPendingFriendRequestsCountForUser] end ");
@@ -331,7 +334,7 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 	}
 
 	/**
-	 * This method populates the friend entity with user entities photo url and
+	 * This method populates the friend entity with user entities photo URL and
 	 * name is the first name + Last name.
 	 * 
 	 * @param firend
@@ -339,7 +342,8 @@ public class FriendRequestDAOImpl implements FriendRequestDAO {
 	 */
 	private void populateFriendPhotoUrl(FriendRequestEntity friend,
 			UserEntity user) {
-		friend.setFriendName(user.getFirstName() + " " + user.getLastName());
+		friend.setFriendName(user.getFirstName()
+				+ AzureChatConstants.CONSTANT_SPACE + user.getLastName());
 		friend.setFriendProfileBlobURL(user.getPhotoBlobUrl());
 	}
 

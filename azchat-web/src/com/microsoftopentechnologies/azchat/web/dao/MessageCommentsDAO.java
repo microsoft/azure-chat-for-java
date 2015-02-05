@@ -20,14 +20,14 @@ import java.util.List;
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.MessageComments;
 
 /**
- * This interface used to do add, get message comments.
+ * This interface defines contract methods for user message comment DAO object.
  * 
  * @author Rupesh_Shirude
  *
  */
 public interface MessageCommentsDAO {
 	/**
-	 * This method is used to add comments over message.
+	 * Add comments for input message.
 	 * 
 	 * @param messageComments
 	 * @return
@@ -37,7 +37,7 @@ public interface MessageCommentsDAO {
 			throws Exception;
 
 	/**
-	 * This method is used to get comments over message by message id.
+	 * Get comments over message by message id.
 	 * 
 	 * @param messageId
 	 * @return
@@ -68,7 +68,7 @@ public interface MessageCommentsDAO {
 	public Integer getMessageCommentsCount(String messageId) throws Exception;
 
 	/**
-	 * This method is used to get count of comments over message by message id &
+	 * Get count of comments for the corresponding message by message id &
 	 * friend id.
 	 * 
 	 * @param messageId
@@ -79,7 +79,7 @@ public interface MessageCommentsDAO {
 			throws Exception;
 
 	/**
-	 * This method is used to delete all comments over message by message id.
+	 * Delete all comments for input message id.
 	 * 
 	 * @param messageId
 	 * @return

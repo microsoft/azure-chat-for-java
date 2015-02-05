@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -59,7 +61,6 @@ public class AzureChatUtils {
 	private static final Logger LOGGER = LogManager
 			.getLogger(AzureChatUtils.class);
 	private static final Properties PROPERTIES = new Properties();
-	private static Connection connection = null;
 	private static final String TOKEN_SEPARATOR = ";";
 
 	/**
@@ -240,6 +241,7 @@ public class AzureChatUtils {
 	 */
 	public static Connection getConnection(String connectionString)
 			throws ClassNotFoundException, SQLException, AzureChatException {
+		Connection connection = null;
 		Class.forName(AzureChatUtils.getProperty(AzureChatConstants.DRIVER));
 		connection = DriverManager.getConnection(connectionString);
 		return connection;
@@ -419,6 +421,117 @@ public class AzureChatUtils {
 					.getProperty(AzureChatConstants.USER_PREF_PREP_KEY + i));
 		}
 		return list;
+	}
+
+	/**
+	 * This method releases this PrepareStatement,ResultSet and Connection
+	 * object's database and JDBC resources.
+	 * 
+	 * @param prepStmt
+	 * @param rs
+	 * @param con
+	 * @throws SQLException
+	 */
+	public static void closeDatabaseResources(PreparedStatement prepStmt,
+			ResultSet rs, Connection con) throws SQLException {
+		if (prepStmt != null) {
+			prepStmt.close();
+		}
+		if (rs != null) {
+			rs.close();
+		}
+		if (con != null) {
+			con.close();
+		}
+
+	}
+
+	/**
+	 * This method releases this Connection and PrepareStatement object's
+	 * database and JDBC resources.
+	 * 
+	 * @param prepStmt
+	 * @param con
+	 * @throws SQLException
+	 */
+	public static void closeDatabaseResources(PreparedStatement prepStmt,
+			Connection con) throws SQLException {
+		if (prepStmt != null) {
+			prepStmt.close();
+		}
+
+		if (con != null) {
+			con.close();
+		}
+
+	}
+
+	/**
+	 * This method releases this ResutlSet and PrepareStatement object's
+	 * database and JDBC resources.
+	 * 
+	 * @param prepStmt
+	 * @param rs
+	 * @throws SQLException
+	 */
+	public static void closeDatabaseResources(PreparedStatement prepStmt,
+			ResultSet rs) throws SQLException {
+		if (prepStmt != null) {
+			prepStmt.close();
+		}
+		if (rs != null) {
+			rs.close();
+		}
+
+	}
+
+	/**
+	 * This Method returns service end point URL from blob URL.
+	 * 
+	 * @param url
+	 * @return serviceUrl
+	 */
+	public static String getServiceEndpointUrl(String url) {
+		String serviceUrl = url.substring(
+				AzureChatConstants.CONSTANT_INT_ZERO,
+				url.indexOf(AzureChatConstants.LITERAL_BACKSLASH,
+						url.indexOf(AzureChatConstants.LITERAL_DOT))
+						+ AzureChatConstants.CONSTANT_INT_ONE);
+		return serviceUrl;
+	}
+
+	/**
+	 * This method will return container name for given URL.
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public static String getContainerName(String url) {
+		int startIndex = url.indexOf(AzureChatConstants.LITERAL_BACKSLASH,
+				url.indexOf(AzureChatConstants.LITERAL_DOT))
+				+ AzureChatConstants.CONSTANT_INT_ONE;
+		int endIndex = url.indexOf(AzureChatConstants.LITERAL_BACKSLASH,
+				startIndex + AzureChatConstants.CONSTANT_INT_ONE);
+		String containerName = url.substring(startIndex, endIndex);
+		return containerName;
+	}
+
+	/**
+	 * This method will find filename using URL and container name.
+	 * 
+	 * @param url
+	 * @param containerName
+	 * @return
+	 * @author prajakta_pednekar
+	 */
+	public static String getFileName(String url, String containerName) {
+		int startIndex = url.indexOf(containerName
+				+ AzureChatConstants.CONSTANT_BACK_SLASH)
+				+ containerName.length() + AzureChatConstants.CONSTANT_INT_ONE;
+		int endIndex = url.indexOf(AzureChatConstants.LITERAL_QUESTION_MARK,
+				startIndex + AzureChatConstants.CONSTANT_INT_ONE);
+		String fileName = url.substring(startIndex, endIndex);
+		return fileName;
 	}
 
 }

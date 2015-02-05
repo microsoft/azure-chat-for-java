@@ -811,7 +811,7 @@ function refreshUserContents(userBean){
 		  $("#div_imgContent_"+userMessageBean.msgID).append('<img class="img_imageContent imageContent" src="'+userMessageBean.mediaUrl+'"/>');
 	  }else if(userMessageBean.mediaType=='video'){
 		  $("#div_vedContent_"+userMessageBean.msgID).removeClass('hide');
-		  $("#div_vedContent_"+userMessageBean.msgID).append('<video class="videoContent" id="video_'+userMessageBean.msgID+'" width="640" height="360" controls preload="none" poster="../images/posterCover.jpg" onclick="startVideo(this);"><source src="'+userMessageBean.mediaUrl+'"/>" type="'+userMessageBean.mediaType+'"/>"></source></video>');
+		  $("#div_vedContent_"+userMessageBean.msgID).append('<video class="videoContent" id="video_'+userMessageBean.msgID+'" width="640" height="360" controls preload="none" poster="/azchat-web/images/posterCover.jpg" onclick="startVideo(this);"><source src="'+userMessageBean.mediaUrl+'"/>" type="'+userMessageBean.mediaType+'"/>"></source></video>');
 	  }
 	  //Render Like Unlike status
 	  if(userMessageBean.isLike == true){

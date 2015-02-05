@@ -15,7 +15,6 @@ limitations under the License.
  */
 package com.microsoftopentechnologies.azchat.web.dao;
 
-import java.sql.Connection;
 import java.util.List;
 
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserPreferenceEntity;
@@ -28,7 +27,7 @@ import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserPrefer
  */
 public interface UserPreferenceDAO {
 	/**
-	 * Used to add User preference entity object in azure sql.
+	 * Add User preference entity object in azure SQL user preference table.
 	 * 
 	 * @param userPreferenceEntity
 	 * @return
@@ -38,7 +37,8 @@ public interface UserPreferenceDAO {
 			UserPreferenceEntity userPreferenceEntity) throws Exception;
 
 	/**
-	 * Used to get user preference entity object by user id.
+	 * Get user preference entity object by user id from azure SQL user
+	 * preference table.
 	 * 
 	 * @param userId
 	 * @return
@@ -48,7 +48,8 @@ public interface UserPreferenceDAO {
 			throws Exception;
 
 	/**
-	 * Used to get user preference entity object by userid & prefMetadataId.
+	 * Get user preference entity object by userId & prefMetadataId from azure
+	 * SQL user preference table.
 	 * 
 	 * @param userId
 	 * @param prefMetadataId
@@ -59,9 +60,9 @@ public interface UserPreferenceDAO {
 			Integer prefMetadataId) throws Exception;
 
 	/**
-	 * Used to create User Preference table.
+	 * Create User Preference table in azure SQL database.
 	 * 
 	 * @throws Exception
 	 */
-	public void createUserPreferenceTable(Connection connection) throws Exception;
+	public void createUserPreferenceTable() throws Exception;
 }

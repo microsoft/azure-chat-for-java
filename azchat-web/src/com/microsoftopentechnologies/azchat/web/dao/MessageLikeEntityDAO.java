@@ -18,65 +18,78 @@ package com.microsoftopentechnologies.azchat.web.dao;
 import java.util.Map;
 
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.MessageLikesEntity;
+
 /**
- * This interface used to add, get likes over message.
+ * This interface defines contract methods for the user message like DAO object.
  * 
  *
  */
 public interface MessageLikeEntityDAO {
 	/**
-	 * this method is used to like the message.
+	 * Add like to the message.
 	 * 
 	 * @param messageLikesEntity
 	 * @return
 	 * @throws Exception
 	 */
-	public MessageLikesEntity addMessageLikesEntity(MessageLikesEntity messageLikesEntity)throws Exception;
+	public MessageLikesEntity addMessageLikesEntity(
+			MessageLikesEntity messageLikesEntity) throws Exception;
+
 	/**
-	 * this method is used to get the likes by message id.
+	 * Get message likes entity by message id.
 	 * 
 	 * @param messageId
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String,MessageLikesEntity> getMessageLikeEntity(String messageId) throws Exception;
+	public Map<String, MessageLikesEntity> getMessageLikeEntity(String messageId)
+			throws Exception;
+
 	/**
-	 * This method is used to get this like by message id & friend id. 
+	 * Get message like entity by message id & friend id.
 	 * 
 	 * @param messageId
 	 * @param friendId
 	 * @return
 	 * @throws Exception
 	 */
-	public MessageLikesEntity getMessageLikeEntity(String messageId, String friendId) throws Exception;
+	public MessageLikesEntity getMessageLikeEntity(String messageId,
+			String friendId) throws Exception;
+
 	/**
-	 * this method is used to get the likes count by message id.
+	 * Get message likes count by message id.
 	 * 
 	 * @param messageId
 	 * @return
 	 * @throws Exception
 	 */
 	public Integer getMessageLikeEntityCount(String messageId) throws Exception;
+
 	/**
-	 * This method is used to get like count by message id & friend id. 
+	 * Get message like count by message id & friend id.
 	 * 
 	 * @param messageId
 	 * @param friendId
 	 * @return
 	 * @throws Exception
 	 */
-	public Integer getMessageLikeEntityCount(String messageId, String friendId) throws Exception;
+	public Integer getMessageLikeEntityCount(String messageId, String friendId)
+			throws Exception;
+
 	/**
-	 * This method is used to delete like by message id & friend id. 
+	 * Delete message like entities by message id & friend id.
 	 * 
 	 * @param messageId
 	 * @param friendId
 	 * @return
 	 * @throws Exception
 	 */
-	public void deleteMessageLikeEntity(MessageLikesEntity messageLikesEntity) throws Exception;
+	public void deleteMessageLikeEntity(MessageLikesEntity messageLikesEntity)
+			throws Exception;
+
 	/**
-	 * This method is used to delete like by message id.
+	 * Delete message like entities by message id.
+	 * 
 	 * @param messageId
 	 * @throws Exception
 	 */

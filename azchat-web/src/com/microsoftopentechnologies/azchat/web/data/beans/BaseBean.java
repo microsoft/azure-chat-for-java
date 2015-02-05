@@ -20,7 +20,8 @@ import java.io.Serializable;
 import com.microsoftopentechnologies.azchat.web.common.utils.ServiceActionEnum;
 
 /**
- * BaseBean for azchat.Holda the data common across the application.
+ * BaseBean for all AzChat data beans.This bean holds the data common across the
+ * application.
  * 
  * @author Dnyaneshwar_Pawar
  *

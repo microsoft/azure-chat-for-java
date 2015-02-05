@@ -52,12 +52,11 @@ import com.microsoftopentechnologies.azchat.web.dao.UserMessageEntityDAOImpl;
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.UserMessageEntity;
 import com.microsoftopentechnologies.azchat.web.data.beans.MediaServiceOutputBean;
 import com.microsoftopentechnologies.azchat.web.mediaservice.AzureChatMediaServices;
-import com.microsoftopentechnologies.azchat.web.mediaservice.AzureChatMediaUtils;
 
 /**
  * This class handles azure service bus related functionality.This class
  * provides the operations to read the video messages from the temporary storage
- * and process using azchat media service.The raw video messages deleted from
+ * and process using AzChat media service.The raw video messages deleted from
  * the temporary storage post processing from the media services and stored in
  * to the azure storage.
  *
@@ -187,7 +186,7 @@ public class AzureChatServiceBus {
 								Integer.parseInt(expiryTime));
 
 						// Remove temporary stored non encoded video from blob
-						String filename = AzureChatMediaUtils.getFileName(url,
+						String filename = AzureChatUtils.getFileName(url,
 								AzureChatConstants.TEMP_UPLOAD_CONTAINER);
 						deleteblob(filename);
 

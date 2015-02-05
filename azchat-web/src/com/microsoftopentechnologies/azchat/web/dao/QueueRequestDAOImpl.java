@@ -28,7 +28,8 @@ import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatStorageUtils;
 
 /**
- * This class used to do azure queue operations for messages.
+ * Implementation class for the QueueRequestDAO.This class provides operations
+ * to interact with the azure queues.
  * 
  * @author Rupesh_Shirude
  */
@@ -38,7 +39,7 @@ public class QueueRequestDAOImpl implements QueueRequestDAO {
 			.getLogger(QueueRequestDAOImpl.class);
 
 	/**
-	 * This method is used to post message to queue.
+	 * This method is used to post the input message to azure queue.
 	 * 
 	 * @param message
 	 * @param expiryTimeInSeconds
@@ -56,7 +57,7 @@ public class QueueRequestDAOImpl implements QueueRequestDAO {
 	}
 
 	/**
-	 * This method is used to get the messages from queue.
+	 * This method is used to get the messages from azure queue.
 	 * 
 	 * @return
 	 * @throws Exception
@@ -72,7 +73,7 @@ public class QueueRequestDAOImpl implements QueueRequestDAO {
 	}
 
 	/**
-	 * This method is used to delete the messages from queue.
+	 * This method is used to delete the input messages from azure queue.
 	 * 
 	 * @param queueMessage
 	 * @throws Exception
@@ -88,7 +89,8 @@ public class QueueRequestDAOImpl implements QueueRequestDAO {
 	}
 
 	/**
-	 * This method is used to get all messages from queue.
+	 * This method is used to get all messages from azure queue for the input
+	 * queue name.
 	 * 
 	 * @param queueMessage
 	 * @throws Exception
@@ -101,7 +103,6 @@ public class QueueRequestDAOImpl implements QueueRequestDAO {
 		Set<String> setStrings = new HashSet<String>();
 		CloudQueue queue = AzureChatStorageUtils.getQueueReference(queueName);
 		queue.downloadAttributes();
-		// int messageCount = (int) queue.getApproximateMessageCount();
 		int messageCount = 32;
 		for (CloudQueueMessage message : queue.retrieveMessages(messageCount,
 				1, null, null)) {
@@ -112,7 +113,8 @@ public class QueueRequestDAOImpl implements QueueRequestDAO {
 	}
 
 	/**
-	 * This method is used to post message to queue.
+	 * This method is used to post input message to azure queue with input
+	 * expire time.
 	 * 
 	 * @param message
 	 * @param expiryTimeInSeconds

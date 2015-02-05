@@ -14,22 +14,24 @@
  limitations under the License.
  */
 package com.microsoftopentechnologies.azchat.web.data.beans;
+
 /**
- * This class used as media service output bean.
- * It will return streaming URL and assetId.
- * AssetId will be used to delete video asset from media service account after expiry time.
+ * This class used as media service output bean. It will return streaming URL
+ * and assetId. AssetId will be used to delete video asset from media service
+ * account after expire time.
+ * 
  * @author prajakta_pednekar
  *
  */
 public class MediaServiceOutputBean {
 	private String streamingUrl;
 	private String assetID;
-	
+
 	public MediaServiceOutputBean(String streamingUrl, String assetToDeleteId) {
 		this.streamingUrl = streamingUrl;
 		this.assetID = assetToDeleteId;
 	}
-	
+
 	public MediaServiceOutputBean() {
 	}
 
@@ -41,7 +43,8 @@ public class MediaServiceOutputBean {
 	}
 
 	/**
-	 * @param streamingUrl the streamingUrl to set
+	 * @param streamingUrl
+	 *            the streamingUrl to set
 	 */
 	public void setStreamingUrl(String streamingUrl) {
 		this.streamingUrl = streamingUrl;
@@ -55,7 +58,8 @@ public class MediaServiceOutputBean {
 	}
 
 	/**
-	 * @param assetToDeleteId the assetToDeleteId to set
+	 * @param assetToDeleteId
+	 *            the assetToDeleteId to set
 	 */
 	public void setAssetID(String assetToDeleteId) {
 		this.assetID = assetToDeleteId;

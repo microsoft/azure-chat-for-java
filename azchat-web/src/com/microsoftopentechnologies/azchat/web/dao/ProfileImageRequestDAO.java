@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface ProfileImageRequestDAO {
 	/**
-	 * Used to save profile image by given file object with file name over azure
+	 * Save/Add profile image by given file object and file name to azure
 	 * storage.
 	 * 
 	 * @param file
@@ -37,7 +37,7 @@ public interface ProfileImageRequestDAO {
 			throws Exception;
 
 	/**
-	 * Used to get the signature to access the private containers.
+	 * Get signature to access the private containers.
 	 * 
 	 * @param containerName
 	 * @return
@@ -46,7 +46,7 @@ public interface ProfileImageRequestDAO {
 	public String getSignatureForPrivateAccess() throws Exception;
 
 	/**
-	 * Used to save profile image by given file object with file name over azure
+	 * Save/Add profile image by given file object and file name to azure
 	 * storage.
 	 * 
 	 * @param file
@@ -58,7 +58,7 @@ public interface ProfileImageRequestDAO {
 			throws Exception;
 
 	/**
-	 * Used to save profile image by given file object with file name over azure
+	 * Save/Add profile image by given file object and file name to the azure
 	 * storage.
 	 * 
 	 * @param file
@@ -70,7 +70,7 @@ public interface ProfileImageRequestDAO {
 			throws Exception;
 
 	/**
-	 * Used to save profile image by given file object with file name over azure
+	 * Save/Ad profile image by given file object and file name to the azure
 	 * storage.
 	 * 
 	 * @param file

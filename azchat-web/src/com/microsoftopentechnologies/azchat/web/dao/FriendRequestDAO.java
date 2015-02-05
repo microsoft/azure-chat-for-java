@@ -17,10 +17,12 @@ limitations under the License.
 package com.microsoftopentechnologies.azchat.web.dao;
 
 import java.util.List;
+
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.FriendRequestEntity;
 
 /**
- * Contract for the Friend Request DAO object.
+ * This Interface defines contract methods for the Friend Request Management DAO
+ * object.
  * 
  * @author Rupesh_Shirude
  *
@@ -28,7 +30,7 @@ import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.Friend
 public interface FriendRequestDAO {
 
 	/**
-	 * Adds friend request entity in Azure table
+	 * Adds friend request entity in Azure table.
 	 * 
 	 * @param userID
 	 * @param friendID
@@ -62,8 +64,7 @@ public interface FriendRequestDAO {
 			String userID) throws Exception;
 
 	/**
-	 * Used to get friend status for logged in user with another user by his
-	 * friend id.
+	 * Get friend status for logged in user with another user by his friend id.
 	 * 
 	 * @param userID
 	 * @param friendId
@@ -74,7 +75,7 @@ public interface FriendRequestDAO {
 			String friendId) throws Exception;
 
 	/**
-	 * Used to check whether friend request is approved or not.
+	 * Check whether friend request is approved or not.
 	 * 
 	 * @param userID
 	 * @param friendID
@@ -85,7 +86,7 @@ public interface FriendRequestDAO {
 			throws Exception;
 
 	/**
-	 * Used to accept friend request by logged in user.
+	 * Accept friend request by logged in user.
 	 * 
 	 * @param userID
 	 * @param friendID
@@ -97,7 +98,7 @@ public interface FriendRequestDAO {
 			String userName, String userProfileBlobURL) throws Exception;
 
 	/**
-	 * Used to reject friend request by logged in user.
+	 * Reject friend request by logged in user.
 	 * 
 	 * @param userID
 	 * @param friendID
@@ -109,8 +110,7 @@ public interface FriendRequestDAO {
 			String userName, String userProfileBlobURL) throws Exception;
 
 	/**
-	 * Used to get pending friend request count for logged is user by his user
-	 * id.
+	 * Get pending friend request count for logged is user by his user id.
 	 * 
 	 * @param userID
 	 * @return

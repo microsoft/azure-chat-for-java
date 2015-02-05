@@ -15,7 +15,6 @@
  */
 package com.microsoftopentechnologies.azchat.web.services;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,7 +93,6 @@ public class FriendRequestService extends BaseServiceImpl {
 	@PostConstruct
 	public void init() {
 		LOGGER.info("[FriendRequestService][init] start");
-		LOGGER.debug("Creating Friend Request Table.");
 		String excpMsg = null;
 		try {
 			// CREATE AZURE TABLES
@@ -121,13 +119,9 @@ public class FriendRequestService extends BaseServiceImpl {
 			// CREATE AZURE SQL TABLES
 			excpMsg = AzureChatUtils
 					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_USER_SQL_TABLES);
-			String connectionString = AzureChatUtils.buildConnectionString();
-			Connection connection = AzureChatUtils
-					.getConnection(connectionString);
-			userDAO.createUserTable(connection);
-			preferenceMetadataDAO.createPreferenceMatedateTable(connection);
-			userPreferenceDAO.createUserPreferenceTable(connection);
-			connection.close();
+			userDAO.createUserTable();
+			preferenceMetadataDAO.createPreferenceMatedateTable();
+			userPreferenceDAO.createUserPreferenceTable();
 		} catch (Exception e) {
 
 			LOGGER.error("Exception occurred while creating SQL tables for user profile management. Exception Message :"

@@ -60,7 +60,6 @@ import com.microsoft.windowsazure.services.media.models.TaskInfo;
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatException;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
-import com.microsoftopentechnologies.azchat.web.dao.FriendRequestDAOImpl;
 import com.microsoftopentechnologies.azchat.web.data.beans.MediaServiceOutputBean;
 
 /**
@@ -70,12 +69,12 @@ import com.microsoftopentechnologies.azchat.web.data.beans.MediaServiceOutputBea
  *
  */
 public class AzureChatMediaServices {
-	static MediaContract mediaService;
-	static AccessPolicyInfo uploadAccessPolicy;
-	static MediaProcessorInfo latestWameMediaProcessor;
+	private static MediaContract mediaService;
+	private static AccessPolicyInfo uploadAccessPolicy;
+	private static MediaProcessorInfo latestWameMediaProcessor;
 
 	private static final Logger LOGGER = LogManager
-			.getLogger(FriendRequestDAOImpl.class);
+			.getLogger(AzureChatMediaServices.class);
 
 	/**
 	 * This method is handling media service operation for given given URL
@@ -92,10 +91,11 @@ public class AzureChatMediaServices {
 	 * @throws AzureChatException
 	 * @author prajakta_pednekar
 	 */
-	public static MediaServiceOutputBean performMediaServicesOperations(String videoBlobURL,
-			double activeMinutes) throws URISyntaxException, ServiceException,
-			FileNotFoundException, NoSuchAlgorithmException,
-			InterruptedException, StorageException, AzureChatException {
+	public static MediaServiceOutputBean performMediaServicesOperations(
+			String videoBlobURL, double activeMinutes)
+			throws URISyntaxException, ServiceException, FileNotFoundException,
+			NoSuchAlgorithmException, InterruptedException, StorageException,
+			AzureChatException {
 		AzureChatMediaServices object = getInstance();
 		MediaServiceOutputBean output = null;
 		if (object != null) {
@@ -119,7 +119,8 @@ public class AzureChatMediaServices {
 			if (downloadedFile.exists()) {
 				downloadedFile.delete();
 			}
-			output = new MediaServiceOutputBean(streamingUrl, encodedAsset.getId());
+			output = new MediaServiceOutputBean(streamingUrl,
+					encodedAsset.getId());
 			LOGGER.info("[AzureChatMediaServices][performMediaServicesOperations] Streaming URL : "
 					+ streamingUrl);
 		} else {
@@ -172,7 +173,7 @@ public class AzureChatMediaServices {
 	private File downloadVideoBlob(String videoBlobURL, String videoFileName)
 			throws URISyntaxException, StorageException, FileNotFoundException {
 		URI endpointUri = new URI(
-				AzureChatMediaUtils.getServiceEndpointUrl(videoBlobURL));
+				AzureChatUtils.getServiceEndpointUrl(videoBlobURL));
 		CloudBlobClient blobClient = new CloudBlobClient(endpointUri);
 		String tempLocForVideoDownload = String.format("%s%s",
 				System.getProperty("java.io.tmpdir"), "%videos%");
@@ -216,9 +217,8 @@ public class AzureChatMediaServices {
 	 * @author prajakta_pednekar
 	 */
 	private String getFileNameFromURL(String videoBlobURL) {
-		String containerName = AzureChatMediaUtils
-				.getContainerName(videoBlobURL);
-		String videoFileName = AzureChatMediaUtils.getFileName(videoBlobURL,
+		String containerName = AzureChatUtils.getContainerName(videoBlobURL);
+		String videoFileName = AzureChatUtils.getFileName(videoBlobURL,
 				containerName);
 		return videoFileName;
 	}

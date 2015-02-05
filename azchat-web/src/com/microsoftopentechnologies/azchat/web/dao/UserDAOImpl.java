@@ -26,8 +26,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatException;
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatSystemException;
+import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatSQLConstants;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserEntity;
@@ -46,44 +46,19 @@ public class UserDAOImpl implements UserDAO {
 	private Connection connection = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
-	private String connectionString = null;
-	private String sqlString = null;
 
 	/**
-	 * This method adds the new row to the user table in the azure SQL.
+	 * This method executes adds new user query on the azure SQL user table.
 	 * 
 	 * @return userEntity
 	 */
 	public UserEntity saveNewUser(UserEntity user) throws Exception {
 		LOGGER.info("[UserDAOImpl][saveNewUser] start ");
-
 		int userId = 0;
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-
-			LOGGER.info("Exception while saveNewUser_loading sql driver class  : "
-					+ e.getMessage());
-
-			LOGGER.info("Exception while saveNewUser_loading sql driver class  : "
-					+ e.getMessage());
-
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-
-			LOGGER.info("Exception while saveNewUser_getting connection  : "
-					+ e.getMessage());
-
-			LOGGER.info("Exception while saveNewUser_getting connection  : "
-					+ e.getMessage());
-
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(AzureChatSQLConstants.SAVE_NEW_USER);
 			preparedStatement = connection.prepareStatement(sqlString,
 					Statement.RETURN_GENERATED_KEYS);
@@ -94,41 +69,24 @@ public class UserDAOImpl implements UserDAO {
 			if (resultSet.next()) {
 				userId = resultSet.getInt(1);
 			}
-		} catch (SQLException e) {
-
-			LOGGER.info("Exception while saveNewUser : " + e.getMessage());
-
-			LOGGER.info("Exception while saveNewUser : " + e.getMessage());
-
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while executing save user query on azure SQL table. Exception Message : "
+					+ e.getMessage());
 			throw new AzureChatSystemException(
-					"Exception executing azure sql for save new user : "
+					"Exception occurred while executing save user query on azure SQL table. Exception Message : "
 							+ e.getMessage());
 		} finally {
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-
-				LOGGER.info("Exception while saveNewUser_closing DB resources : "
-						+ e.getMessage());
-
-				LOGGER.info("Exception while saveNewUser_closing DB resources : "
-						+ e.getMessage());
-
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		user.setUserID(userId);
-
 		LOGGER.info("[UserDAOImpl][saveNewUser] end ");
 		return user;
 	}
 
 	/**
-	 * Used to get the user details from Azure SQL by user id
+	 * This method execute query on azure SQL user table to get the user details
+	 * by input user id.
 	 * 
 	 * @param userId
 	 * @return UserEntity
@@ -136,36 +94,12 @@ public class UserDAOImpl implements UserDAO {
 	 */
 	@Override
 	public UserEntity getUserDetailsByUserId(Integer userId) throws Exception {
-
 		LOGGER.info("[UserDAOImpl][getUserDetailsByUserId] start ");
-
 		UserEntity user = null;
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-
-			LOGGER.info("Exception while getUserDetailsByUserId_loading sql driver class  : "
-					+ e.getMessage());
-
-			LOGGER.info("Exception while getUserDetailsByUserId_loading sql driver class  : "
-					+ e.getMessage());
-
-			throw new AzureChatSystemException(
-					"Exception occurred loading azure sql driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-
-			LOGGER.info("Exception while getUserDetailsByUserId_getting connection  : "
-					+ e.getMessage());
-
-			LOGGER.info("Exception while getUserDetailsByUserId_getting connection  : "
-					+ e.getMessage());
-
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_USERID);
 			preparedStatement = connection.prepareStatement(sqlString);
 			preparedStatement.setInt(1, userId);
@@ -173,37 +107,23 @@ public class UserDAOImpl implements UserDAO {
 			if (resultSet.next()) {
 				user = generateUserObject(resultSet);
 			}
-		} catch (SQLException e) {
-
-			LOGGER.info("Exception while getUserDetailsByUserId : "
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while executing get user details query on azure SQL database. Exception Message : "
 					+ e.getMessage());
-			throw new AzureChatSystemException("Exception executing sql : "
-					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing get user details query on azure SQL database. Exception Message : "
+							+ e.getMessage());
 		} finally {
-
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-
-				LOGGER.info("Exception while getUserDetailsByUserId_closing DB resources : "
-						+ e.getMessage());
-
-				LOGGER.info("Exception while getUserDetailsByUserId_closing DB resources : "
-						+ e.getMessage());
-
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		LOGGER.info("[UserDAOImpl][getUserDetailsByUserId] end ");
 		return user;
 	}
 
 	/**
-	 * Used to get the user details from Azure SQL by name id
+	 * This method execute query on azure SQL user table to get the user details
+	 * by input name id.
 	 * 
 	 * @param nameId
 	 * @return List<UserEntity>
@@ -214,22 +134,10 @@ public class UserDAOImpl implements UserDAO {
 			throws Exception {
 		LOGGER.info("[UserDAOImpl][getUserDetailsByNameID] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while getUserDetailsByNameID_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while getUserDetailsByNameID_getting connection  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_NAMEID);
 			preparedStatement = connection.prepareStatement(sqlString);
 			preparedStatement.setString(1, nameId);
@@ -238,57 +146,38 @@ public class UserDAOImpl implements UserDAO {
 				userEntities.add(generateUserObject(resultSet));
 			}
 		} catch (SQLException e) {
-
-			throw new AzureChatSystemException("Exception executing sql : "
+			LOGGER.error("Exception occurred while executing get user details query on azure SQL database. Exception Message : "
 					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing get user details query on azure SQL database. Exception Message : "
+							+ e.getMessage());
 		} finally {
-
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.info("Exception while getUserDetailsByNameID_closing DB resources : "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		LOGGER.info("[UserDAOImpl][getUserDetailsByNameID] end ");
 		return userEntities;
 	}
 
 	/**
-	 * This method used to get the user details from Azure SQL by nameId and
-	 * identityProvider
+	 * This method executes query on azure SQL user table to get the user
+	 * details by nameId and identityProvider.
 	 * 
 	 * @param nameId
 	 * @param identityProvider
 	 * @return List<UserEntity>
 	 * @author rupesh_shirude
+	 * @throws ClassNotFoundException
 	 */
 	@Override
 	public List<UserEntity> getUserDetailsByNameIdAndIdentityProvider(
-			String nameId, String identityProvider) throws AzureChatException {
+			String nameId, String identityProvider) throws Exception {
 		LOGGER.info("[UserDAOImpl][getUserDetailsByNameIdAndIdentityProvider] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while getUserDetailsByNameIdAndIdentityProvider_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while getUserDetailsByNameIdAndIdentityProvider_getting connection  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(
 					AzureChatSQLConstants.GET_USER_BY_NAMEID_IDNTITY_PROVIDR);
 			preparedStatement = connection.prepareStatement(sqlString);
@@ -298,56 +187,36 @@ public class UserDAOImpl implements UserDAO {
 			while (resultSet.next()) {
 				userEntities.add(generateUserObject(resultSet));
 			}
-		} catch (SQLException e) {
-
-			throw new AzureChatSystemException("Exception executing sql : "
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while executing get user details query on azure SQL database. Exception Message : "
 					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing get user details query on azure SQL database. Exception Message : "
+							+ e.getMessage());
 		} finally {
-
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.info("Exception while getUserDetailsByNameIdAndIdentityProvider_closing DB resources : "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		LOGGER.info("[UserDAOImpl][getUserDetailsByNameIdAndIdentityProvider] end ");
 		return userEntities;
 	}
 
 	/**
-	 * This method is used to get the user details from Azure SQL by first name
+	 * This method executes query on azure SQL user table to get the user
+	 * details by first name.
 	 * 
 	 * @param firstName
-	 * @return List<UserEntity>
-	 * @author rupesh_shirude
+	 * @return userEntities
 	 */
 	@Override
 	public List<UserEntity> getUserDetailsByFirstName(String firstName)
 			throws Exception {
 		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstName] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while getUserDetailsByFirstName_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while getUserDetailsByFirstName_getting connection  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_FIRST_NAME);
 			preparedStatement = connection.prepareStatement(sqlString);
 			preparedStatement.setString(1, firstName + "%");
@@ -356,146 +225,100 @@ public class UserDAOImpl implements UserDAO {
 				userEntities.add(generateUserObject(resultSet));
 			}
 		} catch (SQLException e) {
-
-			throw new AzureChatSystemException("Exception executing sql : "
+			LOGGER.error("Exception occurred while executing get user details query on azure SQL database. Exception Message : "
 					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing get user details query on azure SQL database. Exception Message : "
+							+ e.getMessage());
 		} finally {
-
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.info("Exception while getUserDetailsByFirstName_closing DB resources : "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstName] end ");
 		return userEntities;
 	}
 
 	/**
-	 * Used to get the user details from Azure SQL by last name
+	 * This method executes query on azure SQL user table to get the user
+	 * details by last name.
 	 * 
 	 * @param lastName
-	 * @return List<UserEntity>
-	 * @author rupesh_shirude
+	 * @return userEntities
 	 */
 	@Override
 	public List<UserEntity> getUserDetailsByLastName(String lastName)
 			throws Exception {
 		LOGGER.info("[UserDAOImpl][getUserDetailsByLastName] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while getUserDetailsByLastName_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while getUserDetailsByLastName_getting connection  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_LAST_NAME);
 			preparedStatement = connection.prepareStatement(sqlString);
-			preparedStatement.setString(1, lastName + "%");
+			preparedStatement.setString(1, lastName
+					+ AzureChatConstants.CONSTANT_PERCENTAGE);
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				userEntities.add(generateUserObject(resultSet));
 			}
 		} catch (SQLException e) {
-
-			throw new AzureChatSystemException("Exception executing sql : "
+			LOGGER.error("Exception occurred while executing get user details query on azure SQL database. Exception Message : "
 					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing get user details query on azure SQL database. Exception Message : "
+							+ e.getMessage());
 		} finally {
-
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.info("Exception while getUserDetailsByLastName_closing DB resources : "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		LOGGER.info("[UserDAOImpl][getUserDetailsByLastName] end ");
 		return userEntities;
 	}
 
 	/**
-	 * This method is used to get the user details from Azure SQL by first name
-	 * or last name
+	 * This method executes query on azure SQL user table to get the user
+	 * details by first or last name
 	 * 
 	 * @param name
-	 * @return List<UserEntity>
-	 * @author rupesh_shirude
+	 * @return userEntities
 	 */
 	@Override
 	public List<UserEntity> getUserDetailsByFirstNameOrLastName(String name)
 			throws Exception {
 		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstNameOrLastName] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while getUserDetailsByFirstNameOrLastName_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while getUserDetailsByFirstNameOrLastName_getting connection  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(
 					AzureChatSQLConstants.GET_USER_BY_FIRST_LAST_NAME);
 			preparedStatement = connection.prepareStatement(sqlString);
-			preparedStatement.setString(1, name + "%");
-			preparedStatement.setString(2, name + "%");
+			preparedStatement.setString(1, name
+					+ AzureChatConstants.CONSTANT_PERCENTAGE);
+			preparedStatement.setString(2, name
+					+ AzureChatConstants.CONSTANT_PERCENTAGE);
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				userEntities.add(generateUserObject(resultSet));
 			}
-		} catch (SQLException e) {
-
-			throw new AzureChatSystemException("Exception executing sql : "
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while executing get user details query on azure SQL database. Exception Message : "
 					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing get user details query on azure SQL database. Exception Message : "
+							+ e.getMessage());
 		} finally {
-
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-				LOGGER.info("Exception while getUserDetailsByFirstNameOrLastName_closing DB resources : "
-						+ e.getMessage());
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
-		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstNameOrLastName]         end ");
+		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstNameOrLastName] end ");
 		return userEntities;
 	}
 
 	/**
-	 * THis method generates the prepare statement.
+	 * This method generates the prepare statement from userEntity object.
 	 * 
 	 * @param preparedStatement
 	 * @param user
@@ -525,7 +348,7 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	/**
-	 * This method populates userEntity from the result set.
+	 * This method populates userEntity from the result set object.
 	 * 
 	 * @param resultSet
 	 * @return
@@ -551,27 +374,16 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	/**
-	 * This method updates the user details row in the azure SQL table.
+	 * This method executes the update user details query in the azure SQL
+	 * database for the input user entity.
 	 */
 	@Override
 	public UserEntity updateNewUser(UserEntity user) throws Exception {
-		LOGGER.info("[UserDAOImpl][updateNewUser]         start ");
-		connectionString = AzureChatUtils.buildConnectionString();
+		LOGGER.info("[UserDAOImpl][updateNewUser] start ");
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while updateNewUser_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occured loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while updateNewUser_getting connection  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
-		}
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(AzureChatSQLConstants.UPDATE_NEW_USER);
 			preparedStatement = connection.prepareStatement(sqlString);
 			preparedStatement.setString(1, user.getFirstName());
@@ -582,29 +394,15 @@ public class UserDAOImpl implements UserDAO {
 			preparedStatement.setLong(6, user.getPhoneNumber());
 			preparedStatement.setString(7, user.getNameId());
 			preparedStatement.executeUpdate();
-		} catch (SQLException e) {
-
-			LOGGER.info("Exception while updateNewUser : " + e.getMessage());
-			throw new AzureChatSystemException("Exception executing sql : "
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while executing update user query on the azure SQL table. Exception Message : "
 					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing update user query on the azure SQL table. Exception Message : "
+							+ e.getMessage());
 		} finally {
-
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-
-				LOGGER.info("Exception while updateNewUser_closing DB resources : "
-						+ e.getMessage());
-
-				LOGGER.info("Exception while updateNewUser_closing DB resources : "
-						+ e.getMessage());
-
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		LOGGER.info("[UserDAOImpl][updateNewUser] end ");
 		return user;
@@ -612,30 +410,19 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	/**
-	 * This method fetch and return he user photo blob URL for input user id.
+	 * This method executes the get user photo blob URL query on the azure SQL
+	 * user table for input user id.
 	 * 
-	 * @return userId
+	 * @param userId
+	 * @return profileImageURL
 	 */
 	@Override
 	public String getUserPhotoBlobURL(Integer userId) throws Exception {
 		String profileImageURL = "";
-		connectionString = AzureChatUtils.buildConnectionString();
+		String sqlString = null;
 		try {
-			connection = AzureChatUtils.getConnection(connectionString);
-		} catch (ClassNotFoundException e) {
-			LOGGER.info("Exception while updateNewUser_loading sql driver class  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred loading driver class : "
-							+ e.getMessage());
-		} catch (SQLException e) {
-			LOGGER.info("Exception while updateNewUser_getting connection  : "
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred connecting with sql : " + e.getMessage());
-		}
-
-		try {
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			sqlString = new String(
 					AzureChatSQLConstants.GET_USER_PROFILE_URL_BY_USERID);
 			preparedStatement = connection.prepareStatement(sqlString);
@@ -644,66 +431,44 @@ public class UserDAOImpl implements UserDAO {
 			if (resultSet.next()) {
 				profileImageURL = resultSet.getString(1);
 			}
-		} catch (SQLException e) {
-
-			LOGGER.info("Exception while getUserDetailsByUserId : "
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while executing get user profile image URL on azure SQL user table. Exception MEssage : "
 					+ e.getMessage());
-			throw new AzureChatSystemException("Exception executing sql : "
-					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing get user profile image URL on azure SQL user table. Exception MEssage : "
+							+ e.getMessage());
 		} finally {
-
-			try {
-				resultSet.close();
-				preparedStatement.close();
-				connection.close();
-			} catch (SQLException e) {
-
-				LOGGER.info("Exception while getUserDetailsByUserId_closing DB resources : "
-						+ e.getMessage());
-
-				LOGGER.info("Exception while getUserDetailsByUserId_closing DB resources : "
-						+ e.getMessage());
-
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
+			AzureChatUtils.closeDatabaseResources(preparedStatement, resultSet,
+					connection);
 		}
 		return profileImageURL;
 	}
 
 	/**
-	 * This method creates the user table in azure SQL.
+	 * This method executes create user table query on the azure SQL database.
 	 */
 	@Override
-	public void createUserTable(Connection connection) throws Exception {
+	public void createUserTable() throws Exception {
+		String sqlString = null;
 		try {
 			sqlString = new String(AzureChatSQLConstants.CREATE_USER_TABLE);
+			connection = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
 			preparedStatement = connection.prepareStatement(sqlString);
 			preparedStatement.execute();
-			preparedStatement = connection.prepareStatement(AzureChatSQLConstants.CREATE_USER_TABLE_INDEX);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.CREATE_USER_TABLE_INDEX);
 			preparedStatement.execute();
 		} catch (SQLException e) {
-
-			LOGGER.info("Exception while createUserTable : " + e.getMessage());
-			throw new AzureChatSystemException("Exception executing sql : "
+			LOGGER.error("Exception occurred while executing create user table query on the azure SQL database. Exception Message : "
 					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while executing create user table query on the azure SQL database. Exception Message : "
+							+ e.getMessage());
 		} finally {
+			AzureChatUtils
+					.closeDatabaseResources(preparedStatement, connection);
 
-			try {
-				preparedStatement.close();
-			} catch (SQLException e) {
-
-				LOGGER.info("Exception while createUserTable_closing DB resources : "
-						+ e.getMessage());
-
-				LOGGER.info("Exception while createUserTable_closing DB resources : "
-						+ e.getMessage());
-
-				throw new AzureChatSystemException(
-						"Exception while closing resources : resultSet & prepareStmt : "
-								+ e.getMessage());
-			}
 		}
 	}
 }
