@@ -41,7 +41,7 @@ import com.microsoftopentechnologies.azchat.web.dao.QueueRequestDAOImpl;
 import com.microsoftopentechnologies.azchat.web.dao.UserMessageEntityDAO;
 import com.microsoftopentechnologies.azchat.web.dao.UserMessageEntityDAOImpl;
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.UserMessageEntity;
-import com.microsoftopentechnologies.azchat.web.mediaservice.AzureChatMediaServices;
+import com.microsoftopentechnologies.azchat.web.mediaservice.AzureChatMediaService;
 
 /**
  * This class runs as a thread to get the set of messages from user message
@@ -67,7 +67,7 @@ public class UserMessageExpiryHandler {
 	@Scheduled(fixedRate = 180000)
 	public void deleteExpiredMessages() {
 		LOGGER.info("[UserMessageExpiryHandler][deleteExpiredMessages]         start ");
-		LOGGER.info("THREAD UserMessageExpiryHandler STARTS AT :- "
+		LOGGER.info("THREAD UserMessageExpiryHandler start time : "
 				+ AzureChatUtils.getCurrentTimestamp());
 		Set<String> setOfMsgIdsInQue = null;
 		Set<String> setOfMsgIdsUserMsgTbl = null;
@@ -98,7 +98,7 @@ public class UserMessageExpiryHandler {
 				}
 			}
 		}
-		LOGGER.debug("THREAD UserMessageExpiryHandler STOPS AT :- "
+		LOGGER.debug("THREAD UserMessageExpiryHandler end time : "
 				+ AzureChatUtils.getCurrentTimestamp());
 		LOGGER.info("[UserMessageExpiryHandler][deleteExpiredMessages]         end ");
 	}
@@ -149,8 +149,8 @@ public class UserMessageExpiryHandler {
 		if (null != messageEntity.getMediaType()
 				&& messageEntity.getMediaType().contains(
 						AzureChatConstants.UI_MEDIA_TYPE_VIDEO)) {
-			AzureChatMediaServices.deleteAsset(messageEntity.getAssetID());
+			AzureChatMediaService.deleteAsset(messageEntity.getAssetID());
 		}
-		LOGGER.info("[UserMessageExpiryHandler][deleteMessage] end ");
+		LOGGER.info("[UserMessageExpiryHandler][deleteMessage] end");
 	}
 }

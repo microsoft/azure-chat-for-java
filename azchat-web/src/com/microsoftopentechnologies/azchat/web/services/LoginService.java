@@ -45,7 +45,7 @@ import com.microsoftopentechnologies.azchat.web.data.beans.UserBean;
 import com.microsoftopentechnologies.azchat.web.data.beans.UserPrefBean;
 
 /**
- * This service class provides the service method for user login process.
+ * This service class provides the service methods for user login process.
  * 
  * @author Dnyaneshwar_Pawar
  *
@@ -84,15 +84,16 @@ public class LoginService extends BaseServiceImpl {
 	@Override
 	public BaseBean executeService(BaseBean baseBean) throws AzureChatException {
 		LOGGER.info("[LoginService][executeService]          start");
+		BaseBean baseBeanObj = null;
 		switch (baseBean.getServiceAction()) {
 		case LOGIN:
-			baseBean = processUserLogin((UserBean) baseBean);
+			baseBeanObj = processUserLogin((UserBean) baseBean);
 			break;
 		default:
 			break;
 		}
 		LOGGER.info("[LoginService][executeService]          end");
-		return baseBean;
+		return baseBeanObj;
 	}
 
 	/**
@@ -106,6 +107,79 @@ public class LoginService extends BaseServiceImpl {
 			throws AzureChatException {
 		LOGGER.info("[LoginService][processLoginForm]          start");
 		List<UserEntity> userEntities = null;
+		populateSAMLTokenDetailsToUserBean(userBean);
+		try {
+			userEntities = userDao.getUserDetailsByNameIdAndIdentityProvider(
+					userBean.getNameID(), userBean.getIdProvider());
+			if (userEntities.size() > 0) {
+				UserEntity user = userEntities.get(0);
+				popuateUserDetailsToUserBean(user, userBean);
+			} else {
+				userBean.setNewUser(true);
+				userBean.setUsrPrefList(getUserPreferences());
+			}
+		} catch (AzureChatBusinessException e) {
+			LOGGER.error("Exception occurred while fetching user details from Azure Storage and SQL."
+					+ e.getMessage());
+			throw new AzureChatBusinessException(e.getMessage());
+		} catch (AzureChatSystemException e) {
+			LOGGER.error("Exception occurred while fetching user details from Azure Storage and SQL ."
+					+ e.getMessage());
+			throw new AzureChatSystemException(e.getMessage());
+		} catch (Exception e) {
+			LOGGER.error("Exception occurred while fetching user details from Azure SQL DB."
+					+ e.getMessage());
+			throw new AzureChatSystemException(
+					"Exception occurred while fetching user details from AZURE SQL DB."
+							+ e.getMessage());
+		}
+
+		LOGGER.info("[LoginService][processLoginForm]          end");
+		return userBean;
+	}
+
+	/**
+	 * This method populates the user details and user content share details to
+	 * the userBean.
+	 * 
+	 * @param user
+	 * @param userBean
+	 * @throws Exception
+	 */
+	private void popuateUserDetailsToUserBean(UserEntity user, UserBean userBean)
+			throws Exception {
+		LOGGER.debug("User " + user.getFirstName() + " " + user.getLastName()
+				+ " found with nameID : " + userBean.getNameID()
+				+ " and Identity Provider :" + userBean.getIdProvider());
+		userBean.setUserID(String.valueOf(user.getUserID()));
+		userBean.setNewUser(false);
+		// Set Necessary Properties in the Bean
+		userBean.setPendingFriendReq(friendRequestDAOImpl
+				.getPendingFriendRequestsCountForUser(userBean.getUserID()));
+		userBean.setFirstName(user.getFirstName());
+		userBean.setLastName(user.getLastName());
+		userBean.setEmail(user.getEmailAddress());
+		userBean.setCountryCD(String.valueOf(user.getPhoneCountryCode()));
+		userBean.setPhoneNo(String.valueOf(user.getPhoneNumber()));
+		userBean.setPhotoUrl(user.getPhotoBlobUrl()
+				+ AzureChatConstants.CONSTANT_QUESTION_MARK
+				+ AzureChatUtils
+						.getSASUrl(AzureChatConstants.PROFILE_IMAGE_CONTAINER));
+		// Fetch the content for this user
+		userBean = contentShareService.getUserContent(userBean);
+
+		LOGGER.debug("User Details : " + userBean.toString());
+
+	}
+
+	/**
+	 * This method populates the userBean from samlToken.
+	 * 
+	 * @param samplToken
+	 * @throws AzureChatSystemException
+	 */
+	private void populateSAMLTokenDetailsToUserBean(UserBean userBean)
+			throws AzureChatSystemException {
 		String samlToken = userBean.getSamplToken();
 		LOGGER.debug("saml token : " + samlToken);
 		XPath xPath = XPathFactory.newInstance().newXPath();
@@ -114,9 +188,7 @@ public class LoginService extends BaseServiceImpl {
 			String nameID = AzureChatUtils.getNameIDFromAssertion(xPath,
 					assertionDoc);
 			LOGGER.debug("	Name ID : " + nameID);
-
 			userBean.setNameID(nameID);
-
 			Map<String, String> claimMap = AzureChatUtils
 					.getUserAttributeDetails(xPath, assertionDoc);
 			if (claimMap != null && !claimMap.isEmpty()) {
@@ -148,53 +220,6 @@ public class LoginService extends BaseServiceImpl {
 							+ e.getMessage());
 		}
 
-		try {
-			userEntities = userDao.getUserDetailsByNameIdAndIdentityProvider(
-					userBean.getNameID(), userBean.getIdProvider());
-			if (userEntities.size() > 0) {
-				UserEntity user = userEntities.get(0);
-				userBean.setUserID(String.valueOf(user.getUserID()));
-				userBean.setNewUser(false);
-				// Set Necessary Properties in the Bean
-				userBean.setPendingFriendReq(friendRequestDAOImpl
-						.getPendingFriendRequestsCountForUser(userBean
-								.getUserID()));
-				userBean.setFirstName(user.getFirstName());
-				userBean.setLastName(user.getLastName());
-				userBean.setEmail(user.getEmailAddress());
-				userBean.setCountryCD(String.valueOf(user.getPhoneCountryCode()));
-				userBean.setPhoneNo(String.valueOf(user.getPhoneNumber()));
-				userBean.setPhotoUrl(user.getPhotoBlobUrl()
-						+ "?"
-						+ AzureChatUtils
-								.getSASUrl(AzureChatConstants.PROFILE_IMAGE_CONTAINER));
-				// Fetch the content for this user
-				userBean = contentShareService.getUserContent(userBean);
-
-				LOGGER.debug("User Details : " + userBean.toString());
-
-			} else {
-				userBean.setNewUser(true);
-				userBean.setUsrPrefList(getUserPreferences());
-			}
-		} catch (AzureChatBusinessException e) {
-			LOGGER.error("Exception occurred while fetching user details from Azure Storage and SQL."
-					+ e.getMessage());
-			throw new AzureChatBusinessException(e.getMessage());
-		} catch (AzureChatSystemException e) {
-			LOGGER.error("Exception occurred while fetching user details from Azure Storage and SQL ."
-					+ e.getMessage());
-			throw new AzureChatSystemException(e.getMessage());
-		} catch (Exception e) {
-			LOGGER.error("Exception occurred while fetching user details from Azure SQL DB."
-					+ e.getMessage());
-			throw new AzureChatSystemException(
-					"Exception occurred while fetching user details from AZURE SQL DB."
-							+ e.getMessage());
-		}
-
-		LOGGER.info("[LoginService][processLoginForm]          end");
-		return userBean;
 	}
 
 	/**
@@ -203,7 +228,7 @@ public class LoginService extends BaseServiceImpl {
 	 * @return
 	 * @throws AzureChatSystemException
 	 */
-	public List<UserPrefBean> getUserPreferences()
+	private List<UserPrefBean> getUserPreferences()
 			throws AzureChatSystemException {
 		LOGGER.info("[LoginSErvice][getUserPreferences] start");
 		List<UserPrefBean> userList = new ArrayList<UserPrefBean>();

@@ -68,6 +68,9 @@ public class RegistrationService extends BaseServiceImpl {
 
 	@Autowired
 	private UserPreferenceDAO userPreferenceDAO;
+	
+	@Autowired
+	private ContentShareService contentShareService;
 
 	/**
 	 * Execute Service implementation for the Registration service.The switch
@@ -77,19 +80,20 @@ public class RegistrationService extends BaseServiceImpl {
 	 */
 	@Override
 	public BaseBean executeService(BaseBean baseBean) throws AzureChatException {
-		LOGGER.info("[RegistrationService][executeService]         start ");
+		LOGGER.info("[RegistrationService][executeService] start ");
+		BaseBean baseBeanObj = null;
 		switch (baseBean.getServiceAction()) {
 		case REGISTRATION:
-			baseBean = doUserRegistration((UserBean) baseBean);
+			baseBeanObj = doUserRegistration((UserBean) baseBean);
 			break;
 		case UPDATE_USER_PROFILE:
-			baseBean = updateUserProfile((UserBean) baseBean);
+			baseBeanObj = updateUserProfile((UserBean) baseBean);
 			break;
 		default:
 			break;
 		}
-		LOGGER.info("[RegistrationService][executeService]         end ");
-		return baseBean;
+		LOGGER.info("[RegistrationService][executeService] end ");
+		return baseBeanObj;
 	}
 
 	/**
@@ -101,30 +105,11 @@ public class RegistrationService extends BaseServiceImpl {
 	 */
 	private UserBean doUserRegistration(UserBean userBean)
 			throws AzureChatBusinessException, AzureChatSystemException {
-		LOGGER.info("[RegistrationService][doUserRegistration]         start ");
+		LOGGER.info("[RegistrationService][doUserRegistration] start ");
 		LOGGER.debug("User Details    " + userBean.toString());
 		if (isNewUser(userBean)) {
 			UserEntity userEntity = new UserEntity();
-			String uri = null;
-			try {
-				if (null != userBean.getMultipartFile()
-						&& userBean.getMultipartFile().getSize() > 0) {
-					uri = profileImageRequestDAO.saveProfileImage(
-							userBean.getMultipartFile(), userBean.getNameID());
-				}
-
-			} catch (Exception e) {
-				LOGGER.error("Azure blob storage exception while storing profile image for user id : "
-						+ userBean.getUserID()
-						+ " and Name : "
-						+ userBean.getFirstName());
-				throw new AzureChatBusinessException(
-						"Azure storage exception while storing profile image for user id : "
-								+ userBean.getUserID() + " and Name : "
-								+ userBean.getFirstName() + " "
-								+ e.getMessage());
-			}
-
+			String uri = updateUserProfileImage(userBean);
 			try {
 				userBean.setPhotoUrl(uri);
 				userEntity = buildUserEntity(userBean, userEntity);
@@ -160,7 +145,7 @@ public class RegistrationService extends BaseServiceImpl {
 								+ userBean.getFirstName());
 			}
 		}
-		LOGGER.info("[RegistrationService][doUserRegistration]         end ");
+		LOGGER.info("[RegistrationService][doUserRegistration] end ");
 		return userBean;
 	}
 
@@ -175,24 +160,7 @@ public class RegistrationService extends BaseServiceImpl {
 		LOGGER.info("[RegistrationService][updateUserProfile]         start ");
 		LOGGER.debug("User Details    " + userBean.toString());
 		UserEntity userEntity = new UserEntity();
-		String uri = null;
-		try {
-			if (null != userBean.getMultipartFile()
-					&& userBean.getMultipartFile().getSize() > 0) {
-				uri = profileImageRequestDAO.saveProfileImage(
-						userBean.getMultipartFile(), userBean.getNameID());
-			}
-		} catch (Exception e) {
-			LOGGER.error("Azure blob storage exception while updating profile image for user id : "
-					+ userBean.getUserID()
-					+ " and Name : "
-					+ userBean.getFirstName());
-			throw new AzureChatBusinessException(
-					"Azure blob storage exception while updating profile image for user id : "
-							+ userBean.getUserID() + " and Name : "
-							+ userBean.getFirstName() + " :  " + e.getMessage());
-		}
-
+		String uri = updateUserProfileImage(userBean);
 		try {
 			if (uri == null) {
 				uri = userDao.getUserPhotoBlobURL(Integer.parseInt(userBean
@@ -201,9 +169,8 @@ public class RegistrationService extends BaseServiceImpl {
 			userBean.setPhotoUrl(uri);
 			userEntity = buildUserEntity(userBean, userEntity);
 			userDao.updateNewUser(userEntity);
-
 			userBean.setPhotoUrl(uri
-					+ "?"
+					+ AzureChatConstants.CONSTANT_QUESTION_MARK
 					+ AzureChatUtils
 							.getSASUrl(AzureChatConstants.PROFILE_IMAGE_CONTAINER));
 		} catch (Exception e) {
@@ -219,14 +186,14 @@ public class RegistrationService extends BaseServiceImpl {
 							+ userBean.getFirstName() + " : " + e.getMessage());
 		}
 		userBean.setMsg(AzureChatConstants.SUCCESS_MSG_USR_PROF_UPDT);
-		// Set Multipart null to avoid internal server error on json parsing
+		// Set Multipart null to avoid internal server error on JSON parsing
 		userBean.setMultipartFile(null);
-		LOGGER.info("[RegistrationService][updateUserProfile]         end ");
+		LOGGER.info("[RegistrationService][updateUserProfile] end ");
 		return userBean;
 	}
 
 	/**
-	 * User to create UserEntity object from UserBean object...
+	 * populate UserEntity object from UserBean object.
 	 * 
 	 * @param userBean
 	 * @param userEntity
@@ -279,6 +246,8 @@ public class RegistrationService extends BaseServiceImpl {
 				UserEntity user = userEntities.get(0);
 				userBean.setNewUser(false);
 				populateUserBean(user, userBean);
+				// Fetch the content for this user
+				userBean = contentShareService.getUserContent(userBean);
 				return isNewUser;
 			}
 		} catch (Exception e) {
@@ -292,7 +261,40 @@ public class RegistrationService extends BaseServiceImpl {
 	}
 
 	/**
-	 * This method populates the value fromo userEntity to the user bean.
+	 * This method stores the user photo URL into azure blob storage.
+	 * 
+	 * @param userBean
+	 * @return
+	 * @throws AzureChatBusinessException
+	 */
+	private String updateUserProfileImage(UserBean userBean)
+			throws AzureChatBusinessException {
+		LOGGER.info("[RegistrationService][updateUserProfileImage] start");
+		String photoURL = null;
+		try {
+			if (null != userBean.getMultipartFile()
+					&& userBean.getMultipartFile().getSize() > 0) {
+				photoURL = profileImageRequestDAO.saveProfileImage(
+						userBean.getMultipartFile(), userBean.getNameID());
+				LOGGER.debug("User Photo URL : " + photoURL);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Azure blob storage exception while storing profile image for user id : "
+					+ userBean.getUserID()
+					+ " and Name : "
+					+ userBean.getFirstName());
+			throw new AzureChatBusinessException(
+					"Azure storage exception while storing profile image for user id : "
+							+ userBean.getUserID() + " and Name : "
+							+ userBean.getFirstName() + " " + e.getMessage());
+		}
+		LOGGER.info("[RegistrationService][updateUserProfileImage] end");
+		return photoURL;
+	}
+
+	/**
+	 * This method populates the value from userEntity to the user bean.
 	 * 
 	 * @param userEntity
 	 * @param userBean
@@ -309,7 +311,7 @@ public class RegistrationService extends BaseServiceImpl {
 		userBean.setCountryCD(String.valueOf(userEntity.getPhoneCountryCode()));
 		userBean.setPhoneNo(String.valueOf(userEntity.getPhoneNumber()));
 		userBean.setPhotoUrl(userEntity.getPhotoBlobUrl()
-				+ "?"
+				+ AzureChatConstants.CONSTANT_QUESTION_MARK
 				+ AzureChatUtils
 						.getSASUrl(AzureChatConstants.PROFILE_IMAGE_CONTAINER));
 	}

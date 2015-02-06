@@ -37,6 +37,7 @@ public interface AzureChatConstants {
 	String EXCEP_MSG_STARTUP_SERVICE_BUS = "excp.msg.servicebus.startup";
 	String EXCEP_MSG_STARTUP_SERVICE_QUEUE = "excp.msg.service.queuestartup";
 	String EXCEP_MSG_STARTUP_SERVER_RESTART = "excp.msg.server.restart";
+	String EXCEP_MSG_STARTUP_MEDIA_SERVICE = "excp.msg.media.service.startup";
 
 	// Add Handler mapping Here
 	String FROM_PAGE_INDEX = "index.htm";
@@ -173,6 +174,8 @@ public interface AzureChatConstants {
 
 	// REGEX
 	String REGEX_ONLY_DIGITS = "[^0-9]";
+	String REGEX_ONLY_ALPHA_NUMERIC = "[^a-zA-Z0-9]";
+	String REGEX_QUESTION_MARK="\\?";
 
 	String UI_MEDIA_TYPE_IMAGE = "image";
 	String UI_MEDIA_TYPE_VIDEO = "video";
@@ -211,5 +214,49 @@ public interface AzureChatConstants {
 	int LITERAL_QUESTION_MARK = '?';
 	int CONSTANT_INT_ZERO = 0;
 	int CONSTANT_INT_ONE = 1;
+	int CONSTANT_INT_TWO = 2;
+	String CONSTANT_DOT = ".";
+	String CONSTANT_QUESTION_MARK = "?";
+	// Media Service Constants
+	String MEDIA_SERVICE_ACCESS_POLICY_NAME = "uploadAccessPolicy";
+	Double MEDIA_SERVICE_ACCESS_POLICY_DURATION = 30.0;
+	String STRING_FORMATTER_VED_DOWNLOAD_LOCTION = "%s%s";
+	String GET_TEMP_DIRECTORY = "java.io.tmpdir";
+	String TEMP_VIDEO_FOLDER_NAME = "%videos%";
+	String MEDIA_SERVICE_CREATE_ASSET_APPENDER = "Asset";
+	String MEDIA_SERVICE_ASSET_ATTR_ALTID = "altId";
+	/*
+	 * PC / MAC / ios devices = silver light & flash =
+	 * "H264 Smooth Streaming 720p" HTML 5 = "H264 Broadband 720p" Dynamic
+	 * packaging = "H264 Adaptive Bitrate MP4 Set 720p"
+	 */
+	String MEDIA_SERVICE_ENCODING_TASK_CONF = "H264 Adaptive Bitrate MP4 Set 720p";
+	String MEDIA_SERVICE_TASK_BODY = "<taskBody><inputAsset>JobInputAsset(0)</inputAsset><outputAsset>JobOutputAsset(0)</outputAsset></taskBody>";
+	String MEDIA_SERVICE_TASK_NAME_APPENDER = "Task";
+	String MEDIA_SERVICE_JOB_NAME_APPENDER = "Job";
+	String MEDIA_SERVICE_ASSET_FILE__FORMAT_DEF = "m3u8-aapl.ism";
+	String MEDIA_SERVICE_FILE_FORMAT_AAPL = "/manifest(format=m3u8-aapl)";
+	String MEDIA_SERVICE_FILE_EXTENTION_ISM = ".ism";
+	String MEDIA_SERVICE_FILE_EXTENTION_MP4 = ".mp4";
+	String MEDIA_SERVICE_FILE_FORMAT_CSF = "/manifest(format=mpd-time-csf)";
+
+	// Video Message Properties
+	String BROK_MSG_KEY_URL = "url";
+	String BROK_MSG_KEY_EXPIRY_TIME = "exp";
+	String BROK_MSG_KEY_UID = "uid";
+	String BROK_MSG_KEY_TEXT_MSG = "msg";
+	String BROK_MSG_KEY_USER_NAME = "uname";
+	String BROK_MSG_KEY_PHOTO_BLOB = "photoblob";
+	String BROK_MSG_KEY_MED_TYPE_VEDIO = "video";
+	String BROK_MSG_KEY_MSG_ID = "mid";
+	
+	//Friend Request JSON
+	String FRND_REQ_JSON_KEY_USERID="userID";
+	String FRND_REQ_JSON_KEY_FRNDID="friendID";
+	String FRND_REQ_JSON_KEY_FRNDNM="friendName";
+	String FRND_REQ_JSON_KEY_STATUS="status";
+	String FRND_REQ_JSON_KEY_FRNDURL="friendPhotoUrl";
+	
+	
 
 }

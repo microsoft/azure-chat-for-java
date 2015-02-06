@@ -534,4 +534,61 @@ public class AzureChatUtils {
 		return fileName;
 	}
 
+	/**
+	 * This method removes the special characters from the file name except file
+	 * extension separator i.e. DOT('.')
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	public static String removeSpecialCharactersFromFileName(String fileName) {
+		int index = fileName.lastIndexOf(AzureChatConstants.CONSTANT_DOT);
+		String fileExt = fileName.substring(index, fileName.length());
+		String fileNameWithoutExt = fileName.substring(
+				AzureChatConstants.CONSTANT_INT_ZERO, index);
+		String fileNameWithoutSpecialChar = fileNameWithoutExt.replaceAll(
+				AzureChatConstants.REGEX_ONLY_ALPHA_NUMERIC,
+				AzureChatConstants.CONSTANT_EMPTY_STRING);
+		return fileNameWithoutSpecialChar + fileExt;
+	}
+
+	/**
+	 * This method extract the video file name from input videoBlobURL.
+	 * 
+	 * @param videoBlobURL
+	 * @return
+	 * @author prajakta_pednekar
+	 */
+	public static String getFileNameFromURL(String videoBlobURL) {
+		String containerName = getContainerName(videoBlobURL);
+		String videoFileName = getFileName(videoBlobURL, containerName);
+		return videoFileName;
+	}
+
+	/**
+	 * This method substring the file name into the file name and file extension
+	 * and return the file name only.
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	public static String getFileNameWithoutExtention(String fileName) {
+		if (null != fileName
+				&& fileName.contains(AzureChatConstants.CONSTANT_DOT)) {
+			fileName = fileName.substring(AzureChatConstants.CONSTANT_INT_ZERO,
+					fileName.lastIndexOf(AzureChatConstants.CONSTANT_DOT));
+		}
+		return fileName;
+	}
+
+	/**
+	 * This method return objects string representation.
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static String toString(Object obj) {
+		return obj != null ? obj.toString() : null;
+	}
+
 }

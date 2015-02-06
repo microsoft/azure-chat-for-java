@@ -45,16 +45,17 @@ import com.microsoftopentechnologies.azchat.web.data.beans.FriendRequestBean;
  *
  */
 @Component
-public class EmailNotificationHandler{
+public class EmailNotificationHandler {
 	private static final Logger LOGGER = LogManager
 			.getLogger(EmailNotificationHandler.class);
+
 	/**
 	 * This method is used to send mail about friend request notification &
 	 * logged it in logger.
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(fixedRate=180000)
+	@Scheduled(fixedRate = 180000)
 	private void processFriendRequestNotifications() throws Exception {
 		LOGGER.info("[EmailNotificationHandler][sendMailFriendRequestNotifications] start");
 		Set<String> friendRequests = null;
@@ -70,22 +71,15 @@ public class EmailNotificationHandler{
 		for (String friendReqNotfcnInQue : friendRequests) {
 			JSONObject jsonObject = new JSONObject(friendReqNotfcnInQue);
 			FriendRequestBean friendRequestBean = convertToObject(jsonObject);
-
 			List<UserPreferenceEntity> userPreferenceEntities = userPreferenceDAO
 					.getUserPreferenceEntity(Integer.parseInt(friendRequestBean
 							.getFriendID()));
 			for (UserPreferenceEntity entity : userPreferenceEntities) {
-				if (entity.getPreferenceId() == 1) { // it means user has
-														// activated mail
-														// notification
-														// preferences while
-														// registration.
+				if (entity.getPreferenceId() == 1) {
 					UserDAO userDAO = new UserDAOImpl();
 					UserEntity user = userDAO.getUserDetailsByUserId(Integer
 							.parseInt(friendRequestBean.getUserID()));
-
 					// Send mail notification here to friend
-
 					StringBuilder logstat = new StringBuilder(
 							"Friend request sent by user id: ");
 					logstat.append(user.getUserID());
@@ -103,6 +97,12 @@ public class EmailNotificationHandler{
 		LOGGER.info("[EmailNotificationHandler][sendMailFriendRequestNotifications] end");
 	}
 
+	/**
+	 * This method converts JSON object to the FriendRequestBean object.
+	 * 
+	 * @param jsonObject
+	 * @return
+	 */
 	private FriendRequestBean convertToObject(JSONObject jsonObject) {
 		FriendRequestBean friendRequestBean = new FriendRequestBean();
 		try {

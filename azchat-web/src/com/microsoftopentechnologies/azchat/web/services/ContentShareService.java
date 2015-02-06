@@ -15,7 +15,6 @@
  */
 package com.microsoftopentechnologies.azchat.web.services;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -91,8 +90,9 @@ public class ContentShareService extends BaseServiceImpl {
 	/**
 	 * BeanPostProcessor initialization code to create and get reference to the
 	 * MessageCommemnt,MessageLike and UserMessage table from azure storage.
+	 * This method consumes the exception and add to the application context
+	 * using azure startup utils.
 	 * 
-	 * @throws Exception
 	 */
 	@PostConstruct
 	public void init() {
@@ -115,7 +115,8 @@ public class ContentShareService extends BaseServiceImpl {
 					+ e.getMessage());
 			azureChatStartupUtils.populateStartupErrors(new AzureChatException(
 					AzureChatConstants.EXCEP_CODE_SYSTEM_EXCEPTION,
-					AzureChatConstants.EXCEP_TYPE_SYSTYEM_EXCEPTION, excpMsg+e.getMessage()));
+					AzureChatConstants.EXCEP_TYPE_SYSTYEM_EXCEPTION, excpMsg
+							+ e.getMessage()));
 		}
 		LOGGER.info("[FriendRequestService][init] end");
 	}
@@ -169,6 +170,8 @@ public class ContentShareService extends BaseServiceImpl {
 						.getMessageComments(userMessageBean.getMsgID());
 				List<MessageCommentBean> msgCommentList = new ArrayList<MessageCommentBean>();
 				if (!AzureChatUtils.isEmpty(messageComments)) {
+					LOGGER.debug("User message comment count : "
+							+ messageComments.size());
 					userMessageBean.setCommentCount(messageComments.size());
 					for (MessageComments comment : messageComments) {
 						MessageCommentBean commentBean = new MessageCommentBean();
@@ -254,7 +257,6 @@ public class ContentShareService extends BaseServiceImpl {
 			MessageCommentBean messageCommentBean)
 			throws AzureChatBusinessException {
 		LOGGER.info("[ContentShareService][updateMessageComment] start");
-
 		if (!AzureChatUtils.isEmptyOrNull(messageCommentBean.getMsgID())) {
 			LOGGER.debug("Message ID : " + messageCommentBean.getMsgID()
 					+ " User ID" + messageCommentBean.getFriendID());
@@ -307,9 +309,13 @@ public class ContentShareService extends BaseServiceImpl {
 			List<UserMessageEntity> userMessageEntities = null;
 			if (AzureChatConstants.GET_USER_ONLY_CONTENTS
 					.equalsIgnoreCase(userBean.getContentLevel())) {
+				LOGGER.debug("Friend profile page data. getUserContent Indicator : "
+						+ userBean.getContentLevel());
 				userMessageEntities = userMessageEntityDAO
 						.getUserMessageEntities(userBean.getUserID());
 			} else {
+				LOGGER.debug("User profile page data. getUserContent Indicator : "
+						+ userBean.getContentLevel());
 				userMessageEntities = userMessageEntityDAO
 						.getUserAndFriendsMessages(userBean.getUserID());
 			}
@@ -350,23 +356,13 @@ public class ContentShareService extends BaseServiceImpl {
 		LOGGER.info("[ContentShareService][shareContent] start");
 		UserMessageEntity userMessageEntity = buildUserMessageEntity(userBean);
 		String expiryTime = userBean.getUserMessageListBean().getExpiryTime();
+		LOGGER.debug("Media Type : " + userMessageEntity.getMediaType());
 		try {
 			if (null != userMessageEntity.getMediaType()
 					&& userMessageEntity.getMediaType().contains(
 							AzureChatConstants.UI_MEDIA_TYPE_VIDEO)) {
-				BrokeredMessage message = new BrokeredMessage(
-						AzureChatConstants.CONSTANT_EMPTY_STRING);
-				message.setProperty("msg", userMessageEntity.getTextContent());
-				message.setProperty("url", (userMessageEntity.getMediaURL()
-						+ "?" + AzureChatUtils
-						.getSASUrl(AzureChatConstants.TEMP_UPLOAD_CONTAINER)));
-				message.setProperty("uname", userMessageEntity.getUserName());
-				message.setProperty("photoblob",
-						userMessageEntity.getUserPhotoBlobURL());
-				message.setProperty("exp",
-						AzureChatUtils.covertMinToSec(expiryTime));
-				message.setProperty("uid", userMessageEntity.getUserID());
-				message.setProperty("mid", userMessageEntity.getMessageID());
+				BrokeredMessage message = prepareBrokerMessage(
+						userMessageEntity, expiryTime);
 				AzureChatServiceBus.getServicebus().sendQueueMessage(
 						AzureChatConstants.SERVICE_BUS_QUEUENAME, message);
 			} else {
@@ -410,7 +406,7 @@ public class ContentShareService extends BaseServiceImpl {
 				.getMediaType()));
 		LOGGER.debug("Set media type : " + userMessageBean.getMediaType());
 		userMessageBean.setMediaUrl(userMessageEntity.getMediaURL()
-				+ "?"
+				+ AzureChatConstants.CONSTANT_QUESTION_MARK
 				+ AzureChatUtils
 						.getSASUrl(AzureChatConstants.PHOTO_UPLOAD_CONTAINER));
 		LOGGER.debug("Media URL : " + userMessageBean.getMediaUrl());
@@ -420,7 +416,7 @@ public class ContentShareService extends BaseServiceImpl {
 		userMessageBean.setOwnerID(userMessageEntity.getUserID());
 		userMessageBean.setOwnerName(userMessageEntity.getUserName());
 		userMessageBean.setPhotoUrl(userMessageEntity.getUserPhotoBlobURL()
-				+ "?"
+				+ AzureChatConstants.CONSTANT_QUESTION_MARK
 				+ AzureChatUtils
 						.getSASUrl(AzureChatConstants.PROFILE_IMAGE_CONTAINER));
 		LOGGER.debug("Message ID : " + userMessageBean.getMsgID()
@@ -573,16 +569,50 @@ public class ContentShareService extends BaseServiceImpl {
 	}
 
 	/**
-	 * This method parse the user photo blob url to remove the private
-	 * signature.If private signature present remove and returns the url.
+	 * This method parse the user photo blob URL to remove the private
+	 * signature.If private signature present remove and returns the URL.
 	 * 
 	 * @param photoUrl
 	 * @return
 	 */
 	private String getUserPhotoBlobUrl(String photoUrl) {
-		if (photoUrl != null && photoUrl.length() > 0 && photoUrl.contains("?")) {
-			return photoUrl.split("\\?")[0];
+		if (photoUrl != null && photoUrl.length() > 0
+				&& photoUrl.contains(AzureChatConstants.CONSTANT_QUESTION_MARK)) {
+			return photoUrl.split(AzureChatConstants.REGEX_QUESTION_MARK)[0];
 		}
 		return photoUrl;
+	}
+
+	/**
+	 * This method populates the broker message from userMessageEntity.
+	 * 
+	 * @param userMessageEntity
+	 * @param expiryTime
+	 * @return
+	 * @throws Exception
+	 */
+	public BrokeredMessage prepareBrokerMessage(
+			UserMessageEntity userMessageEntity, String expiryTime)
+			throws Exception {
+		BrokeredMessage message = new BrokeredMessage(
+				AzureChatConstants.CONSTANT_EMPTY_STRING);
+		message.setProperty(AzureChatConstants.BROK_MSG_KEY_TEXT_MSG,
+				userMessageEntity.getTextContent());
+		message.setProperty(
+				AzureChatConstants.BROK_MSG_KEY_URL,
+				(userMessageEntity.getMediaURL()
+						+ AzureChatConstants.CONSTANT_QUESTION_MARK + AzureChatUtils
+						.getSASUrl(AzureChatConstants.TEMP_UPLOAD_CONTAINER)));
+		message.setProperty(AzureChatConstants.BROK_MSG_KEY_USER_NAME,
+				userMessageEntity.getUserName());
+		message.setProperty(AzureChatConstants.BROK_MSG_KEY_PHOTO_BLOB,
+				userMessageEntity.getUserPhotoBlobURL());
+		message.setProperty(AzureChatConstants.BROK_MSG_KEY_EXPIRY_TIME,
+				AzureChatUtils.covertMinToSec(expiryTime));
+		message.setProperty(AzureChatConstants.BROK_MSG_KEY_UID,
+				userMessageEntity.getUserID());
+		message.setProperty(AzureChatConstants.BROK_MSG_KEY_MSG_ID,
+				userMessageEntity.getMessageID());
+		return message;
 	}
 }

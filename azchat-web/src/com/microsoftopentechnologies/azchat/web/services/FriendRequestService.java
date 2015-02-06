@@ -95,7 +95,7 @@ public class FriendRequestService extends BaseServiceImpl {
 		LOGGER.info("[FriendRequestService][init] start");
 		String excpMsg = null;
 		try {
-			// CREATE AZURE TABLES
+			LOGGER.debug("Creating Friend Request Management tables.");
 			excpMsg = AzureChatUtils
 					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_FRINED_REQ);
 			AzureChatStorageUtils
@@ -116,14 +116,13 @@ public class FriendRequestService extends BaseServiceImpl {
 		}
 
 		try {
-			// CREATE AZURE SQL TABLES
+			LOGGER.debug("Creating user profile management tables.");
 			excpMsg = AzureChatUtils
 					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_USER_SQL_TABLES);
 			userDAO.createUserTable();
 			preferenceMetadataDAO.createPreferenceMatedateTable();
 			userPreferenceDAO.createUserPreferenceTable();
 		} catch (Exception e) {
-
 			LOGGER.error("Exception occurred while creating SQL tables for user profile management. Exception Message :"
 					+ e.getMessage());
 			azureChatStartupUtils.populateStartupErrors(new AzureChatException(
@@ -133,8 +132,7 @@ public class FriendRequestService extends BaseServiceImpl {
 		}
 
 		try {
-			// Used to add preference entries in metadata table, if table is
-			// newly created.
+			LOGGER.debug(" Preparing preference mata data.");
 			excpMsg = AzureChatUtils
 					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_USER_PREF);
 			List<PreferenceMetadataEntity> list = preferenceMetadataDAO
@@ -161,7 +159,7 @@ public class FriendRequestService extends BaseServiceImpl {
 		try {
 			excpMsg = AzureChatUtils
 					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_EMAIL_NOTIFICATION_QUEUE);
-			// CREATE QUEUE
+			LOGGER.debug(" Creating email notification queue.");
 			AzureChatStorageUtils
 					.createQueue(AzureChatConstants.QUEUE_NAME_EMAIL_NOTIFICATION);
 		} catch (Exception e) {
@@ -184,33 +182,36 @@ public class FriendRequestService extends BaseServiceImpl {
 	@Override
 	public BaseBean executeService(BaseBean baseBean) throws AzureChatException {
 		LOGGER.info("[FriendRequestService][executeService] start");
+		BaseBean baseBeanObj = null;
 		switch (baseBean.getServiceAction()) {
 		case FIND_FRIENDS:
-			baseBean = searchFriends((UserBean) baseBean);
+			baseBeanObj = searchFriends((UserBean) baseBean);
 			break;
 		case FRIEND_STATUS:
-			baseBean = getFriendStatus((FriendRequestBean) baseBean);
+			baseBeanObj = getFriendStatus((FriendRequestBean) baseBean);
 			break;
 		case ADD_FRIEND:
-			baseBean = addFriend((FriendRequestBean) baseBean);
+			baseBeanObj = addFriend((FriendRequestBean) baseBean);
 			break;
 		case GET_PENDING_FRIENDS:
-			baseBean = getPendingFriends((UserBean) baseBean);
+			baseBeanObj = getPendingFriends((UserBean) baseBean);
 			break;
 		case UPDATE_FRIENDREQ_STATUS:
-			baseBean = updateFriendReqStatus((FriendRequestBean) baseBean);
+			baseBeanObj = updateFriendReqStatus((FriendRequestBean) baseBean);
 			break;
 		case GET_PENDING_FRIEND_COUNT:
-			baseBean = getPendingFriendRequestCount((UserBean) baseBean);
+			baseBeanObj = getPendingFriendRequestCount((UserBean) baseBean);
 			break;
 		default:
 			break;
 		}
 		LOGGER.info("[FriendRequestService][executeService] end");
-		return baseBean;
+		return baseBeanObj;
 	}
 
 	/**
+	 * This method fetch the pending friend list for input user by calling the
+	 * friendRequestDAO.
 	 * 
 	 * @param baseBean
 	 * @return
@@ -235,6 +236,7 @@ public class FriendRequestService extends BaseServiceImpl {
 					"Exception occurred while fetching pending request for user."
 							+ e.getMessage());
 		}
+		LOGGER.info("[FriendRequestService][getPendingFriends] end");
 		return userBean;
 	}
 
@@ -298,7 +300,8 @@ public class FriendRequestService extends BaseServiceImpl {
 	}
 
 	/**
-	 * This service method will search the friend for input first name.
+	 * This service method search the friend for input first name by calling
+	 * friend request DAO.
 	 * 
 	 * @param userBean
 	 * @return
@@ -312,14 +315,14 @@ public class FriendRequestService extends BaseServiceImpl {
 	}
 
 	/**
-	 * This method search friends by querying SQL Database and fetch the friend
-	 * request status by calling azure tables.
+	 * This method search friends by input first name by calling friend request
+	 * DAO.
 	 * 
 	 * @param firstName
 	 * @return
 	 * @throws AzureChatException
 	 */
-	public List<FriendRequestBean> searchFriends(String firstName)
+	private List<FriendRequestBean> searchFriends(String firstName)
 			throws AzureChatException {
 		LOGGER.info("[FriendRequestService][searchFriends] start");
 		LOGGER.debug("Input : First Name : " + firstName);
@@ -348,13 +351,14 @@ public class FriendRequestService extends BaseServiceImpl {
 	}
 
 	/**
-	 * This method fetch the friend request status by calling azure tables.
+	 * This method fetch the friend request status by calling friend request
+	 * DAO.
 	 * 
 	 * @param firstName
 	 * @return
 	 * @throws AzureChatException
 	 */
-	public FriendRequestBean getFriendStatus(FriendRequestBean friendRequestBean)
+	private FriendRequestBean getFriendStatus(FriendRequestBean friendRequestBean)
 			throws AzureChatException {
 		LOGGER.info("[FriendRequestService][getFriendStatus] start");
 		LOGGER.debug("Input : logInUserID : " + friendRequestBean.getUserID()
@@ -364,14 +368,13 @@ public class FriendRequestService extends BaseServiceImpl {
 					.getFriendStatusForUserWithFriend(
 							friendRequestBean.getUserID(),
 							friendRequestBean.getFriendID());
-
 			if (friendRequestEntity != null) {
 				friendRequestBean.setUserID(friendRequestEntity.getUserID());
 				friendRequestBean.setStatus(friendRequestEntity.getStatus());
 				friendRequestBean
 						.setFriendPhotoUrl(friendRequestEntity
 								.getFriendProfileBlobURL()
-								+ "?"
+								+ AzureChatConstants.CONSTANT_QUESTION_MARK
 								+ AzureChatUtils
 										.getSASUrl(AzureChatConstants.PROFILE_IMAGE_CONTAINER));
 				friendRequestBean.setFriendName(friendRequestEntity
@@ -398,7 +401,7 @@ public class FriendRequestService extends BaseServiceImpl {
 	 * @param friendRequestBean
 	 * @return
 	 */
-	public FriendRequestBean buildFriendRequestBean(UserEntity userEntity,
+	private FriendRequestBean buildFriendRequestBean(UserEntity userEntity,
 			FriendRequestBean friendRequestBean) {
 		if (null != userEntity.getUserID()) {
 			friendRequestBean
@@ -411,13 +414,14 @@ public class FriendRequestService extends BaseServiceImpl {
 	}
 
 	/**
-	 * This method update the friend request status.
+	 * This method update the friend request status by calling friend request
+	 * DAO.
 	 * 
 	 * @param firstName
 	 * @return
 	 * @throws AzureChatException
 	 */
-	public FriendRequestBean updateFriendReqStatus(
+	private FriendRequestBean updateFriendReqStatus(
 			FriendRequestBean friendRequestBean) throws AzureChatException {
 		LOGGER.info("[FriendRequestService][updateFriendReqStatus] start");
 		try {
@@ -477,11 +481,16 @@ public class FriendRequestService extends BaseServiceImpl {
 			throws AzureChatBusinessException {
 		JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject.put("userID", entity.getUserID());
-			jsonObject.put("friendID", entity.getFriendID());
-			jsonObject.put("friendName", entity.getFriendName());
-			jsonObject.put("status", entity.getStatus());
-			jsonObject.put("friendPhotoUrl", entity.getFriendPhotoUrl());
+			jsonObject.put(AzureChatConstants.FRND_REQ_JSON_KEY_USERID,
+					entity.getUserID());
+			jsonObject.put(AzureChatConstants.FRND_REQ_JSON_KEY_FRNDID,
+					entity.getFriendID());
+			jsonObject.put(AzureChatConstants.FRND_REQ_JSON_KEY_FRNDNM,
+					entity.getFriendName());
+			jsonObject.put(AzureChatConstants.FRND_REQ_JSON_KEY_STATUS,
+					entity.getStatus());
+			jsonObject.put(AzureChatConstants.FRND_REQ_JSON_KEY_FRNDURL,
+					entity.getFriendPhotoUrl());
 		} catch (JSONException e) {
 			LOGGER.error("Exception while converting to JSONObject. "
 					+ e.getMessage());
@@ -494,7 +503,7 @@ public class FriendRequestService extends BaseServiceImpl {
 
 	/**
 	 * This method fetch the pending friend list for the user and calculate the
-	 * count and return.
+	 * count.
 	 * 
 	 * @param baseBean
 	 * @return
@@ -529,7 +538,7 @@ public class FriendRequestService extends BaseServiceImpl {
 	}
 
 	/**
-	 * This method is used to create preference metadata object .
+	 * This method is used to create preference meta-data object .
 	 * 
 	 * @param preference
 	 * @return

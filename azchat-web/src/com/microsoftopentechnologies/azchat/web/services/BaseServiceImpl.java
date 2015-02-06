@@ -32,8 +32,8 @@ import com.microsoftopentechnologies.azchat.web.data.beans.ErrorListBean;
 /**
  * Base Service providing implementation for invokeService operation of the
  * BaseService contract which in turn has a call to excecuteService. Every
- * controller has to call this method with ServiceActionEnum.serviceAction
- * property added in the model bean and also provide the executeSerice
+ * controller has to call invokeService method with ServiceActionEnum.serviceAction
+ * property added in the model bean and service has to provide the executeSerice
  * implementation.An instance specific executeService will be called.Back trace
  * will parse and add exceptions to model bean if any and return the model bean
  * to controller.
@@ -47,7 +47,7 @@ public abstract class BaseServiceImpl implements BaseService {
 			.getLogger(BaseServiceImpl.class);
 
 	/**
-	 * common method to call the azchat services and handle the exceptions.
+	 * This is a common method to call the AzChat services and handle the exceptions.
 	 * 
 	 * @param baseBean
 	 * @return
@@ -108,7 +108,7 @@ public abstract class BaseServiceImpl implements BaseService {
 	}
 
 	/**
-	 * This method parse and add the azchat exceptions to the baseBean.
+	 * This method parse and add the AzChat exceptions to the baseBean.
 	 * 
 	 * @param e
 	 * @param baseBean

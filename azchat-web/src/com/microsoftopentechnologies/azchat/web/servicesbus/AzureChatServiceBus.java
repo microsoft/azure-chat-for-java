@@ -40,6 +40,7 @@ import com.microsoft.windowsazure.services.servicebus.models.QueueInfo;
 import com.microsoft.windowsazure.services.servicebus.models.ReceiveMessageOptions;
 import com.microsoft.windowsazure.services.servicebus.models.ReceiveMode;
 import com.microsoft.windowsazure.services.servicebus.models.ReceiveQueueMessageResult;
+import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatBusinessException;
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatException;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatStartupUtils;
@@ -51,7 +52,7 @@ import com.microsoftopentechnologies.azchat.web.dao.UserMessageEntityDAO;
 import com.microsoftopentechnologies.azchat.web.dao.UserMessageEntityDAOImpl;
 import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.UserMessageEntity;
 import com.microsoftopentechnologies.azchat.web.data.beans.MediaServiceOutputBean;
-import com.microsoftopentechnologies.azchat.web.mediaservice.AzureChatMediaServices;
+import com.microsoftopentechnologies.azchat.web.mediaservice.AzureChatMediaService;
 
 /**
  * This class handles azure service bus related functionality.This class
@@ -72,19 +73,24 @@ public class AzureChatServiceBus {
 	@Autowired
 	private AzureChatStartupUtils azureChatStartupUtils;
 
+	@Autowired
+	AzureChatMediaService azureChatMediaService;
+
 	/**
-	 * BeanPostProcessor initialization method to create service bus and
-	 * queue.Also start the timer task to read and process the video messages.
+	 * BeanPostProcessor initialization method to create azure service bus and
+	 * queue.This method consumes the exceptions and store it in application
+	 * context using azure startup utils.
 	 * 
-	 * @throws AzureChatException
-	 * @throws ServiceException
 	 */
 	@PostConstruct
 	public void init() {
+		LOGGER.info("[AzureChatServiceBus][init] start");
 		String excpMsg = null;
 		try {
+
 			excpMsg = AzureChatUtils
 					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_SERVICE_BUS);
+			LOGGER.debug("Service Bus initialization started.");
 			getServicebus();
 		} catch (Exception e) {
 			LOGGER.error("Exception occurred while creating azure service bus object from the existing configuration. Exception Message : "
@@ -97,6 +103,7 @@ public class AzureChatServiceBus {
 		try {
 			excpMsg = AzureChatUtils
 					.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_SERVICE_QUEUE);
+			LOGGER.debug("creating Service Bus queue.");
 			createQueue();
 		} catch (Exception e) {
 			LOGGER.error("Exception occurred while creating azure service bus queue. Exception Message :"
@@ -106,10 +113,12 @@ public class AzureChatServiceBus {
 					AzureChatConstants.EXCEP_TYPE_SYSTYEM_EXCEPTION, excpMsg
 							+ e.getMessage()));
 		}
+		LOGGER.info("[AzureChatServiceBus][init] end");
 	}
 
 	/**
-	 * This method will give the object of the service bus
+	 * This method create and assign the static reference to the azure service
+	 * bus object.
 	 * 
 	 * @return
 	 * @throws AzureChatException
@@ -137,16 +146,19 @@ public class AzureChatServiceBus {
 	}
 
 	/**
-	 * This method will read the message from queue and pass it to media service
-	 * call.
+	 * This method reads video messages from the service bus queue and perform
+	 * the media service operations on the video message.Finally it deletes the
+	 * blob from temporary storage.
+	 * 
+	 * @param
+	 * @return
 	 */
 	@Scheduled(fixedRate = 36000)
-	public static void readmessage() {
+	public void readmessage() {
 		LOGGER.info("[AzureChatServiceBus][readmessage] start");
 		try {
 			ReceiveMessageOptions options = ReceiveMessageOptions.DEFAULT;
 			options.setReceiveMode(ReceiveMode.RECEIVE_AND_DELETE);
-
 			while (true) {
 				ReceiveQueueMessageResult resultQM = service
 						.receiveQueueMessage(
@@ -154,49 +166,46 @@ public class AzureChatServiceBus {
 								options);
 				BrokeredMessage message = resultQM.getValue();
 				if (message != null && message.getMessageId() != null) {
-					String url = (String) message.getProperty("url");
+					String url = (String) message
+							.getProperty(AzureChatConstants.BROK_MSG_KEY_URL);
 					url = StringEscapeUtils.unescapeJava(url);
-					String expiryTime = String.valueOf(message
-							.getProperty("exp"));
+					String expiryTime = String
+							.valueOf(message
+									.getProperty(AzureChatConstants.BROK_MSG_KEY_EXPIRY_TIME));
+					LOGGER.debug("Broker Message : URL : " + url
+							+ " Expiry time : " + expiryTime + " seconds.");
 					// Media service call
-					MediaServiceOutputBean outputObject = AzureChatMediaServices
+					LOGGER.debug("Media service call start time : "
+							+ AzureChatUtils.getCurrentTimestamp());
+					MediaServiceOutputBean outputObject = azureChatMediaService
 							.performMediaServicesOperations(url,
 									Double.parseDouble(expiryTime));
+					LOGGER.debug("Media service call end time : "
+							+ AzureChatUtils.getCurrentTimestamp());
 					if (outputObject != null) {
-						UserMessageEntity userMessageEntity = new UserMessageEntity(
-								message.getProperty("uid").toString(),
-								AzureChatUtils.getGUID());
-						userMessageEntity.setTextContent(message.getProperty(
-								"msg").toString());
-						userMessageEntity.setMediaURL(outputObject
-								.getStreamingUrl());
-						userMessageEntity.setUserName(message.getProperty(
-								"uname").toString());
-						userMessageEntity.setUserPhotoBlobURL(StringEscapeUtils
-								.unescapeJava(message.getProperty("photoblob")
-										.toString()));
-						userMessageEntity.setMediaType("video");
-						userMessageEntity.setAssetID(outputObject.getAssetID());
+						LOGGER.debug("Asset ID : " + outputObject.getAssetID());
+						UserMessageEntity userMessageEntity = prepareUserMessageEntity(
+								message, outputObject);
 						UserMessageEntityDAO dao = new UserMessageEntityDAOImpl();
 						dao.addUserMessageEntity(userMessageEntity);
-
+						LOGGER.debug("Video message added the user message table. Message id : "
+								+ userMessageEntity.getMessageID());
 						QueueRequestDAO queueRequestDAO = new QueueRequestDAOImpl();
 						queueRequestDAO.postMessage(
 								userMessageEntity.getMessageID(),
 								Integer.parseInt(expiryTime));
-
+						LOGGER.debug("Video message added the user message expiry queue. Message id : "
+								+ userMessageEntity.getMessageID());
 						// Remove temporary stored non encoded video from blob
 						String filename = AzureChatUtils.getFileName(url,
 								AzureChatConstants.TEMP_UPLOAD_CONTAINER);
 						deleteblob(filename);
-
-						// //Remove message from queue.
-						// service.deleteMessage(message);
-					} else {
-						LOGGER.info("[AzureChatServiceBus][readmessage] No output from media service.");
+						LOGGER.debug("Deleted " + filename + " blob from the "
+								+ AzureChatConstants.TEMP_UPLOAD_CONTAINER
+								+ " storage.");
 					}
 				} else {
-					LOGGER.info("[AzureChatServiceBus][readmessage] no more messages");
+					LOGGER.debug("No more messages");
 					break;
 				}
 			}
@@ -211,7 +220,7 @@ public class AzureChatServiceBus {
 	}
 
 	/**
-	 * This method is used to create queue.
+	 * This method creates service bus queue.
 	 * 
 	 * @return
 	 * @throws AzureChatException
@@ -231,6 +240,9 @@ public class AzureChatServiceBus {
 
 		} catch (ServiceException e) {
 			if (queue == null) {
+				LOGGER.debug("Not able to find the queue "
+						+ AzureChatConstants.SERVICE_BUS_QUEUENAME
+						+ " for service bus.Creating new queue.");
 				result = service.createQueue(queueInfo);
 			}
 		}
@@ -239,7 +251,7 @@ public class AzureChatServiceBus {
 	}
 
 	/**
-	 * This method will delete the temporary non-encoded video stored on blob
+	 * This method deletes temporary non-encoded video from azure storage.
 	 * 
 	 * @param filename
 	 * @throws AzureChatException
@@ -260,10 +272,43 @@ public class AzureChatServiceBus {
 			// Delete the blob.
 			blob.deleteIfExists();
 		} catch (Exception e) {
-			throw new AzureChatException("Unable to delete file from blob "
-					+ filename + " " + e.getMessage());
+			throw new AzureChatBusinessException(
+					"Exception occurred while deleting blob " + filename
+							+ " from the  "
+							+ AzureChatConstants.TEMP_UPLOAD_CONTAINER
+							+ ". Exception Message : " + e.getMessage());
 		}
 		LOGGER.info("[AzureChatServiceBus][createQueue] end");
+	}
+
+	/**
+	 * This method populates the userMessageEntity values from the broker
+	 * message and MediaServiceOutputBean.
+	 * 
+	 * @param message
+	 * @param outputObject
+	 * @return userMessageEntity
+	 */
+	private UserMessageEntity prepareUserMessageEntity(BrokeredMessage message,
+			MediaServiceOutputBean outputObject) {
+		UserMessageEntity userMessageEntity = new UserMessageEntity(
+				AzureChatUtils.toString(message
+						.getProperty(AzureChatConstants.BROK_MSG_KEY_UID)),
+				AzureChatUtils.toString(message
+						.getProperty(AzureChatConstants.BROK_MSG_KEY_MSG_ID)));
+
+		userMessageEntity.setTextContent(AzureChatUtils.toString(message
+				.getProperty(AzureChatConstants.BROK_MSG_KEY_TEXT_MSG)));
+		userMessageEntity.setMediaURL(outputObject.getStreamingUrl());
+		userMessageEntity.setUserName(AzureChatUtils.toString(message
+				.getProperty(AzureChatConstants.BROK_MSG_KEY_USER_NAME)));
+		userMessageEntity
+				.setUserPhotoBlobURL(StringEscapeUtils.unescapeJava(AzureChatUtils.toString(message
+						.getProperty(AzureChatConstants.BROK_MSG_KEY_PHOTO_BLOB))));
+		userMessageEntity
+				.setMediaType(AzureChatConstants.BROK_MSG_KEY_MED_TYPE_VEDIO);
+		userMessageEntity.setAssetID(outputObject.getAssetID());
+		return userMessageEntity;
 	}
 
 }
