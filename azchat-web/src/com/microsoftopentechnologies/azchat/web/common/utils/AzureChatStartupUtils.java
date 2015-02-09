@@ -95,26 +95,6 @@ public class AzureChatStartupUtils {
 	}
 
 	/**
-	 * This method check if server restart message already added to the startup
-	 * errors.
-	 * 
-	 * @param excpMsg
-	 * @param startupErrors
-	 * @return
-	 */
-	public boolean isServerRestartMsgAdded(String excpMsg,
-			BaseBean startupErrors) {
-		boolean isServerRestartMsg = false;
-		for (ErrorBean error : startupErrors.getErrorList().getErrorList()) {
-			if (excpMsg.equalsIgnoreCase(error.getExcpMsg())) {
-				isServerRestartMsg = true;
-				return isServerRestartMsg;
-			}
-		}
-		return isServerRestartMsg;
-	}
-
-	/**
 	 * This method add the application startup errors to the application
 	 * context.
 	 * 
@@ -132,7 +112,11 @@ public class AzureChatStartupUtils {
 	 * @return baseBean
 	 */
 	public BaseBean getStartupErrors() {
-		return (BaseBean) AzureChatAppCtxUtils.getApplicationContext()
-				.getAttribute(AzureChatConstants.STARTUP_ERRORS);
+		if (null != AzureChatAppCtxUtils.getApplicationContext().getAttribute(
+				AzureChatConstants.STARTUP_ERRORS)) {
+			return (BaseBean) AzureChatAppCtxUtils.getApplicationContext()
+					.getAttribute(AzureChatConstants.STARTUP_ERRORS);
+		}
+		return null;
 	}
 }

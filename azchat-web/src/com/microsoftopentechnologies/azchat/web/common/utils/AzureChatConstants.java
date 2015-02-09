@@ -87,9 +87,9 @@ public interface AzureChatConstants {
 
 	// Success Messages
 	String SUCCESS_MSG_REG = "Registrered Successfully.Sign In to proceed.";
-	String SUCCESS_MSG_ADD_FRIEND = "Friend Added Successfully.";
+	String SUCCESS_MSG_ADD_FRIEND = "Friend request sent successfully.";
 	String SUCCESS_MSG_USR_PROF_UPDT = "User profile updated successfully.";
-	String SUCCESS_MSG_APPROVE_FRND_REQ = "Friend Added successfully.";
+	String SUCCESS_MSG_APPROVE_FRND_REQ = "Friend request approved successfully.";
 	String SUCCESS_MSG_CONTENT_SHARE = "User status updated successfully.";
 	String SUCCESS_MSG_COMMENT_UPDATE = "Comment updated successfully.";
 	String SUCCESS_MSG_LIKE_STATUS = "Like status updated successfully.";

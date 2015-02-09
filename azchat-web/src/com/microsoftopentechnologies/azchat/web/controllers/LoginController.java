@@ -31,7 +31,6 @@ import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatExcep
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatAppCtxUtils;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatStartupUtils;
-import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatUtils;
 import com.microsoftopentechnologies.azchat.web.common.utils.ServiceActionEnum;
 import com.microsoftopentechnologies.azchat.web.data.beans.UserBean;
 import com.microsoftopentechnologies.azchat.web.services.BaseService;
@@ -66,20 +65,7 @@ public class LoginController extends BaseController {
 	@RequestMapping(AzureChatConstants.FROM_PAGE_INDEX)
 	public ModelAndView goIndex() throws AzureChatException {
 		LOGGER.info("[LoginController][goLogin] start");
-		String excpMsg = AzureChatUtils
-				.getProperty(AzureChatConstants.EXCEP_MSG_STARTUP_SERVER_RESTART);
-		if (null != AzureChatAppCtxUtils.getApplicationContext().getAttribute(
-				AzureChatConstants.STARTUP_ERRORS)) {
-			// Add server restart message.
-			if (!azureChatStartupUtils.isServerRestartMsgAdded(excpMsg,
-					azureChatStartupUtils.getStartupErrors())) {
-				azureChatStartupUtils
-						.populateStartupErrors(new AzureChatException(
-								AzureChatConstants.EXCEP_CODE_SYSTEM_EXCEPTION,
-								AzureChatConstants.EXCEP_TYPE_SYSTYEM_EXCEPTION,
-								excpMsg));
-			}
-
+		if (null != azureChatStartupUtils.getStartupErrors()) {
 			return processResults(AzureChatConstants.VIEW_NAME_ERROR,
 					new ModelMap(), azureChatStartupUtils.getStartupErrors());
 		}

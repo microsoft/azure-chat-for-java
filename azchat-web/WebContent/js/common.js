@@ -72,5 +72,13 @@ function isInteger(n) {
 	var intRegex = /^-?[0-9]+$/;
 	return intRegex.test(n);
 }
+/**
+ * This function force user to enter only numbers in the input field.
+ * @param input
+ */
+function onlyNumbers(input){
+	reg = /[^0-9]/g;
+	input.value =  input.value.replace(reg,"");
+}
 
 

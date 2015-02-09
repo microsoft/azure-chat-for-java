@@ -72,6 +72,7 @@
 			<div class="row">
 				<div class="col-md-12">
 					<div align="center" class="errorDiv"><c:import url="/jsp/error.jsp"/></div>
+					<div align="center" id="errorDiv_Ajax"></div>
 					<div class="well well-sm">
 						<form:form id="registrationForm" class="form-horizontal" commandName="userBean" enctype="multipart/form-data"
 							data-toggle="validator" role="form">
@@ -138,7 +139,7 @@
 										class="fa fa-phone-square bigicon"></i></span>
 									<div class="col-md-6">
 										<form:input path="phoneNo"  id="phone" name="phone" type="text" placeholder="Phone"
-											class="form-control" maxlength="10"  required="true"/>
+											class="form-control" maxlength="10"  required="true" onkeyup="return onlyNumbers(this)" />
 									</div>
 								</div>
 								
@@ -155,7 +156,7 @@
 								</div>
 								<div class="form-group">
 									<div class="col-md-12 text-center">
-										<button type="submit" class="btn btn-primary btn-md">Register</button>
+										<button type="submit" class="btn btn-primary btn-md" id="btn_submt_reg">Register</button>
 									</div>
 								</div>
 							</fieldset>
