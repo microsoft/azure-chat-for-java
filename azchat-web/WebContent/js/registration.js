@@ -50,7 +50,8 @@ $(document).ready(function() {
 			$("#errorDiv_Ajax").empty();
 			$(".errorDiv").empty();
 			var countryCD=$("#dupCountryCD").val();
-			if(countryCD==null || countryCD==''){
+			var countryName=getCountryByName($("#input_countryCD").val());
+			if((countryName==null || countryName=='') || (countryCD==null || countryCD=='')){
 				$("#errorDiv_Ajax").html("<font size='1' color='red'>Country selection is not valid.Please select valid country from drop down.</font>");
 				return false;
 			}

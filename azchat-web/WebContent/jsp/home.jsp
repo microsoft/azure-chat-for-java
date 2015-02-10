@@ -45,7 +45,7 @@
 							<div class="span12 pull-right">
 								<ul class="nav navbar-nav">
 									<li><img id="img_navUserImage" width="25px;" height="25px;" style="margin-top: 10px;margin-bottom: 5px;" src="${userBean.photoUrl}"/></li>
-									<li id="li_logInUser"><a href="#">${userBean.firstName} </a></li>
+									<li id="li_logInUser"><a id="a_logInUser" href="#">${userBean.firstName} </a></li>
 									<li id="li_home"><a href="#"><i class="glyphicon glyphicon-home"></i>
 											Home</a></li>
 	

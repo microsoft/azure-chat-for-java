@@ -284,8 +284,10 @@ $("#btn_profUpdt_submt").click(function(event){
 			}else{
 				$("#img_navUserImage").prop("src",data.photoUrl);
 				$("#img_usrProfUpdateImg").prop("src",data.photoUrl);
-				$("#li_logInUser").val(data.firstName);
+				$("#a_logInUser").text(data.firstName);
 				$("#hi_UserName").val(data.firstName);
+				$("#hi_UserLName").val(data.lastName);
+				$("#hi_photoUrl").val(data.photoUrl);
 				showSuccess(data.msg);
 		}
 		},
@@ -649,7 +651,7 @@ function updateMessageComment(msgID){
 						showServiceErrors(serErrMsg);
 					}
 				}else{
-					$("#ta_usrMsgComment").val("");
+					$("#ta_usrMsgComment_"+msgID).val("");
 					showSuccess(data.msg);
 					getMessageComment(msgID);
 				}

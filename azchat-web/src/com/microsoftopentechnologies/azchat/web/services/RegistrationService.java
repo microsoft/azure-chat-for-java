@@ -68,7 +68,7 @@ public class RegistrationService extends BaseServiceImpl {
 
 	@Autowired
 	private UserPreferenceDAO userPreferenceDAO;
-	
+
 	@Autowired
 	private ContentShareService contentShareService;
 
@@ -108,6 +108,11 @@ public class RegistrationService extends BaseServiceImpl {
 		LOGGER.info("[RegistrationService][doUserRegistration] start ");
 		LOGGER.debug("User Details    " + userBean.toString());
 		if (isNewUser(userBean)) {
+			if (AzureChatUtils.isEmptyOrNull(userBean.getNameID())
+					|| AzureChatUtils.isEmptyOrNull(userBean.getIdProvider())) {
+				throw new AzureChatBusinessException(
+						"Unable to process the user registration.Name ID and/or Identity Provider is not set.Please clear browser cookies and try again.");
+			}
 			UserEntity userEntity = new UserEntity();
 			String uri = updateUserProfileImage(userBean);
 			try {
@@ -134,15 +139,11 @@ public class RegistrationService extends BaseServiceImpl {
 				}
 
 			} catch (Exception e) {
-				LOGGER.error("Azure storage exception while storing user registration details for user id : "
-						+ userBean.getUserID()
-						+ " and Name : "
-						+ userBean.getFirstName());
+				LOGGER.error("Exception occurred while storing the user detail in azure SQL table. Exception Message : "
+						+ e.getMessage());
 				throw new AzureChatBusinessException(
-						"Azure storage exception while storing user registration details for user id : "
-								+ userBean.getUserID()
-								+ " and Name : "
-								+ userBean.getFirstName());
+						"Exception occurred while storing the user detail in azure SQL table. Exception Message : "
+								+ e.getMessage());
 			}
 		}
 		LOGGER.info("[RegistrationService][doUserRegistration] end ");
@@ -173,17 +174,15 @@ public class RegistrationService extends BaseServiceImpl {
 					+ AzureChatConstants.CONSTANT_QUESTION_MARK
 					+ AzureChatUtils
 							.getSASUrl(AzureChatConstants.PROFILE_IMAGE_CONTAINER));
+			userBean.setFirstName(userEntity.getFirstName());
+			userBean.setLastName(userEntity.getLastName());
 		} catch (Exception e) {
-			LOGGER.error("Azure storage exception while updating user registration details for user id : "
-					+ userBean.getUserID()
-					+ " and Name : "
-					+ userBean.getFirstName());
+			LOGGER.error("Exception occurred while updating user profile details in azure SQL table.Exception Message : "
+					+ e.getMessage());
 			userBean.setMsg(AzureChatConstants.FAILURE_MSG_USR_PROF_UPDT);
 			throw new AzureChatBusinessException(
-					"Azure storage exception while updating user registration details for user id : "
-							+ userBean.getUserID()
-							+ " and Name : "
-							+ userBean.getFirstName() + " : " + e.getMessage());
+					"Exception occurred while updating user profile details in azure SQL table.Exception Message : "
+							+ e.getMessage());
 		}
 		userBean.setMsg(AzureChatConstants.SUCCESS_MSG_USR_PROF_UPDT);
 		// Set Multipart null to avoid internal server error on JSON parsing
@@ -280,14 +279,11 @@ public class RegistrationService extends BaseServiceImpl {
 			}
 
 		} catch (Exception e) {
-			LOGGER.error("Azure blob storage exception while storing profile image for user id : "
-					+ userBean.getUserID()
-					+ " and Name : "
-					+ userBean.getFirstName());
+			LOGGER.error("Exception occurred while storing user profile image in azure blob storage. Exception Message  : "
+					+ e.getMessage());
 			throw new AzureChatBusinessException(
-					"Azure storage exception while storing profile image for user id : "
-							+ userBean.getUserID() + " and Name : "
-							+ userBean.getFirstName() + " " + e.getMessage());
+					"Exception occurred while storing user profile image in azure blob storage. Exception Message  : "
+							+ e.getMessage());
 		}
 		LOGGER.info("[RegistrationService][updateUserProfileImage] end");
 		return photoURL;

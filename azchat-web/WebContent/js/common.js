@@ -81,4 +81,3 @@ function onlyNumbers(input){
 	input.value =  input.value.replace(reg,"");
 }
 
-

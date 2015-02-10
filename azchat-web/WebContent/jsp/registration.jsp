@@ -87,7 +87,7 @@
 										class="fa fa-user bigicon"></i></span>
 									<div class="col-md-6">
 										<form:input path="firstName" value="${userBean.firstName}"  id="fname" name="name" type="text"
-											placeholder="First Name" class="form-control" required="true" />
+											placeholder="First Name" class="form-control" required="true" maxlength="25" />
 									</div>
 								</div>
 								<div class="form-group">
@@ -95,7 +95,7 @@
 										class="fa fa-user bigicon"></i></span>
 									<div class="col-md-6">
 										<form:input path="lastName" value="${userBean.lastName}" id="lname" name="name" type="text"
-											placeholder="Last Name" class="form-control" required="true"/>
+											placeholder="Last Name" class="form-control" required="true" maxlength="25"/>
 									</div>
 								</div>
 
@@ -106,7 +106,7 @@
 										<form:input path="email" value="${userBean.email}" id="email" name="email" type="email"
 											placeholder="Email Address"
 											data-error="That email address is invalid"
-											class="form-control" required="true"/>
+											class="form-control" required="true" maxlength="50"/>
 									</div>
 								</div>
 
