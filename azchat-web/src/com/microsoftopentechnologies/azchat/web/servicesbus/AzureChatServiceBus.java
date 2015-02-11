@@ -58,8 +58,8 @@ import com.microsoftopentechnologies.azchat.web.mediaservice.AzureChatMediaServi
  * This class handles azure service bus related functionality.This class
  * provides the operations to read the video messages from the temporary storage
  * and process using AzChat media service.The raw video messages deleted from
- * the temporary storage post processing from the media services and stored in
- * to the azure storage.
+ * the temporary storage post processing from the media services and blob is
+ * stored in to the azure storage.
  *
  */
 @Component

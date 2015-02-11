@@ -42,10 +42,8 @@ import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserEntity
 @Service("userDao")
 public class UserDAOImpl implements UserDAO {
 
-	static final Logger LOGGER = LogManager.getLogger(UserDAOImpl.class);
-	private Connection connection = null;
-	private PreparedStatement preparedStatement = null;
-	private ResultSet resultSet = null;
+	private static final Logger LOGGER = LogManager
+			.getLogger(UserDAOImpl.class);
 
 	/**
 	 * This method executes adds new user query on the azure SQL user table.
@@ -55,12 +53,14 @@ public class UserDAOImpl implements UserDAO {
 	public UserEntity saveNewUser(UserEntity user) throws Exception {
 		LOGGER.info("[UserDAOImpl][saveNewUser] start ");
 		int userId = 0;
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(AzureChatSQLConstants.SAVE_NEW_USER);
-			preparedStatement = connection.prepareStatement(sqlString,
+			preparedStatement = connection.prepareStatement(
+					AzureChatSQLConstants.SAVE_NEW_USER,
 					Statement.RETURN_GENERATED_KEYS);
 			preparedStatement = generatePreparedStatement(preparedStatement,
 					user);
@@ -96,12 +96,14 @@ public class UserDAOImpl implements UserDAO {
 	public UserEntity getUserDetailsByUserId(Integer userId) throws Exception {
 		LOGGER.info("[UserDAOImpl][getUserDetailsByUserId] start ");
 		UserEntity user = null;
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_USERID);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_USER_BY_USERID);
 			preparedStatement.setInt(1, userId);
 			resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
@@ -134,12 +136,14 @@ public class UserDAOImpl implements UserDAO {
 			throws Exception {
 		LOGGER.info("[UserDAOImpl][getUserDetailsByNameID] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_NAMEID);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_USER_BY_NAMEID);
 			preparedStatement.setString(1, nameId);
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
@@ -174,13 +178,14 @@ public class UserDAOImpl implements UserDAO {
 			String nameId, String identityProvider) throws Exception {
 		LOGGER.info("[UserDAOImpl][getUserDetailsByNameIdAndIdentityProvider] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(
-					AzureChatSQLConstants.GET_USER_BY_NAMEID_IDNTITY_PROVIDR);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_USER_BY_NAMEID_IDNTITY_PROVIDR);
 			preparedStatement.setString(1, nameId);
 			preparedStatement.setString(2, identityProvider);
 			resultSet = preparedStatement.executeQuery();
@@ -213,13 +218,16 @@ public class UserDAOImpl implements UserDAO {
 			throws Exception {
 		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstName] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_FIRST_NAME);
-			preparedStatement = connection.prepareStatement(sqlString);
-			preparedStatement.setString(1, firstName + "%");
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_USER_BY_FIRST_NAME);
+			preparedStatement.setString(1, firstName
+					+ AzureChatConstants.CONSTANT_PERCENTAGE);
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				userEntities.add(generateUserObject(resultSet));
@@ -250,12 +258,14 @@ public class UserDAOImpl implements UserDAO {
 			throws Exception {
 		LOGGER.info("[UserDAOImpl][getUserDetailsByLastName] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(AzureChatSQLConstants.GET_USER_BY_LAST_NAME);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_USER_BY_LAST_NAME);
 			preparedStatement.setString(1, lastName
 					+ AzureChatConstants.CONSTANT_PERCENTAGE);
 			resultSet = preparedStatement.executeQuery();
@@ -288,13 +298,14 @@ public class UserDAOImpl implements UserDAO {
 			throws Exception {
 		LOGGER.info("[UserDAOImpl][getUserDetailsByFirstNameOrLastName] start ");
 		List<UserEntity> userEntities = new ArrayList<UserEntity>();
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(
-					AzureChatSQLConstants.GET_USER_BY_FIRST_LAST_NAME);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_USER_BY_FIRST_LAST_NAME);
 			preparedStatement.setString(1, name
 					+ AzureChatConstants.CONSTANT_PERCENTAGE);
 			preparedStatement.setString(2, name
@@ -380,12 +391,14 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public UserEntity updateNewUser(UserEntity user) throws Exception {
 		LOGGER.info("[UserDAOImpl][updateNewUser] start ");
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(AzureChatSQLConstants.UPDATE_NEW_USER);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.UPDATE_NEW_USER);
 			preparedStatement.setString(1, user.getFirstName());
 			preparedStatement.setString(2, user.getLastName());
 			preparedStatement.setString(3, user.getPhotoBlobUrl());
@@ -418,14 +431,15 @@ public class UserDAOImpl implements UserDAO {
 	 */
 	@Override
 	public String getUserPhotoBlobURL(Integer userId) throws Exception {
-		String profileImageURL = "";
-		String sqlString = null;
+		String profileImageURL = AzureChatConstants.CONSTANT_EMPTY_STRING;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(
-					AzureChatSQLConstants.GET_USER_PROFILE_URL_BY_USERID);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_USER_PROFILE_URL_BY_USERID);
 			preparedStatement.setInt(1, userId);
 			resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
@@ -449,17 +463,22 @@ public class UserDAOImpl implements UserDAO {
 	 */
 	@Override
 	public void createUserTable() throws Exception {
-		String sqlString = null;
+		Connection connection = null;
+		Connection connection1 = null;
+		PreparedStatement preparedStatement = null;
+		PreparedStatement preparedStatement1 = null;
 		try {
-			sqlString = new String(AzureChatSQLConstants.CREATE_USER_TABLE);
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			preparedStatement = connection.prepareStatement(sqlString);
-			preparedStatement.execute();
 			preparedStatement = connection
-					.prepareStatement(AzureChatSQLConstants.CREATE_USER_TABLE_INDEX);
+					.prepareStatement(AzureChatSQLConstants.CREATE_USER_TABLE);
 			preparedStatement.execute();
-		} catch (SQLException e) {
+			connection1 = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
+			preparedStatement1 = connection1
+					.prepareStatement(AzureChatSQLConstants.CREATE_USER_TABLE_INDEX);
+			preparedStatement1.execute();
+		} catch (Exception e) {
 			LOGGER.error("Exception occurred while executing create user table query on the azure SQL database. Exception Message : "
 					+ e.getMessage());
 			throw new AzureChatSystemException(
@@ -468,6 +487,8 @@ public class UserDAOImpl implements UserDAO {
 		} finally {
 			AzureChatUtils
 					.closeDatabaseResources(preparedStatement, connection);
+			AzureChatUtils.closeDatabaseResources(preparedStatement1,
+					connection1);
 
 		}
 	}

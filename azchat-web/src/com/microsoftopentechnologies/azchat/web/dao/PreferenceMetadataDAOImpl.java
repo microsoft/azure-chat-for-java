@@ -44,9 +44,6 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 
 	private static final Logger LOGGER = LogManager
 			.getLogger(PreferenceMetadataDAOImpl.class);
-	private Connection connection = null;
-	private PreparedStatement preparedStatement = null;
-	private ResultSet resultSet = null;
 
 	/**
 	 * This method adds the user preference data in the azure SQL table.
@@ -61,13 +58,14 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 		LOGGER.debug("PreferenceMetadataEntity    "
 				+ preferenceMetadataEntity.getPreferenceDesc());
 		int prefMetadataId = 0;
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(
-					AzureChatSQLConstants.ADD_PREFERENCE_METADATA);
-			preparedStatement = connection.prepareStatement(sqlString,
+			preparedStatement = connection.prepareStatement(
+					AzureChatSQLConstants.ADD_PREFERENCE_METADATA,
 					Statement.RETURN_GENERATED_KEYS);
 			preparedStatement = generatePreparedStatement(preparedStatement,
 					preferenceMetadataEntity);
@@ -103,13 +101,14 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 		LOGGER.debug("PreferenceMetadataEntity   id "
 				+ preferenceMetadataEntityId);
 		PreferenceMetadataEntity preferenceMetadataEntity = null;
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(
-					AzureChatSQLConstants.GET_PREFERENCE_METADATA_BY_ID);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_PREFERENCE_METADATA_BY_ID);
 			preparedStatement.setInt(1, preferenceMetadataEntityId);
 			resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
@@ -139,13 +138,14 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 			throws Exception {
 		LOGGER.info("[PreferenceMetadataEntity][getPreferenceMetadataEntityById]         start ");
 		List<PreferenceMetadataEntity> preferenceMetadataEntities = new ArrayList<PreferenceMetadataEntity>();
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(
-					AzureChatSQLConstants.GET_PREFERENCE_METADATA_ALL);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_PREFERENCE_METADATA_ALL);
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				preferenceMetadataEntities.add(generateUserObject(resultSet));
@@ -201,12 +201,12 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 	public PreferenceMetadataEntity generateUserObject(ResultSet resutSet)
 			throws SQLException {
 		PreferenceMetadataEntity preferenceMetadataEntity = new PreferenceMetadataEntity();
-		preferenceMetadataEntity.setPreferenceId(resultSet.getInt(1));
-		preferenceMetadataEntity.setPreferenceDesc(resultSet.getString(2));
-		preferenceMetadataEntity.setDateCreated(resultSet.getDate(3));
-		preferenceMetadataEntity.setCreatedBy(resultSet.getDate(3));
-		preferenceMetadataEntity.setDateModified(resultSet.getDate(3));
-		preferenceMetadataEntity.setModifiedBy(resultSet.getDate(3));
+		preferenceMetadataEntity.setPreferenceId(resutSet.getInt(1));
+		preferenceMetadataEntity.setPreferenceDesc(resutSet.getString(2));
+		preferenceMetadataEntity.setDateCreated(resutSet.getDate(3));
+		preferenceMetadataEntity.setCreatedBy(resutSet.getDate(3));
+		preferenceMetadataEntity.setDateModified(resutSet.getDate(3));
+		preferenceMetadataEntity.setModifiedBy(resutSet.getDate(3));
 		return preferenceMetadataEntity;
 
 	}
@@ -221,13 +221,14 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 			throws Exception {
 		LOGGER.info("[PreferenceMetadataEntity][getPreferenceMetadataEntityById]         start ");
 		Integer id = new Integer(0);
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(
-					AzureChatSQLConstants.GET_PREFERENCE_METADATA_BY_DESC);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_PREFERENCE_METADATA_BY_DESC);
 			preparedStatement.setString(1, desc);
 			resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
@@ -252,21 +253,21 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 	 */
 	@Override
 	public void createPreferenceMatedateTable() throws Exception {
-		String sqlString = null;
-		PreparedStatement prepStmtIndex = null;
-		Connection connIndex = null;
+		Connection connection = null;
+		Connection connection1 = null;
+		PreparedStatement preparedStatement = null;
+		PreparedStatement preparedStatement1 = null;
 		try {
-			sqlString = new String(
-					AzureChatSQLConstants.CREATE_PREFERENCE_METADATA_TABLE);
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			preparedStatement = connection.prepareStatement(sqlString);
-			connIndex = AzureChatUtils.getConnection(AzureChatUtils
-					.buildConnectionString());
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.CREATE_PREFERENCE_METADATA_TABLE);
 			preparedStatement.execute();
-			prepStmtIndex = connIndex
+			connection1 = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
+			preparedStatement1 = connection1
 					.prepareStatement(AzureChatSQLConstants.CREATE_PREFERENCE_METADATA_TABLE_INDEX);
-			prepStmtIndex.execute();
+			preparedStatement1.execute();
 		} catch (SQLException e) {
 			LOGGER.error("Exception occurred while executing create user table  query on azure SQL table. Exception Mesage : "
 					+ e.getMessage());
@@ -276,7 +277,8 @@ public class PreferenceMetadataDAOImpl implements PreferenceMetadataDAO {
 		} finally {
 			AzureChatUtils
 					.closeDatabaseResources(preparedStatement, connection);
-			AzureChatUtils.closeDatabaseResources(prepStmtIndex, connIndex);
+			AzureChatUtils.closeDatabaseResources(preparedStatement1,
+					connection1);
 		}
 	}
 

@@ -58,19 +58,19 @@ public abstract class BaseServiceImpl implements BaseService {
 		try {
 			executeService(baseBean);
 		} catch (AzureChatBusinessException e) {
-			LOGGER.error("AZChatBusinessException catched. Exception Message : "
+			LOGGER.error("AzureChatBusinessException catched. Exception Message : "
 					+ e.getMessage() + "Parsing and Adding the exceptions.");
 			addBusinessException(e, baseBean);
 
 		} catch (AzureChatSystemException e) {
-			LOGGER.error("AZChatSystemException catched. Exception Message : "
+			LOGGER.error("AzureChatSystemException catched. Exception Message : "
 					+ e.getMessage() + "Parsing and Adding the exceptions.");
 			addSystemException(e, baseBean);
 
 		} catch (AzureChatException e) {
-			LOGGER.error("AZChatException catched. Exception Message : "
+			LOGGER.error("AzureChatException catched. Exception Message : "
 					+ e.getMessage() + "Parsing and Adding the exceptions.");
-			addAZChatException(e, baseBean);
+			addAzChatException(e, baseBean);
 
 		} catch (Exception e) {
 			LOGGER.error("Exception catched. Exception Message : "
@@ -113,7 +113,7 @@ public abstract class BaseServiceImpl implements BaseService {
 	 * @param e
 	 * @param baseBean
 	 */
-	private void addAZChatException(AzureChatException e, BaseBean baseBean) {
+	private void addAzChatException(AzureChatException e, BaseBean baseBean) {
 		LOGGER.info("[BaseServiceImpl][addAZChatException] start");
 		ErrorBean error = new ErrorBean();
 		ErrorListBean errorListBean = new ErrorListBean();

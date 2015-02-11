@@ -44,10 +44,11 @@ import com.microsoftopentechnologies.azchat.web.dao.data.entities.storage.UserMe
 import com.microsoftopentechnologies.azchat.web.mediaservice.AzureChatMediaService;
 
 /**
- * This class runs as a thread to get the set of messages from user message
- * table & check whether messages message is expired & deleted or still present
- * in queue. If present then, it will keep it in table or delete from table
- * also.
+ * This class handles the user message expiry functionality by using spring
+ * timer tasks and azure queue.This class executes scheduled operation to delete
+ * the expired user messages from the table by comparing with messages in queue
+ * which has automatic functionality to delete the messages once the specified
+ * time/ expiry time for the corresponding message reaches.
  * 
  * @author Rupesh_Shirude
  *
@@ -59,8 +60,14 @@ public class UserMessageExpiryHandler {
 			.getLogger(UserMessageExpiryHandler.class);
 
 	/**
-	 * This is Spring Scheduled Fixed Task.This method will delete the messages
-	 * from UserMessage table which are expired and removed from queue.
+	 * This is Spring task scheduler method.This method executes fixed timer
+	 * interval as per the fixedRate provided in millisecond's.Delete the
+	 * messages from the userMessage table by comparing with the queue
+	 * messages.Azure queue has functionality to specify the message expiry time
+	 * and once messages crosses specified time it automatically gets deleted
+	 * from the queue.This method compare the azure queue and user message
+	 * storage table with each other and delete the user messages from the table
+	 * for which corresponding message is deleted from the queue.
 	 * 
 	 * @param setOfMessageIdsInQueue
 	 */
@@ -126,7 +133,7 @@ public class UserMessageExpiryHandler {
 		MessageCommentsDAO messageCommentsDAO = new MessageCommentsDAOImpl();
 		messageCommentsDAO.deleteAllMessageComments(messageEntity
 				.getMessageID());
-		// 3 :  delete associated likes for this message.
+		// 3 : delete associated likes for this message.
 		MessageLikeEntityDAO messageLikeEntityDAO = new MessageLikeEntityDAOImpl();
 		messageLikeEntityDAO.deleteMessageLikeByMessageId(messageEntity
 				.getMessageID());
@@ -144,7 +151,7 @@ public class UserMessageExpiryHandler {
 			TableOperation deleteOperation = TableOperation.delete(entity);
 			cloudTable.execute(deleteOperation);
 		}
-		// 5 :  delete video asset from media service account after expiry
+		// 5 : delete video asset from media service account after expiry
 		// time.
 		if (null != messageEntity.getMediaType()
 				&& messageEntity.getMediaType().contains(

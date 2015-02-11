@@ -20,10 +20,10 @@ import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
 /**
  * This class can be used to raise the application specific exceptions.Single
  * parameter constructor create the exception instance with customized message
- * which in turn appends the more information like exception code and exception
- * type for business category exception by calling super class constructor.
- * Customized exception code and type can also be provided by using
- * parameterized constructor.
+ * and call the super constructor with default information for exception code
+ * and exception type.This class specifically set the exception code and type as
+ * a business category exception. Customized exception code and type can also be
+ * provided by using parameterized constructor.
  * 
  * @author Dnyaneshwar_Pawar
  *
@@ -31,12 +31,12 @@ import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
 public class AzureChatBusinessException extends AzureChatException {
 
 	/**
-	 * Generated serial version id for AZChatBusinessExcdeption
+	 * Generated serial version id for AzureChatBusinessException
 	 */
 	private static final long serialVersionUID = -8265777189718232923L;
 
 	/**
-	 * Parameterized constructor to generate custom azchat business exceptions.
+	 * Parameterized constructor to generate custom AzChat business exceptions.
 	 * 
 	 * @param excpMsg
 	 */
@@ -46,7 +46,7 @@ public class AzureChatBusinessException extends AzureChatException {
 	}
 
 	/**
-	 * Parameterized constructor to generate custom azchat business exceptions.
+	 * Parameterized constructor to generate custom AzChat business exceptions.
 	 * Exception code is the exception severity level mainly Business and System
 	 * exception and exception type is exception class identifies exception
 	 * area.

@@ -50,8 +50,10 @@ public class EmailNotificationHandler {
 			.getLogger(EmailNotificationHandler.class);
 
 	/**
-	 * This method is used to send mail about friend request notification &
-	 * logged it in logger.
+	 * This method is used to send mail about friend request notification. 
+	 * TODO : Currently this method does not support email sending it just logs the
+	 * message using log4j implementation.If you want to send the email's you
+	 * need to hook corresponding code.
 	 * 
 	 * @throws Exception
 	 */

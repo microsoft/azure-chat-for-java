@@ -28,8 +28,8 @@ import com.microsoftopentechnologies.azchat.web.data.beans.ErrorListBean;
 /**
  * This class stores the application startup data and errors in application
  * context. This class provides the operations to parse the input exception
- * object to the error bean and add the error bean to the error list which in
- * turn set to the errorListBean and finally errorListBean is set to the base
+ * object to the error bean and add the error bean to the error list.errorList
+ * is set to the errorListBean and finally errorListBean is set to the base
  * bean.
  * 
  * @author Dnyaneshwar_Pawar
@@ -42,8 +42,8 @@ public class AzureChatStartupUtils {
 	 * This method add the startup errors to the application context.This method
 	 * takes exception object as a input parse it to error bean,add errorBean to
 	 * the errorList.Set errorList to the errorListBean and finally set
-	 * errorListBean to the baseBean. error list and store the baseBean to the
-	 * application context.
+	 * errorListBean to the baseBean and store the baseBean to the application
+	 * context.
 	 * 
 	 * @param e
 	 */

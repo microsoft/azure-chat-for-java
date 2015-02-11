@@ -44,11 +44,8 @@ import com.microsoftopentechnologies.azchat.web.dao.data.entities.sql.UserPrefer
 @Service("userPreferenceDAO")
 public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 
-	static final Logger LOGGER = LogManager
+	private static final Logger LOGGER = LogManager
 			.getLogger(UserPreferenceDAOImpl.class);
-	private Connection connection = null;
-	private PreparedStatement preparedStatement = null;
-	private ResultSet resultSet = null;
 
 	/**
 	 * This method executes add user preference query on azure SQL user
@@ -64,12 +61,14 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 			UserPreferenceEntity userPreferenceEntity) throws Exception {
 		LOGGER.info("[UserPreferenceEntity][addUserPreferenceEntity] start ");
 		int userPreferenceId = 0;
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(AzureChatSQLConstants.ADD_USER_PREFERENCE);
-			preparedStatement = connection.prepareStatement(sqlString,
+			preparedStatement = connection.prepareStatement(
+					AzureChatSQLConstants.ADD_USER_PREFERENCE,
 					Statement.RETURN_GENERATED_KEYS);
 			preparedStatement = generatePreparedStatement(preparedStatement,
 					userPreferenceEntity);
@@ -107,13 +106,14 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 			throws Exception {
 		LOGGER.info("[UserPreferenceDAOImpl][getUserPreferenceEntity]         start ");
 		List<UserPreferenceEntity> userPreferenceEntities = new ArrayList<UserPreferenceEntity>();
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(
-					AzureChatSQLConstants.GET_USER_PREFERENCE_BY_USERID);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_USER_PREFERENCE_BY_USERID);
 			preparedStatement.setInt(1, userId);
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
@@ -148,13 +148,14 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 			Integer preferenceMetadataId) throws Exception {
 		LOGGER.info("[UserPreferenceDAOImpl][getUserPreferenceEntity] start ");
 		List<UserPreferenceEntity> userPreferenceEntities = new ArrayList<UserPreferenceEntity>();
-		String sqlString = null;
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			sqlString = new String(
-					AzureChatSQLConstants.GET_USER_PREFERENCE_BY_USERID_PREFERENCEID);
-			preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement = connection
+					.prepareStatement(AzureChatSQLConstants.GET_USER_PREFERENCE_BY_USERID_PREFERENCEID);
 			preparedStatement.setInt(1, userId);
 			preparedStatement.setInt(2, preferenceMetadataId);
 			resultSet = preparedStatement.executeQuery();
@@ -230,17 +231,21 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 	 */
 	@Override
 	public void createUserPreferenceTable() throws Exception {
-		String sqlString = null;
+		Connection connection = null;
+		Connection connection1 = null;
+		PreparedStatement preparedStatement = null;
+		PreparedStatement preparedStatement1 = null;
 		try {
-			sqlString = new String(
-					AzureChatSQLConstants.CREATE_USER_PREFERENCES_TABLE);
 			connection = AzureChatUtils.getConnection(AzureChatUtils
 					.buildConnectionString());
-			preparedStatement = connection.prepareStatement(sqlString);
-			preparedStatement.execute();
 			preparedStatement = connection
-					.prepareStatement(AzureChatSQLConstants.CREATE_USER_PREFERENCES_TABLE_INDEX);
+					.prepareStatement(AzureChatSQLConstants.CREATE_USER_PREFERENCES_TABLE);
 			preparedStatement.execute();
+			connection1 = AzureChatUtils.getConnection(AzureChatUtils
+					.buildConnectionString());
+			preparedStatement1 = connection1
+					.prepareStatement(AzureChatSQLConstants.CREATE_USER_PREFERENCES_TABLE_INDEX);
+			preparedStatement1.execute();
 		} catch (Exception e) {
 			LOGGER.error("Exception occurred while executing create user preference table in Azure SQL database. Exception Message  : "
 					+ e.getMessage());
@@ -250,6 +255,8 @@ public class UserPreferenceDAOImpl implements UserPreferenceDAO {
 		} finally {
 			AzureChatUtils
 					.closeDatabaseResources(preparedStatement, connection);
+			AzureChatUtils.closeDatabaseResources(preparedStatement1,
+					connection1);
 		}
 
 	}

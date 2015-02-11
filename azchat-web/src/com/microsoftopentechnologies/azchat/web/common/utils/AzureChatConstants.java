@@ -27,8 +27,8 @@ public interface AzureChatConstants {
 	String EXCEP_CODE_BUSSINESS_EXCEPTION = "BE";
 	String EXCEP_CODE_SYSTEM_EXCEPTION = "SE";
 	String EXCEP_CODE_JAVA_EXCEPTION = "JE";
-	String EXCEP_TYPE_BUSSINESS_EXCEPTION = "com.microsoftopentechnologies.azchat.web.common.exceptions.AZChatBusinessExcdeption";
-	String EXCEP_TYPE_SYSTYEM_EXCEPTION = "com.microsoftopentechnologies.azchat.web.common.exceptions.AZChatSystemException";
+	String EXCEP_TYPE_BUSSINESS_EXCEPTION = "com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatBusinessExcdeption";
+	String EXCEP_TYPE_SYSTYEM_EXCEPTION = "com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatSystemException";
 	String EXCEP_MSG_STARTUP_CONTENT_SHARE = "excp.msg.content.share.startup";
 	String EXCEP_MSG_STARTUP_FRINED_REQ = "excp.msg.friend.req.startup";
 	String EXCEP_MSG_STARTUP_USER_SQL_TABLES = "excp.msg.user.sql.tables.startup";

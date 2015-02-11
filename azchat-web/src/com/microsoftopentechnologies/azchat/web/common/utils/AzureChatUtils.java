@@ -71,7 +71,7 @@ public class AzureChatUtils {
 	 * @throws Exception
 	 */
 	public static Document getDocument(String data) throws Exception {
-		LOGGER.info("[AZChatUtils][getDocument] start");
+		LOGGER.info("[AzureChatUtils][getDocument] start");
 		Document document = null;
 		DocumentBuilder documentBuilder;
 
@@ -84,7 +84,7 @@ public class AzureChatUtils {
 		ByteArrayInputStream bis = new ByteArrayInputStream(samlToken);
 		document = documentBuilder.parse(bis);
 		document.getDocumentElement().normalize();
-		LOGGER.info("[AZChatUtils][getDocument] end");
+		LOGGER.info("[AzureChatUtils][getDocument] end");
 		return document;
 	}
 
@@ -98,11 +98,11 @@ public class AzureChatUtils {
 	 */
 	public static String getNameIDFromAssertion(XPath xPath,
 			Document assertionDoc) throws Exception {
-		LOGGER.info("[AZChatUtils][getNameIDFromAssertion] start");
+		LOGGER.info("[AzureChatUtils][getNameIDFromAssertion] start");
 		Node nameIDNode = (Node) xPath.evaluate(
 				AzureChatConstants.NAME_ID_NODE, assertionDoc,
 				XPathConstants.NODE);
-		LOGGER.info("[AZChatUtils][getNameIDFromAssertion] end");
+		LOGGER.info("[AzureChatUtils][getNameIDFromAssertion] end");
 		return nameIDNode.getTextContent();
 	}
 
@@ -116,7 +116,7 @@ public class AzureChatUtils {
 	 */
 	public static Map<String, String> getUserAttributeDetails(XPath xPath,
 			Document assertionDoc) throws Exception {
-		LOGGER.info("[AZChatUtils][getUserAttributeDetails] start");
+		LOGGER.info("[AzureChatUtils][getUserAttributeDetails] start");
 		NodeList userAttributes = (NodeList) xPath.evaluate(
 				AzureChatConstants.ATTRIBUTE_NODE, assertionDoc,
 				XPathConstants.NODESET);
@@ -146,7 +146,7 @@ public class AzureChatUtils {
 			}
 
 		}
-		LOGGER.info("[AZChatUtils][getUserAttributeDetails] start");
+		LOGGER.info("[AzureChatUtils][getUserAttributeDetails] start");
 		return claimMap;
 	}
 

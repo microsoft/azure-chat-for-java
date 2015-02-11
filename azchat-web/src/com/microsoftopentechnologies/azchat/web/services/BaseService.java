@@ -19,7 +19,7 @@ import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatExcep
 import com.microsoftopentechnologies.azchat.web.data.beans.BaseBean;
 
 /**
- * This interface defines contract for azure chat application service layer binding.
+ * This interface defines contract for AzChat application service layer binding.
  * 
  * @author Dnyaneshwar_Pawar
  *

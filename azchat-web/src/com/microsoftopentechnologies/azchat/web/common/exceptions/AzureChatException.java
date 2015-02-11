@@ -16,7 +16,7 @@
 package com.microsoftopentechnologies.azchat.web.common.exceptions;
 
 /**
- * Parent class used to raise the application specific exception.This class
+ * Azure exception hierarchy parent class used to raise the application specific exception.This class
  * can hold the more information about exception like exception code and type
  * with customized exception message. 
  * 
@@ -26,7 +26,7 @@ package com.microsoftopentechnologies.azchat.web.common.exceptions;
 public class AzureChatException extends Exception {
 
 	/**
-	 * Generated Serial version id for AZChatExceptions
+	 * Generated Serial version id for AzureChatException
 	 */
 	private static final long serialVersionUID = 8609243190793948020L;
 	private String excpCode;

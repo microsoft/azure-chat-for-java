@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.microsoftopentechnologies.azchat.web.common.exceptions.AzureChatException;
-import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatAppCtxUtils;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatConstants;
 import com.microsoftopentechnologies.azchat.web.common.utils.AzureChatStartupUtils;
 import com.microsoftopentechnologies.azchat.web.common.utils.ServiceActionEnum;
@@ -36,7 +35,7 @@ import com.microsoftopentechnologies.azchat.web.data.beans.UserBean;
 import com.microsoftopentechnologies.azchat.web.services.BaseService;
 
 /**
- * LoginController for azchat.This controller redirect user to the login page
+ * LoginController for AzChat.This controller redirect user to the login page
  * and also handle the login flow.On Successful login corresponding service logs
  * the user details in azure database.
  * 

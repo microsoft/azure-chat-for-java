@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.ServletContextAware;
 
 /**
- * ContextAware implementation to store the ServletContext to be used in the
- * application as a cache.
+ * ServletContextAware implementation class to store the ServletContext to be
+ * used in the application as a cache.
  * 
  * @author Dnyaneshwar_pawar
  *
