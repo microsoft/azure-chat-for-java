@@ -1,0 +1,403 @@
+@CHARSET "ISO-8859-1";
+
+.navbar-custom {
+	color: white;
+	background-color: white;
+	text-decoration: none;
+}
+
+.jumbotron {
+	background-color: white;
+	color: white;
+}
+
+.container {
+	background-color: white;
+	color: white;
+}
+
+.azchat-div {
+	background-color: white;
+	color: white;
+}
+
+.color-black {
+	color: black;
+}
+	
+.margin-zero {
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
+/* custom template */
+html, body {
+	height: 100%;
+	font-family: verdana, arial, sans-serif;
+	color: #555555;
+	overflow : hidden;
+}
+
+.nav {
+	font-family: Arial, sans-serif;
+	font-size: 13px;
+}
+
+a {
+	color: #222222;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+hr {
+	border-color: #dedede;
+}
+
+.wrapper, .row {
+	height: 100%;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.wrapper:before, .wrapper:after, .column:before, .column:after {
+	content: "";
+	display: table;
+}
+
+.wrapper:after, .column:after {
+	clear: both;
+}
+
+.column {
+	height: 100%;
+	overflow: auto;
+	*zoom: 1;
+}
+
+.column .padding {
+	padding: 20px;
+}
+
+.full {
+	padding-top: 70px;
+}
+
+.box {
+	bottom: 0; 
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	background-color: #444444;
+}
+
+.divider {
+	margin-top: 32px;
+}
+
+.navbar-lblue {
+	border-width: 0;
+	background-color: #6DA5CD;
+	color: #ffffff;
+	font-family: arial, sans-serif;
+	top: 0;
+	position: fixed;
+	width: inherit;
+}
+
+.navbar-lblue li>a, .navbar-toggle {
+	color: #efefef;
+}
+
+.navbar-lblue .dropdown-menu li a {
+	color: #3B5893;
+}
+
+.navbar-lblue .dropdown-menu li>a {
+	padding-left: 30px;
+}
+
+.navbar-lblue li>a:hover, .navbar-lblue li>a:focus, .navbar-lblue .open>a, .navbar-lblue .open>a:hover, .navbar-lblue .open>a:focus
+	{
+	background-color: #3B5893;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+	background-color: #3B5893 !important;
+	text-decoration: none;
+}
+
+#main {
+	background-color: #e9eaed;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+#sidebar {
+	padding: 0px;
+	padding-top: 15px;
+}
+
+#sidebar, #sidebar a, #sidebar-footer a {
+	color: #ffffff;
+	background-color: transparent;
+	text-shadow: 0 0 2px #000000;
+	padding-left: 5px;
+}
+
+#sidebar .nav li>a:hover {
+	background-color: #393939;
+}
+
+.logo {
+	display: block;
+	padding: 3px;
+	background-color: #fff;
+	color: #3B5999;
+	height: 28px;
+	width: 28px;
+	margin: 9px;
+	margin-right: 2px;
+	margin-left: 15px;
+	font-size: 20px;
+	font-weight: 700;
+	text-align: center;
+	text-decoration: none;
+	text-shadow: 0 0 1px;
+	border-radius: 2px;
+}
+
+#sidebar-footer {
+	background-color: #444;
+	position: absolute;
+	bottom: 5px;
+	padding: 5px;
+}
+
+#footer {
+	margin-bottom: 20px;
+}
+
+/* Message Update Container */
+
+.update-box {
+	width: 100%;
+}
+
+.update-box .communicate {
+	margin-bottom: 10px;
+	position: relative;
+}
+
+.update-box .communicate .arrow {
+	background: url(arrow.png) no-repeat #dddddd;
+	position: absolute;
+	width: 14px;
+	height: 10px;
+	left: 10px;
+	display: inline;
+	top: -10px;
+	transition: 0.3s ease-out all;
+}
+
+.update-box .post-case li a {
+	color: #085083;
+	text-decoration: none;
+}
+
+.update-box .post-case li a.active {
+	color: #404040;
+}
+
+.update-box .post-case {
+	padding-left: 5px;
+}
+
+.update-box ul {
+	list-style: none;
+	margin-bottom: 9px;
+}
+
+.update-box .post-case li {
+	display: inline;
+	margin-right: 10px;
+}
+
+.message {
+	border-radius: 0;
+	border: none;
+}
+
+.panel {
+	border-radius: 0;
+	border: none;
+	margin-bottom: 0;
+}
+
+.privacy-dropdown {
+	width: 100px;
+}
+
+/* bootstrap overrides */
+h1, h2, h3 {
+	font-weight: 800;
+}
+
+.navbar-toggle, .close {
+	outline: 0;
+}
+
+.navbar-toggle .icon-bar {
+	background-color: #fff;
+}
+
+.btn-primary, .label-primary, .list-group-item.active, .list-group-item.active:hover,
+	.list-group-item.active:focus {
+	background-color: #3B5999;
+	color: #fffffe;
+}
+
+.btn-default {
+	color: #666666;
+	text-shadow: 0 0 1px rgba(0, 0, 0, .3);
+}
+
+.panel textarea, .well textarea, textarea.form-control {
+	resize: none;
+}
+
+.badge {
+	color: #3B5999;
+	background-color: #fff;
+}
+
+.badge:hover, .badge-inverse {
+	background-color: #3B5999;
+	color: #fff;
+}
+
+.jumbotron {
+	background-color: transparent;
+}
+
+.label-default {
+	background-color: #dddddd;
+}
+
+.page-header {
+	margin-top: 55px;
+	padding-top: 9px;
+	border-top: 1px solid #eeeeee;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+}
+
+.panel-default .panel-heading {
+	background-color: #f9fafb;
+	color: #555555;
+}
+
+.col-sm-9.full {
+	width: 100%;
+}
+
+small.text-muted {
+	font-family: courier, courier-new, monospace;
+}
+
+/*   changes for css of avatar label*/
+
+[type=file] {
+    position: absolute;
+    filter: alpha(opacity=0);
+    opacity: 0;
+}
+.upload-text {
+  border: 1px solid #CCC;
+  border-radius: 3px;
+  text-align: left;
+  padding: 10px;
+  width: 150px;
+  margin: 0;
+  left: 0;
+  position: relative;
+}
+
+/* Custom CSS */
+
+.avatar-label {
+	text-align:left; 
+	width: 278px !important;
+	font-weight: 200;
+	margin-left: 10px;
+	margin-top: 10px;
+}
+
+/* Custom CSS for status Feed Block*/
+
+.friend-info-box {
+	height:120px;
+	display:inline-block;
+}
+.friend-image-size {
+	min-height: 50px;
+	max-height: 120px;
+	min-width: 50px;
+	max-width: 120px;
+}
+.status-update-box {
+	height: 500px;
+	overflow-x: hidden;
+}
+.profilePic{
+	position: fixed;
+}
+.profileUserName{
+	height: 50px;
+    text-align: left;
+}
+.userStatus {
+	margin-top: 55px;
+    padding: 10px;
+}
+.videoContent, .imageContent {
+	min-height: 100px;
+	max-height: 612px;
+	min-width: 100px;
+	max-width: 612px;
+}
+.time-ago {
+	display: inline;
+	font-weight: lighter !important;
+	text-align: right;
+	opacity: 5;
+}
+.like-comment-status {
+	margin-top: 10px;
+	border: 1px solid activeborder;
+	background-color: #EFEFEF;
+	cursor: pointer;
+	position: absolute;
+	
+}
+.like-comment-data {
+	display: none;
+	padding-top: 10px;
+}
+.statusBorder {
+	padding-bottom: 20px;
+	padding-top: 10px;
+	border-width:thin;
+	border-bottom-style: dashed;
+	border-spacing: 10px;
+}
+.friendComment {
+	padding-bottom: 60px;
+}
+.typeahead-srch-frnd {
+	font-weight: bolder;
+	font-stretch: wider;
+}
