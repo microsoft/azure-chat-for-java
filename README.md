@@ -76,7 +76,7 @@ The following Azure services need to be created from the Azure management portal
     * Click New > App Services > Active Directory > Access Control > Quick Create. 
 	* Enter a name space and a region, click CREATE.
 	* After the service has been created and activated, click on MANAGE to define the configuration for the Access control service.
-	* Click on identity providers and the click and add an identity provider. The Sample application currently supports Live, Yahoo and Google. 
+	* Click on identity providers and then click and add an identity provider. The Sample application currently supports Live, Yahoo and Google. 
 		* Note that Google [deprecated OpenID 2.0 support as of May 19, 2014](https://developers.google.com/accounts/docs/OpenID2 "OpenID support Deprecation") ,so ACS namespaces created after that date do not support Google as an identity provider.
     
 	*Click on relying party applications and configure properties as below
@@ -126,11 +126,10 @@ The following Azure services need to be created from the Azure management portal
  * At the bottom of the navigation pane, click NEW > Data Services > SQL Database > Quick Create.
  * Choose New SQL Database Server
  * Select an appropriate region, choose a login name and a password.  Make a note of both.
- * When the Database is created and shows as online, 
- * Next - set up DB access by opening your Database service, then click on Configure
-	 * If you plan on runnning this aplpication locally, add your current IP address to the allowed IP addresses.  
+ * Next - set up DB access by opening your Database service from under SQL Database > Servers, then click on Configure
+	 * If you plan on runnning this application locally, add your current IP address to the allowed IP addresses.  
 	 *  If you plan to run this application on Azure, make sure Windows Azure Services is selected as an allowed service.
- * Open the database service then click on "Show Connection Strings" on the right. 
+ * Open the SQL Database > Dashboard, then click on "Show connection strings" on the right.
  * Open the azchatResources.properties file, located under azure-chat-for-java-master\azchat-web\src\main\resources in the Eclipse project
  * Use the values from the JDBC connection string to update the values:
  
@@ -161,7 +160,7 @@ The following Azure services need to be created from the Azure management portal
  * In the lower pane of the Management Portal, click Create.
  * Select an appropriate queue name, region, and namespace
  * When the Service Bus Queue is created and shows as Active, open the Queue service then click on "Manage Connection Strings" on the right. 
- *Open the azchatResources.properties file, located under azure-chat-for-java-master\azchat-web\src\main\resources in the Eclipse project
+ * Open the azchatResources.properties file, located under azure-chat-for-java-master\azchat-web\src\main\resources in the Eclipse project
  * Use the values from the Access Connection Information to update the values:
  
  	   * service.bus.namespace: The namespace you just created.
@@ -174,9 +173,8 @@ The following Azure services need to be created from the Azure management portal
 ###Create an Azure Media Service
  * Sign into the Management Portal.
  * Click New > App Services > Media Service > Quick Create
- * Select an a
- * ppropriate name and region
- * Choose the default of Create a new Storage Account and the default Storage Account name
+ * Select an appropriate name and region
+ * Choose to Create a new Storage Account and accept the default Storage Account name
  
 	#####Scale your Streaming Endpoints and Encoding for the Media Service
 	The on demand streaming feature for Azure Chat for Java only works after you scale your media service.   
