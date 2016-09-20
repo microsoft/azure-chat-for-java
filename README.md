@@ -10,7 +10,7 @@ Following [Microsoft Azure services](http://azure.microsoft.com/ "Microsoft Azur
 
 - [Azure Access Control Service (ACS)](http://azure.microsoft.com/en-us/documentation/articles/active-directory-java-authenticate-users-access-control-eclipse/ "Azure ACS") manages user identities and access to the application 
 
-- [Azure SQL Database](http://azure.microsoft.com/en-us/documentation/articles/sql-data-java-how-to-use-sql-database/ "Azure SQL") stores user profiles
+- [Azure SQL Database](https://azure.microsoft.com/en-us/documentation/services/sql-database/ "Azure SQL") stores user profiles
 - [Azure Tables](http://azure.microsoft.com/en-us/documentation/articles/storage-java-how-to-use-table-storage/) manage friend relationships
 
 - [Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-java-how-to-use-blob-storage/) stores media
