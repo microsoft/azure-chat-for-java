@@ -1,7 +1,7 @@
-#Azure-chat-for-java
+# Azure-chat-for-java
 This readme outlines steps for configuring and deploying the “azure-chat-for-java” application.
 
-##Application summary:
+## Application summary:
 Azure Chat for Java is a sample Java application designed to show key features of the [Microsoft Azure SDK for Java](http://azure.microsoft.com/en-us/develop/java/ "Azure Dev Center").    
 
  
@@ -22,7 +22,7 @@ Following [Microsoft Azure services](http://azure.microsoft.com/ "Microsoft Azur
 - [Azure Service Bus Queues](http://azure.microsoft.com/en-us/documentation/articles/service-bus-java-how-to-use-queues/) Manage deletion of items from storage once media services has completed processing, and controls message expiry  
 
 
-##Software Requirements:
+## Software Requirements:
 In order to run the application you need to install the following items:
 
 1.	 JDK 1.8
@@ -31,7 +31,7 @@ In order to run the application you need to install the following items:
 4.	 Any major JEE Web App Server
 5.	 Spring 4.1
 
-##Steps to deploy
+## Steps to deploy
 
 1.	Clone this GitHub repo
 2.	Install Packages via Maven (mvn clean compile package)
@@ -41,9 +41,9 @@ In order to run the application you need to install the following items:
 6.	Configure the application properties based on the Azure services you create
 7.	Run the application locally or on Microsoft Azure
 
-##Cloning the Repo and Installing Packages via Maven
+## Cloning the Repo and Installing Packages via Maven
 
-###Install the JDK, Eclipse and Maven and prepare the Eclipse Maven Project
+### Install the JDK, Eclipse and Maven and prepare the Eclipse Maven Project
 1. Make sure [JDK 1.8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html), [Eclipse EE](https://eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/keplersr2) and [Apache Maven](http://maven.apache.org/download.cgi) are installed and working on your local machine
 2. Clone [this GitHub repo](http://github.com/MSOpenTech/azure-chat-for-java/) locally using your favorite Git tools
 3. Run the following maven commands:
@@ -59,18 +59,18 @@ OPTIONAL - Import the package into Eclipse as a Maven Project:
 * File > import > Existing Maven Project
 * In Eclipse, right-click on the project then select Run As > Maven Install to build the project in Eclipse and rebuild the .WAR file   
 
-##Azure Services configuration 
+## Azure Services configuration 
 The following Azure services need to be created from the Azure management portal.  If you don't already have an Azure account you can sign up for a free trial at [http://azure.microsoft.com](http://azure.microsoft.com)  
 
 
-###Create an Azure Cloud Service
+### Create an Azure Cloud Service
 
 1. Azure Cloud Service - you need to create a unique Azure Cloud Service name to be used with the other services below.
     * Sign into the Azure Management Portal
     * Click New > Compute > Cloud Service > Quick Create
     * Enter a Cloud Service name and an appropriate region.
 
-###Configure the Azure Access Control Service
+### Configure the Azure Access Control Service
 1. Access control name space
 	* Sign into the Azure Management Portal
     * Click New > App Services > Active Directory > Access Control > Quick Create. 
@@ -116,12 +116,12 @@ The following Azure services need to be created from the Azure management portal
  * Click on Application integration -> Login pages -> and copy the ACS endpoint under "Option 1: Link to an ACS-hosted login page" to the left of the first question mark (?) to your clipboard.
  * It will be in the form of https://your ACS namespace>.accesscontrol.windows.net:443/v2/wsfederation
 
-	###Update the web.xml in your Eclipse Project
+	### Update the web.xml in your Eclipse Project
 	In Eclipse, navigate to \azure-chat-for-java-master\azchat-web\src\main\webapp\WEB-INF
      1.	Paste from the clipboard into the PassiveRequestorEndpoint init value 
      2.	Update the RelyingPartRealm value with your Cloud Service name
 
-###Create an Azure SQL Database:  
+### Create an Azure SQL Database:  
  * Log into the Azure Management Portal
  * At the bottom of the navigation pane, click NEW > Data Services > SQL Database > Quick Create.
  * Choose New SQL Database Server
@@ -143,7 +143,7 @@ The following Azure services need to be created from the Azure management portal
 	* db.encrypt: false
 	* db.driver.classname: com.microsoft.sqlserver.jdbc.SQLServerDriver
  
-###Create an Azure Storage Account: 
+### Create an Azure Storage Account: 
  * Sign into the Management Portal.
  * Click New > Storage > Quick Create.
  * Select an appropriate storage name, region, and choose the default replication of Geo-Redundant
@@ -155,7 +155,7 @@ The following Azure services need to be created from the Azure management portal
        * default.endpoint.protocol: DefaultEndpointsProtocol=http;
   * For more details on Azure Storage Accounts, click [here](http://azure.microsoft.com/en-in/documentation/articles/storage-create-storage-account/)
         
-###Create an Azure Service Bus Queue
+### Create an Azure Service Bus Queue
  * Sign into the Management Portal.
  * Click New > App Services > Service Bus > Queue > Quick Create.
  * In the lower pane of the Management Portal, click Create.
@@ -171,14 +171,14 @@ The following Azure services need to be created from the Azure management portal
        
        
 
-###Create an Azure Media Service
+### Create an Azure Media Service
  * Sign into the Management Portal.
  * Click New > App Services > Media Service > Quick Create
  * Select an a
  * ppropriate name and region
  * Choose the default of Create a new Storage Account and the default Storage Account name
  
-	#####Scale your Streaming Endpoints and Encoding for the Media Service
+	##### Scale your Streaming Endpoints and Encoding for the Media Service
 	The on demand streaming feature for Azure Chat for Java only works after you scale your media service.   
 	* When the Media Service created and shows as Active, open the service then click on STREAMING ENDPOINTS form the menu along the top
 	* Click on default and configure Streaming units to 2 units
@@ -198,14 +198,14 @@ The following Azure services need to be created from the Azure management portal
 
        
 
-#Local Deployment:
+## Local Deployment:
 To deploy the application locally, user needs to follow these steps:
 
-###Edit Azure Access Control to point to the local application
+### Edit Azure Access Control to point to the local application
  * Edit the Relying Party Application on the portal to point to local URLs.  
  * See the "Configure the Azure Access Control Service" section above for how to change URLs.
   
-###Update the web.xml in your Eclipse Project
+### Update the web.xml in your Eclipse Project
 * In Eclipse, navigate to azure-chat-for-java-master\azchat-web\src\main\webapp\WEB-INF
 	* Update the RelyingPartRealm value with your local URL 
 * Edit the LOG4J_HOME environment variable
@@ -220,20 +220,20 @@ and add your current IP address to the allowed IP addresses
 	*mvn clean compile package* 
 
  
-#Azure deployment:
+## Azure deployment:
 
-###Edit Azure Access Control to point to the Azure application
+### Edit Azure Access Control to point to the Azure application
  * Log into the Azure Management Portal
  * Edit the Relying Party Application on the portal to point to the URLs for your Azure Cloud service.  
 	 * See the "Configure the Azure Access Control Service" section above for how to change URLs.
 * Set up Azure SQL Database access by opening your Database service, then click on Configure, and make sure Windows Azure Services is selected as an allowed service.
 
   
-###Update the web.xml in your Eclipse Project
+### Update the web.xml in your Eclipse Project
 * In Eclipse, navigate to azure-chat-for-java-master\azchat-web\src\main\webapp\WEB-INF
 	* Update the RelyingPartRealm value with your Cloud Service name 
 
-###Deploy your Cloud Service using the Eclipse Toolkit for Java
+### Deploy your Cloud Service using the Eclipse Toolkit for Java
 * [Install the Eclipse Toolkit for Java](https://msdn.microsoft.com/en-us/library/azure/hh690946.aspx)
 * [Create an Azure Deployment project](https://msdn.microsoft.com/en-us/library/azure/hh690944.aspx).
 	* Add a LOG4J_HOME environment variable in the deployment project 
